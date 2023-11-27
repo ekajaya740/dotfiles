@@ -10,7 +10,7 @@ mac_bootstrap () {
   sudo chsh -s $(which zsh)
   chsh -s $(which zsh)
   sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-  # Install powerlevel10k
+  # TODO: Install powerlevel10k
 }
 
 # Debian

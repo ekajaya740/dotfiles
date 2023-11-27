@@ -134,8 +134,18 @@ return packer.startup(function(use)
 		requires = { { "nvim-lua/plenary.nvim" } },
 	})
 
-	-- indent rainbow
-	use({ "lukas-reineke/indent-blankline.nvim" })
+	-- indent visualization
+	use({
+		"lukas-reineke/indent-blankline.nvim",
+		config = function()
+			local opts = {}
+			-- Other blankline configuration here
+			require("ibl").setup(require("indent-rainbowline").make_opts(opts))
+		end,
+		requires = {
+			{ "TheGLander/indent-rainbowline.nvim" },
+		},
+	})
 
 	-- graph visualization
 	use({ "liuchengxu/graphviz.vim" })
@@ -154,6 +164,7 @@ return packer.startup(function(use)
 		end,
 	})
 
+	-- Live server in neovim
 	use({
 		"aurum77/live-server.nvim",
 		run = function()
