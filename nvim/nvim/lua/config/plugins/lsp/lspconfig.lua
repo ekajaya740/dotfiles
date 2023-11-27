@@ -43,6 +43,8 @@ local on_attach = function(client, bufnr)
 		keymap.set("n", "<leader>oi", ":TypescriptOrganizeImports<CR>") -- organize imports (not in youtube nvim video)
 		keymap.set("n", "<leader>ru", ":TypescriptRemoveUnused<CR>") -- remove unused variables (not in youtube nvim video)
 	end
+
+  -- NOTE: you can make changes spesific for other client below
 end
 
 -- used to enable autocompletion (assign to every lsp server config)
