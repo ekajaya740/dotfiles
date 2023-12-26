@@ -6,7 +6,7 @@ bootstrap () {
   sudo xcodebuild -license accept
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
   brew install git thefuck neovim node python3 zsh tmux curl wget stow
-  brew install --cask google-chrome flutter
+  brew install --cask google-chrome maccy iterm2
   sudo chsh -s $(which zsh)
   chsh -s $(which zsh)
   sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"

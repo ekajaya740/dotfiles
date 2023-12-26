@@ -44,7 +44,7 @@ local on_attach = function(client, bufnr)
 		keymap.set("n", "<leader>ru", ":TypescriptRemoveUnused<CR>") -- remove unused variables (not in youtube nvim video)
 	end
 
-  -- NOTE: you can make changes spesific for other client below
+	-- NOTE: you can make changes spesific for other client below
 end
 
 -- used to enable autocompletion (assign to every lsp server config)
@@ -119,4 +119,9 @@ lspconfig["lua_ls"].setup({
 			},
 		},
 	},
+})
+
+lspconfig["jedi_language_server"].setup({
+	capabilities = capabilities,
+	on_attach = on_attach,
 })

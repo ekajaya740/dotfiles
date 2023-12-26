@@ -75,9 +75,6 @@ return packer.startup(function(use)
 	use("saadparwaiz1/cmp_luasnip") -- for autocompletion
 	use("rafamadriz/friendly-snippets") -- useful snippets
 
-	-- Neovim COC
-	-- use("neoclide/coc.nvim", { branch = "release" })
-
 	-- managing & installing lsp servers, linters & formatters
 	use("williamboman/mason.nvim") -- in charge of managing lsp servers, linters & formatters
 	use("williamboman/mason-lspconfig.nvim") -- bridges gap b/w mason & lspconfig
@@ -99,7 +96,7 @@ return packer.startup(function(use)
 	-- formatting & linting
 	use("jose-elias-alvarez/null-ls.nvim") -- configure formatters & linters
 	use("jayp0521/mason-null-ls.nvim") -- bridges gap b/w mason & null-ls
-	--
+
 	-- treesitter configuration
 	use({
 		"nvim-treesitter/nvim-treesitter",
@@ -125,9 +122,6 @@ return packer.startup(function(use)
 	-- wakatime
 	use("wakatime/vim-wakatime")
 
-	-- github copilot
-	-- use("github/copilot.vim")
-
 	-- todo highlight
 	use({
 		"folke/todo-comments.nvim",
@@ -152,9 +146,6 @@ return packer.startup(function(use)
 
 	-- API Testing
 	use({ "rest-nvim/rest.nvim", requires = { "nvim-lua/plenary.nvim" } })
-
-	-- Godot
-	use({ "habamax/vim-godot" })
 
 	-- Preview for Markdown
 	use({
