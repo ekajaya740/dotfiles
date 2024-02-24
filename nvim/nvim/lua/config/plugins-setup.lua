@@ -109,12 +109,22 @@ return packer.startup(function(use)
 		},
 	})
 
+	use({
+		"laytan/tailwind-sorter.nvim",
+		requires = { { "nvim-treesitter/nvim-treesitter" }, { "nvim-lua/plenary.nvim" } },
+		config = function()
+			require("tailwind-sorter").setup()
+		end,
+		run = "cd formatter && npm i && npm run build",
+	})
+
 	-- auto closing
 	use("windwp/nvim-autopairs") -- autoclose parens, brackets, quotes, etc...
 	use({ "windwp/nvim-ts-autotag", after = "nvim-treesitter" }) -- autoclose tags
 
 	-- git integration
 	use("lewis6991/gitsigns.nvim") -- show line modifications on left hand side
+	use("f-person/git-blame.nvim") -- git blame
 
 	-- multicursor
 	use({ "mg979/vim-visual-multi", branch = "master" })
