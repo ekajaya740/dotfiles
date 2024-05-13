@@ -174,6 +174,11 @@ return packer.startup(function(use)
 		cmd = { "LiveServer", "LiveServerStart", "LiveServerStop" },
 	})
 
+	use({
+		"kkoomen/vim-doge",
+		run = ":call doge#install()",
+	})
+
 	if packer_bootstrap then
 		require("packer").sync()
 	end
