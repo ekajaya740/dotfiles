@@ -1,27 +1,38 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-cd ~
-
-git pull origin main
-
-function doIt() {
-  rsync --exclude ".git/" \
-    --exclude ".DS_Store" \
-    --exclude ".osx" \
-    --exclude "bootstrap.sh" \
-    --exclude "README.md" \
-    -avh --no-perms . ~
-  source ~/.zshrc
+runMac() {
+  brew update
+  brew install stow
+  stow . -v
 }
 
-if [ "$1" == "--force" -o "$1" == "-f" ]; then
-  doIt
-else
-  read -p "This may overwrite existing files in your home directory. Are you sure? (y/n) " -n 1
-  echo ""
-  if [[ $REPLY =~ ^[Yy]$ ]]; then
-    doIt
-  fi
-fi
+runDebian() {
+  sudo apt update
+  sudo apt install stow
+  stow . -v
+}
 
-unset doIt
+runUbuntu() {
+  sudo apt update
+  sudo apt install stow
+  stow . -v
+}
+
+runArch() {
+  sudo pacman -Syu stow
+  stow . -v
+}
+
+if [ -f /etc/debian_version ]; then
+  if [ -f /etc/lsb-release ]; then
+    runUbuntu
+  else
+    runDebian
+  fi
+elif [ -f /etc/arch-release ]; then
+  runArch
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+  runMac
+else
+  echo "Unknown OS"
+fi
