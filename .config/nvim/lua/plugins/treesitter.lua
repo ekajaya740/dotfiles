@@ -42,6 +42,7 @@ return {
       "python",
       "query",
       "regex",
+      "ruby",
       "toml",
       "tsx",
       "typescript",
