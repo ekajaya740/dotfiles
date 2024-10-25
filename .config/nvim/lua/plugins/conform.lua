@@ -9,6 +9,7 @@ return {
       javascript = { "prettierd", "prettier" },
       typescript = { "prettierd", "prettier" },
       json = { "jq" },
+      php = { { "pint", "php_cs_fixer" } },
     },
     formatters = {},
   },

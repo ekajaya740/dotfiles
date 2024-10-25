@@ -23,7 +23,7 @@ return {
   ---@diagnostic disable-next-line: missing-fields
   opts = {
     highlight = { enable = true },
-    indent = { enable = true },
+    indent = { enable = true, disable = { "yaml", "ruby" } },
     ensure_installed = {
       "bash",
       "c",
@@ -34,10 +34,12 @@ return {
       "json",
       "jsonc",
       "lua",
+      "embedded_template",
       "luadoc",
       "luap",
       "markdown",
       "markdown_inline",
+      "php",
       "printf",
       "python",
       "query",
@@ -78,6 +80,22 @@ return {
     if type(opts.ensure_installed) == "table" then
       opts.ensure_installed = LazyVim.dedup(opts.ensure_installed)
     end
+    vim.filetype.add({
+      pattern = {
+        [".*%.blade%.php"] = "blade",
+      },
+    })
+
+    require("nvim-treesitter.configs").setup(opts)
+    local parser_config = require("nvim-treesitter.parsers").get_parser_configs()
+    parser_config.blade = {
+      install_info = {
+        url = "https://github.com/EmranMR/tree-sitter-blade",
+        files = { "src/parser.c" },
+        branch = "main",
+      },
+      filetype = "blade",
+    }
     require("nvim-treesitter.configs").setup(opts)
   end,
 }

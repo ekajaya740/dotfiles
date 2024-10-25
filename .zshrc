@@ -139,3 +139,6 @@ eval
                 test -n "$TF_CMD" && print -s $TF_CMD
             }
         
+
+export DYLD_LIBRARY_PATH="$(brew - prefix)/lib:$DYLD_LIBRARY_PATH"
+
