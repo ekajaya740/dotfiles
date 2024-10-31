@@ -10,6 +10,7 @@ return {
       typescript = { "prettierd", "prettier" },
       json = { "jq" },
       php = { { "pint", "php_cs_fixer" } },
+      blade = { "blade-formatter" },
     },
     formatters = {},
   },
