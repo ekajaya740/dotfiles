@@ -2,16 +2,19 @@ return {
   "stevearc/conform.nvim",
   opts = {
     formatters_by_ft = {
-      ruby = { "rubyfmt" },
-      eruby = { "erb_format" },
+      ruby = { "solargraph", "rubocop" },
+      -- eruby = {
+      --   "erb_format",
+      -- },
       markdown = { "markdownlint" },
       yaml = { "yamlfmt" },
-      javascript = { "prettierd", "prettier" },
+      -- javascript = { "prettierd", "prettier" },
       typescript = { "prettierd", "prettier" },
       json = { "jq" },
-      php = { { "pint", "php_cs_fixer" } },
+      php = { { "pint", "php_cs_fixer", "php" } },
       blade = { "blade-formatter" },
     },
-    formatters = {},
+    stop_after_first = true,
+    format_on_save = false,
   },
 }

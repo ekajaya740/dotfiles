@@ -64,6 +64,7 @@ return {
         formatting_options = nil,
         timeout_ms = nil,
       },
+      autoformat = false
       -- LSP Server Settings
       ---@type lspconfig.options
       servers = {
