@@ -32,7 +32,9 @@ return {
       php = { { "pint", "php_cs_fixer", "php" } },
       blade = { "blade-formatter" },
     },
-    stop_after_first = true,
-    format_on_save = false,
+  },
+  format_on_save = {
+    lsp_format = "fallback",
+    timeout_ms = 500,
   },
 }
