@@ -18,17 +18,32 @@ end, {
 
 return {
   "stevearc/conform.nvim",
+  event = { "BufWritePre" },
+  keys = {
+    {
+      "<leader>f",
+      function()
+        require("conform").format({ async = true, lsp_fallback = true })
+      end,
+      mode = "",
+      desc = "Format buffer",
+    },
+  },
   opts = {
     formatters_by_ft = {
       ruby = { "solargraph" },
-      -- eruby = {
-      --   "erb_format",
-      -- },
-      markdown = { "markdownlint" },
-      yaml = { "yamlfmt" },
-      -- javascript = { "prettierd", "prettier" },
+      vue = { "prettierd", "prettier" },
+      javascript = { "prettierd", "prettier" },
       typescript = { "prettierd", "prettier" },
-      json = { "jq" },
+      javascriptreact = { "prettierd", "prettier" },
+      typescriptreact = { "prettierd", "prettier" },
+      html = { "prettierd", "prettier" },
+      css = { "prettierd", "prettier" },
+      scss = { "prettierd", "prettier" },
+      less = { "prettierd", "prettier" },
+      json = { "prettierd", "prettier" },
+      yaml = { "prettierd", "prettier" },
+      markdown = { "prettierd", "prettier" },
       php = { { "pint", "php_cs_fixer", "php" } },
       blade = { "blade-formatter" },
     },
@@ -36,5 +51,17 @@ return {
   format_on_save = {
     lsp_format = "fallback",
     timeout_ms = 500,
+  },
+  formatters = {
+    prettierd = {
+      env = {
+        PRETTIERD_DEFAULT_CONFIG = vim.fn.expand("~/.config/nvim/utils/linter-config/.prettierrc.json"),
+      },
+    },
+    prettier = {
+      env = {
+        PRETTIER_CONFIG_PATH = vim.fn.expand("~/.config/nvim/utils/linter-config/.prettierrc.json"),
+      },
+    },
   },
 }

@@ -68,6 +68,21 @@ return {
       -- LSP Server Settings
       ---@type lspconfig.options
       servers = {
+        volar = {
+          filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue", "json" },
+          init_options = {
+            typescript = {
+              tsdk = vim.fn.expand("$HOME/node_modules/typescript/lib"),
+              -- alternatively, for global typescript:
+              -- tsdk = vim.fn.expand('$HOME/.nvm/versions/node/v18.x/lib/node_modules/typescript/lib')
+              -- or if using package.json typescript:
+              -- tsdk = vim.fn.getcwd() .. "/node_modules/typescript/lib"
+            },
+            vue = {
+              hybridMode = true, -- Enable "Takeover Mode" for TypeScript
+            },
+          },
+        },
         lua_ls = {
           -- mason = false, -- set to false if you don't want this server to be installed with mason
           -- Use this to add any additional keymaps
