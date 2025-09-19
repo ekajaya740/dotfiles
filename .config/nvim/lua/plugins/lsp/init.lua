@@ -2,11 +2,8 @@ return {
   "neovim/nvim-lspconfig",
   event = "LazyFile",
   dependencies = {
-    "mason-org/mason-lspconfig.nvim", -- Fixed: was "mason-org/mason.nvim"
-    {
-      "folke/neodev.nvim",
-      opts = {},
-    },
+    "hrsh7th/cmp-nvim-lsp",
+    "mason-org/mason-lspconfig.nvim",
   },
   opts = function()
     ---@class PluginLspOpts
@@ -204,7 +201,36 @@ return {
     local have_mason, mlsp = pcall(require, "mason-lspconfig")
     local all_mslp_servers = {}
     if have_mason then
-      all_mslp_servers = vim.tbl_keys(require("mason-lspconfig.mappings.server").lspconfig_to_package)
+      -- Fix: Use the new API instead of deprecated mappings.server
+      local ok, available_servers = pcall(mlsp.get_available_servers)
+      if ok then
+        all_mslp_servers = available_servers
+      else
+        -- Fallback: try the old get_installed_servers method
+        local ok2, installed_servers = pcall(mlsp.get_installed_servers)
+        if ok2 then
+          all_mslp_servers = installed_servers
+        else
+          -- Final fallback: manually define commonly available servers
+          all_mslp_servers = {
+            "bashls",
+            "cssls",
+            "html",
+            "jsonls",
+            "lua_ls",
+            "pyright",
+            "tsserver",
+            "vimls",
+            "yamlls",
+            "eslint",
+            "tailwindcss",
+            "emmet_ls",
+            "prismals",
+            "rust_analyzer",
+            "gopls",
+          }
+        end
+      end
     end
 
     local ensure_installed = {} ---@type string[]
@@ -231,17 +257,5 @@ return {
         handlers = { setup },
       })
     end
-
-    if LazyVim.lsp.is_enabled("denols") and LazyVim.lsp.is_enabled("vtsls") then
-      local is_deno = require("lspconfig.util").root_pattern("deno.json", "deno.jsonc")
-      LazyVim.lsp.disable("vtsls", is_deno)
-      LazyVim.lsp.disable("denols", function(root_dir, config)
-        if not is_deno(root_dir) then
-          config.settings.deno.enable = false
-        end
-        return false
-      end)
-    end
   end,
 }
-
