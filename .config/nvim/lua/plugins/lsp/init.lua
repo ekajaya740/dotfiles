@@ -2,8 +2,11 @@ return {
   "neovim/nvim-lspconfig",
   event = "LazyFile",
   dependencies = {
-    "mason.nvim",
-    { "williamboman/mason-lspconfig.nvim", config = function() end },
+    "mason-org/mason-lspconfig.nvim", -- Fixed: was "mason-org/mason.nvim"
+    {
+      "folke/neodev.nvim",
+      opts = {},
+    },
   },
   opts = function()
     ---@class PluginLspOpts
@@ -17,9 +20,6 @@ return {
           spacing = 4,
           source = "if_many",
           prefix = "●",
-          -- this will set set the prefix to a function that returns the diagnostics icon based on the severity
-          -- this only works on a recent 0.10.0 build. Will be set to "●" when not supported
-          -- prefix = "icons",
         },
         severity_sort = true,
         signs = {
@@ -32,15 +32,11 @@ return {
         },
       },
       -- Enable this to enable the builtin LSP inlay hints on Neovim >= 0.10.0
-      -- Be aware that you also will need to properly configure your LSP server to
-      -- provide the inlay hints.
       inlay_hints = {
         enabled = true,
-        exclude = { "vue" }, -- filetypes for which you don't want to enable inlay hints
+        exclude = { "vue" },
       },
       -- Enable this to enable the builtin LSP code lenses on Neovim >= 0.10.0
-      -- Be aware that you also will need to properly configure your LSP server to
-      -- provide the code lenses.
       codelens = {
         enabled = false,
       },
@@ -58,8 +54,6 @@ return {
         },
       },
       -- options for vim.lsp.buf.format
-      -- `bufnr` and `filter` is handled by the LazyVim formatter,
-      -- but can be also overridden when specified
       format = {
         formatting_options = nil,
         timeout_ms = nil,
@@ -73,22 +67,13 @@ return {
           init_options = {
             typescript = {
               tsdk = vim.fn.expand("$HOME/node_modules/typescript/lib"),
-              -- alternatively, for global typescript:
-              -- tsdk = vim.fn.expand('$HOME/.nvm/versions/node/v18.x/lib/node_modules/typescript/lib')
-              -- or if using package.json typescript:
-              -- tsdk = vim.fn.getcwd() .. "/node_modules/typescript/lib"
             },
             vue = {
-              hybridMode = true, -- Enable "Takeover Mode" for TypeScript
+              hybridMode = true,
             },
           },
         },
         lua_ls = {
-          -- mason = false, -- set to false if you don't want this server to be installed with mason
-          -- Use this to add any additional keymaps
-          -- for specific lsp servers
-          -- ---@type LazyKeysSpec[]
-          -- keys = {},
           settings = {
             Lua = {
               workspace = {
@@ -116,17 +101,8 @@ return {
         },
       },
       -- you can do any additional lsp server setup here
-      -- return true if you don't want this server to be setup with lspconfig
       ---@type table<string, fun(server:string, opts:_.lspconfig.options):boolean?>
-      setup = {
-        -- example to setup with typescript.nvim
-        -- tsserver = function(_, opts)
-        --   require("typescript").setup({ server = opts })
-        --   return true
-        -- end,
-        -- Specify * to use this function as a fallback for any server
-        -- ["*"] = function(server, opts) end,
-      },
+      setup = {},
     }
     return ret
   end,
@@ -142,8 +118,6 @@ return {
 
     LazyVim.lsp.setup()
     LazyVim.lsp.on_dynamic_capability(require("lazyvim.plugins.lsp.keymaps").on_attach)
-
-    -- LazyVim.lsp.words.setup(opts.document_highlight)
 
     -- diagnostics signs
     if vim.fn.has("nvim-0.10.0") == 0 then
@@ -238,7 +212,6 @@ return {
       if server_opts then
         server_opts = server_opts == true and {} or server_opts
         if server_opts.enabled ~= false then
-          -- run manual setup if mason=false or if this is a server that cannot be installed with mason-lspconfig
           if server_opts.mason == false or not vim.tbl_contains(all_mslp_servers, server) then
             setup(server)
           else
@@ -271,3 +244,4 @@ return {
     end
   end,
 }
+
