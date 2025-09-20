@@ -12,6 +12,7 @@ return {
           filetypes = { "png", "jpg", "jpeg", "mp4", "webm", "pdf" },
           -- Set the command to find files, "rg" or "fd" are popular choices
           find_cmd = "rg",
+          backend = "chafa",
         },
       },
     })
