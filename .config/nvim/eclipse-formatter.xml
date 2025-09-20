@@ -1,0 +1,29 @@
+
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<profiles version="13">
+    <profile kind="CodeFormatterProfile" name="CustomEclipseStyle" version="13">
+        <!-- Brace positions -->
+        <setting id="org.eclipse.jdt.core.formatter.brace_position_for_type_declaration" value="end_of_line"/>
+        <setting id="org.eclipse.jdt.core.formatter.brace_position_for_method_declaration" value="end_of_line"/>
+        <setting id="org.eclipse.jdt.core.formatter.brace_position_for_block" value="end_of_line"/>
+        <setting id="org.eclipse.jdt.core.formatter.brace_position_for_annotation_type_declaration" value="end_of_line"/>
+        <setting id="org.eclipse.jdt.core.formatter.brace_position_for_switch" value="end_of_line"/>
+        <setting id="org.eclipse.jdt.core.formatter.brace_position_for_array_initializer" value="end_of_line"/>
+
+        <!-- Don’t force empty blocks onto multiple lines -->
+        <setting id="org.eclipse.jdt.core.formatter.insert_new_line_in_empty_type_declaration" value="do not insert"/>
+        <setting id="org.eclipse.jdt.core.formatter.insert_new_line_in_empty_method_body" value="do not insert"/>
+        <setting id="org.eclipse.jdt.core.formatter.insert_new_line_in_empty_block" value="do not insert"/>
+
+        <!-- Don’t add new line at end of file -->
+        <setting id="org.eclipse.jdt.core.formatter.insert_new_line_at_end_of_file_if_missing" value="do not insert"/>
+
+        <!-- Indentation -->
+        <setting id="org.eclipse.jdt.core.formatter.tabulation.char" value="space"/>
+        <setting id="org.eclipse.jdt.core.formatter.tabulation.size" value="4"/>
+        <setting id="org.eclipse.jdt.core.formatter.indentation.size" value="4"/>
+
+        <!-- Line length -->
+        <setting id="org.eclipse.jdt.core.formatter.lineSplit" value="120"/>
+    </profile>
+</profiles>

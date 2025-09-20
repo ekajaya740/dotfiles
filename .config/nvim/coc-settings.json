@@ -44,6 +44,7 @@
   "codeLens.enable": true,
   "snippets.ultisnips.pythonPrompt": false,
 
-  "java.format.settings.url": "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml",
-  "java.format.settings.profile": "GoogleStyle"
+  "java.format.settings.url": "~/.config/nvim/eclipse-formatter.xml",
+  "java.format.settings.profile": "CustomEclipseStyle",
+  "java.format.enabled": true
 }
