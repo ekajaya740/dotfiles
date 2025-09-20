@@ -19,6 +19,7 @@ return {
       "python",
       "query",
       "regex",
+      "java",
       "ruby",
       "typescript",
       "vim",

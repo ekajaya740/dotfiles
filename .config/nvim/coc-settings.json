@@ -1,0 +1,49 @@
+{
+  "suggest.noselect": false,
+  "suggest.enablePreview": true,
+  "suggest.snippetPriority": 90,
+  "suggest.minTriggerInputLength": 1,
+  "suggest.snippetIndicator": "●",
+  "suggest.autoTrigger": "always",
+
+  "diagnostic.enable": true,
+  "diagnostic.virtualText": true,
+  "diagnostic.signOffset": 9999,
+  "diagnostic.errorSign": "✘",
+  "diagnostic.warningSign": "▲",
+  "diagnostic.infoSign": "",
+  "diagnostic.hintSign": "⚑",
+
+  "coc.preferences.formatOnSave": true,
+
+  "tsserver.enable": true,
+  "tsserver.formatOnType": true,
+
+  "volar.enable": true,
+  "volar.takeOverMode": true,
+
+  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.autoImportCompletions": true,
+  "python.formatting.provider": "black",
+
+  "go.goplsPath": "gopls",
+  "go.enable": true,
+  "go.lintTool": "golangci-lint",
+
+  "rust-analyzer.enable": true,
+  "rust-analyzer.cargo.allFeatures": true,
+  "rust-analyzer.checkOnSave.command": "clippy",
+
+  "java.jdt.ls.vmargs": "-Xmx2G -XX:+UseG1GC -XX:+UseStringDeduplication",
+
+  "prettier.enable": true,
+  "prettier.requireConfig": false,
+
+  "coc.preferences.currentFunctionSymbolAutoUpdate": true,
+  "signature.enable": true,
+  "codeLens.enable": true,
+  "snippets.ultisnips.pythonPrompt": false,
+
+  "java.format.settings.url": "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml",
+  "java.format.settings.profile": "GoogleStyle"
+}

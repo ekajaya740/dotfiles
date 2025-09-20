@@ -19,6 +19,7 @@ end, {
 return {
   "stevearc/conform.nvim",
   event = { "BufWritePre" },
+  enable = false,
   keys = {
     {
       "<leader>f",

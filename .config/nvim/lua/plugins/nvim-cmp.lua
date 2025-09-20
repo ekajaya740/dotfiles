@@ -1,5 +1,6 @@
 return {
   "hrsh7th/nvim-cmp",
+  enable = false,
   dependencies = {
     { "wassimk/cmp-rails-fixture-names", version = "*", ft = "ruby" },
     "hrsh7th/cmp-buffer",
