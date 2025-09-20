@@ -3,20 +3,36 @@ return {
     "nvim-mini/mini.map",
     version = false,
     config = function()
-      local map = require("mini.map")
+      local minimap = require('mini.map')
 
-      map.setup({
+      -- Setup mini.map with custom configuration
+      minimap.setup({
+        -- Integrations with other plugins
         integrations = {
-          map.gen_integration.builtin_search(),
-          map.gen_integration.gitsigns(),
-          map.gen_integration.diagnostic(),
+          minimap.gen_integration.builtin_search(),
+          minimap.gen_integration.gitsigns(),
+          minimap.gen_integration.diagnostic({
+            error = 'DiagnosticFloatingError',
+            warn  = 'DiagnosticFloatingWarn',
+            info  = 'DiagnosticFloatingInfo',
+            hint  = 'DiagnosticFloatingHint',
+          }),
         },
+
+        -- Symbols used to display data
         symbols = {
-          encode = map.gen_encode_symbols.dot('4x2'),
+          encode = minimap.gen_encode_symbols.dot('4x2'),
+          scroll_line = '█',
+          scroll_view = '┃',
         },
+
+        -- Window options
         window = {
-          width = 10,
-          side = "right",
+          side = 'right',              -- Which side to open ('left' or 'right')
+          width = 20,                  -- Total width
+          winblend = 25,               -- Value between 0 and 100 for transparency
+          focusable = false,           -- Whether window can be focused
+          show_integration_count = true, -- Show count of integrations
         },
       })
 
