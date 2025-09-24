@@ -28,10 +28,10 @@ return {
 
         -- Window options
         window = {
-          side = 'right',              -- Which side to open ('left' or 'right')
-          width = 20,                  -- Total width
-          winblend = 25,               -- Value between 0 and 100 for transparency
-          focusable = false,           -- Whether window can be focused
+          side = 'right',                -- Which side to open ('left' or 'right')
+          width = 20,                    -- Total width
+          winblend = 25,                 -- Value between 0 and 100 for transparency
+          focusable = false,             -- Whether window can be focused
           show_integration_count = true, -- Show count of integrations
         },
       })
