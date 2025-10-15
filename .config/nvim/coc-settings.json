@@ -34,7 +34,11 @@
   "rust-analyzer.cargo.allFeatures": true,
   "rust-analyzer.checkOnSave.command": "clippy",
 
-  "java.jdt.ls.vmargs": "-Xmx2G -XX:+UseG1GC -XX:+UseStringDeduplication",
+  "java.jdt.ls.vmargs": "-Xms512m -Xmx4G -javaagent:~/.m2/repository/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar -XX:+UseG1GC -XX:+UseStringDeduplication",
+  "java.import.gradle.enabled": false,
+  "java.import.maven.enabled": true,
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.compile.nullAnalysis.mode": "automatic",
 
   "prettier.enable": true,
   "prettier.requireConfig": false,
@@ -46,5 +50,32 @@
 
   "java.format.settings.url": "~/.config/nvim/eclipse-formatter.xml",
   "java.format.settings.profile": "CustomEclipseStyle",
-  "java.format.enabled": true
+  "java.format.enabled": true,
+
+  "diagnostic-languageserver.linters": {
+    "hadolint": {
+      "command": "hadolint",
+      "debounce": 100,
+      "args": ["--format", "json", "-"],
+      "sourceName": "hadolint",
+      "parseJson": {
+        "errorsRoot": "",
+        "line": "line",
+        "column": "column",
+        "endLine": "endLine",
+        "endColumn": "endColumn",
+        "message": "${message} [${code}]",
+        "security": "level"
+      },
+      "securities": {
+        "error": "error",
+        "warning": "warning",
+        "info": "info",
+        "style": "hint"
+      }
+    }
+  },
+  "diagnostic-languageserver.filetypes": {
+    "dockerfile": ["hadolint"]
+  }
 }

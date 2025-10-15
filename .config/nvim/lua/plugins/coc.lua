@@ -34,6 +34,17 @@ return {
       vim.o.updatetime = 300
       vim.o.signcolumn = "yes"
 
+      vim.api.nvim_create_autocmd("BufWritePost", {
+        pattern = "*.html",
+        callback = function()
+          local line = vim.api.nvim_buf_get_lines(0, 0, 1, false)[1]
+          if line and line:match("<!doctype html>") then
+            vim.api.nvim_buf_set_lines(0, 0, 1, false, { "<!DOCTYPE html>" })
+            vim.cmd("silent write")
+          end
+        end,
+      })
+
 
       -- Tab completion
       function _G.check_back_space()
