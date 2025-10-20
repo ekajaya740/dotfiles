@@ -1,43 +1,34 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-runMac() {
-  brew update
-  brew install stow
-  stow . -v
-}
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LIB_PATH="${SCRIPT_DIR}/bootstrap/lib.sh"
 
-runDebian() {
-  sudo apt update
-  sudo apt install stow
-  stow . -v
-}
-
-runUbuntu() {
-  sudo apt update
-  sudo apt install stow vim python3 python3-pip
-  stow . -v
-}
-
-runArch() {
-  sudo pacman -Syu stow vim neovim python3 docker rbenv zsh tmux dbeaver code discord gimp atac vlc wezterm
-
-  sudo pacman -S --needed git base-devel && git clone https://aur.archlinux.org/yay-bin.git && cd yay-bin && makepkg -si
-
-  sudo yay -Syu wps-office google-chrome mongodb-compass postman-bin raindrop zoom
-
-  stow . -v
-}
-
-if [ -f /etc/debian_version ]; then
-  if [ -f /etc/lsb-release ]; then
-    runUbuntu
-  else
-    runDebian
-  fi
-elif [ -f /etc/arch-release ]; then
-  runArch
-elif [[ "$OSTYPE" == "darwin"* ]]; then
-  runMac
-else
-  echo "Unknown OS"
+if [[ ! -f "$LIB_PATH" ]]; then
+  printf 'bootstrap: missing helper library at %s\n' "$LIB_PATH" >&2
+  exit 1
 fi
+
+# shellcheck source=bootstrap/lib.sh
+source "$LIB_PATH"
+
+main() {
+  local os_id handler
+
+  os_id="$(detect_os)"
+  if [[ "$os_id" == "unknown" ]]; then
+    log_error "Unsupported or undetected platform. Specify STOW_PACKAGES and run stow manually."
+    exit 1
+  fi
+
+  handler="${SCRIPT_DIR}/bootstrap/${os_id}.sh"
+  if [[ ! -x "$handler" ]]; then
+    log_error "No handler for platform '${os_id}' (${handler})."
+    exit 1
+  fi
+
+  export DOTFILES_ROOT="${SCRIPT_DIR}"
+  exec "$handler" "$@"
+}
+
+main "$@"

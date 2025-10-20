@@ -1,0 +1,13 @@
+## Bootstrap
+
+Run `./bootstrap.sh` to install GNU stow (if needed) and symlink packages into your home directory. The script auto-detects macOS, Arch, Debian/Ubuntu, Void, and MSYS2/Git Bash on Windows. On other platforms the script attempts a best-effort install and prompts if manual steps are required.
+
+By default it links every top-level directory in the repository (excluding `bootstrap/`). To explicitly control the set of packages, export `STOW_PACKAGES` before running the script, for example:
+
+```bash
+STOW_PACKAGES="zsh git nvim" ./bootstrap.sh
+```
+
+Set `STOW_TARGET` to override the destination directory. The default is your `$HOME`.
+
+Run `bash tests/run.sh` to execute a lightweight test suite that exercises OS detection and stow linking helpers.
