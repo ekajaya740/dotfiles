@@ -85,14 +85,57 @@ default_stow_packages() {
 }
 
 link_dotfiles() {
-  local packages=("$@")
+  local force_override="${BOOTSTRAP_FORCE:-${BOOTSTRAP_FORCE_OVERRIDE:-0}}"
+  local packages=()
+  local arg
+
+  while [[ $# -gt 0 ]]; do
+    arg="$1"
+    case "$arg" in
+      --force|--override)
+        force_override=1
+        ;;
+      --no-force)
+        force_override=0
+        ;;
+      --)
+        shift
+        packages+=("$@")
+        break
+        ;;
+      -*)
+        log_error "Unknown option '${arg}' for link_dotfiles."
+        exit 1
+        ;;
+      *)
+        packages+=("$arg")
+        ;;
+    esac
+    shift || break
+  done
+
+  case "$force_override" in
+    1|true|TRUE|yes|YES|on|ON)
+      force_override=1
+      ;;
+    *)
+      force_override=0
+      ;;
+  esac
 
   if [[ ${#packages[@]} -eq 0 ]]; then
     if [[ -n "${STOW_PACKAGES:-}" ]]; then
       # shellcheck disable=SC2206
       packages=(${STOW_PACKAGES})
     else
-      mapfile -t packages < <(default_stow_packages)
+      local pkg_name
+      if builtin mapfile >/dev/null 2>&1; then
+        mapfile -t packages < <(default_stow_packages)
+      else
+        while IFS= read -r pkg_name; do
+          packages+=("$pkg_name")
+        done < <(default_stow_packages)
+      fi
     fi
   fi
 
@@ -106,8 +149,61 @@ link_dotfiles() {
     exit 1
   fi
 
-  mkdir -p "${STOW_TARGET:-$HOME}"
+  local target_dir="${STOW_TARGET:-$HOME}"
+  mkdir -p "$target_dir"
 
-  log_info "Linking packages into ${STOW_TARGET:-$HOME}: ${packages[*]}"
-  stow --dir "${DOTFILES_ROOT}" --target "${STOW_TARGET:-$HOME}" --restow "${packages[@]}"
+  log_info "Linking packages into ${target_dir}: ${packages[*]}"
+
+  local stow_cmd=(stow --dir "${DOTFILES_ROOT}" --target "$target_dir" --restow "${packages[@]}")
+  local output
+
+  if [[ "$force_override" -eq 1 ]]; then
+    if output=$("${stow_cmd[@]}" 2>&1); then
+      [[ -n "$output" ]] && printf '%s\n' "$output"
+      return 0
+    fi
+
+    local conflicts=()
+    while IFS= read -r line; do
+      if [[ "$line" =~ over\ existing\ target\ (.+)\ since ]]; then
+        conflicts+=("${BASH_REMATCH[1]}")
+      fi
+    done <<< "$output"
+
+    if [[ ${#conflicts[@]} -eq 0 ]]; then
+      printf '%s\n' "$output" >&2
+      return 1
+    fi
+
+    local conflict path_full trimmed_target
+    trimmed_target="${target_dir%/}"
+    for conflict in "${conflicts[@]}"; do
+      if [[ -z "$conflict" || "$conflict" == "." || "$conflict" == ".." || "$conflict" == /* || "$conflict" == *"../"* ]]; then
+        log_error "Refusing to remove suspicious conflict path '$conflict'."
+        printf '%s\n' "$output" >&2
+        return 1
+      fi
+
+      if [[ -n "$trimmed_target" ]]; then
+        path_full="${trimmed_target}/${conflict}"
+      else
+        path_full="/${conflict}"
+      fi
+
+      if [[ -e "$path_full" || -L "$path_full" ]]; then
+        log_warn "Removing conflicting path ${path_full} (force override)."
+        rm -rf -- "$path_full"
+      fi
+    done
+
+    if output=$("${stow_cmd[@]}" 2>&1); then
+      [[ -n "$output" ]] && printf '%s\n' "$output"
+      return 0
+    fi
+
+    printf '%s\n' "$output" >&2
+    return 1
+  fi
+
+  "${stow_cmd[@]}"
 }

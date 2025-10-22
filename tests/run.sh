@@ -127,7 +127,10 @@ link_default_script=$(cat <<'EOF'
 set -euo pipefail
 source "$1"
 link_dotfiles
-mapfile -t args < "$STOW_STUB_OUTPUT"
+args=()
+while IFS= read -r line; do
+  args+=("$line")
+done < "$STOW_STUB_OUTPUT"
 [[ "${args[0]}" == "--dir" ]]
 [[ "${args[1]}" == "$DOTFILES_ROOT" ]]
 [[ "${args[2]}" == "--target" ]]
@@ -137,14 +140,31 @@ mapfile -t args < "$STOW_STUB_OUTPUT"
 args_joined=" ${args[*]} "
 [[ "$args_joined" == *" zsh "* ]]
 [[ "$args_joined" == *" nvim "* ]]
+[[ "$args_joined" == *" tmux "* ]]
 EOF
 )
 link_tmp="$(mktemp -d)"
 TMP_DIRS+=("$link_tmp")
-mkdir -p "${link_tmp}/root/zsh" "${link_tmp}/root/nvim" "${link_tmp}/root/bootstrap"
+mkdir -p "${link_tmp}/root/zsh" "${link_tmp}/root/nvim" "${link_tmp}/root/tmux" "${link_tmp}/root/bootstrap"
 mkdir -p "${link_tmp}/bin"
 cat > "${link_tmp}/bin/stow" <<'EOF'
 #!/usr/bin/env bash
+set -euo pipefail
+mode="${STOW_STUB_MODE:-record}"
+case "$mode" in
+  conflict)
+    conflict_path="${STOW_FORCE_TARGET:-}"
+    if [[ -n "$conflict_path" && ( -e "$conflict_path" || -L "$conflict_path" ) ]]; then
+      pkg="${@: -1}"
+      target_rel="${STOW_FORCE_TARGET_REL:-$(basename "$conflict_path")}"
+      source_rel="${STOW_FORCE_SOURCE:-../dotfiles/${pkg}/${target_rel}}"
+      printf 'WARNING! stowing %s would cause conflicts:\n' "$pkg" >&2
+      printf '  * cannot stow %s over existing target %s since neither a link nor a directory and --adopt not specified\n' "$source_rel" "$target_rel" >&2
+      exit 1
+    fi
+    ;;
+esac
+
 printf '%s\n' "$@" > "$STOW_STUB_OUTPUT"
 EOF
 chmod +x "${link_tmp}/bin/stow"
@@ -158,15 +178,46 @@ link_custom_script=$(cat <<'EOF'
 set -euo pipefail
 source "$1"
 link_dotfiles
-mapfile -t args < "$STOW_STUB_OUTPUT"
-[[ "${args[-2]}" == "vim" ]]
-[[ "${args[-1]}" == "tmux" ]]
+args=()
+while IFS= read -r line; do
+  args+=("$line")
+done < "$STOW_STUB_OUTPUT"
+count=${#args[@]}
+[[ $count -ge 2 ]]
+[[ "${args[count-2]}" == "vim" ]]
+[[ "${args[count-1]}" == "tmux" ]]
 EOF
 )
 export STOW_STUB_OUTPUT="${link_tmp}/stow_custom.txt"
 export STOW_PACKAGES="vim tmux"
 run_test "link_dotfiles_custom_packages" 0 "$link_custom_script"
 unset STOW_PACKAGES
+
+link_force_script=$(cat <<'EOF'
+set -euo pipefail
+source "$1"
+link_dotfiles --force zsh
+[[ ! -e "$STOW_FORCE_TARGET" ]]
+[[ ! -L "$STOW_FORCE_TARGET" ]]
+args=()
+while IFS= read -r line; do
+  args+=("$line")
+done < "$STOW_STUB_OUTPUT"
+count=${#args[@]}
+[[ $count -ge 1 ]]
+[[ "${args[count-1]}" == "zsh" ]]
+EOF
+)
+export STOW_STUB_OUTPUT="${link_tmp}/stow_force.txt"
+export STOW_STUB_MODE="conflict"
+export STOW_FORCE_TARGET="${STOW_TARGET}/.zshrc"
+export STOW_FORCE_TARGET_REL=".zshrc"
+export STOW_FORCE_SOURCE="../root/zsh/.zshrc"
+mkdir -p "$(dirname "$STOW_FORCE_TARGET")"
+printf 'existing' > "$STOW_FORCE_TARGET"
+touch "${DOTFILES_ROOT}/zsh/.zshrc"
+run_test "link_dotfiles_force_overrides_conflicts" 0 "$link_force_script"
+unset STOW_STUB_MODE STOW_FORCE_TARGET STOW_FORCE_TARGET_REL STOW_FORCE_SOURCE
 
 missing_stow_script=$(cat <<'EOF'
 set -euo pipefail
