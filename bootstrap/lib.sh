@@ -154,7 +154,7 @@ link_dotfiles() {
 
   log_info "Linking packages into ${target_dir}: ${packages[*]}"
 
-  local stow_cmd=(stow --dir "${DOTFILES_ROOT}" --target "$target_dir" --restow "${packages[@]}")
+  local stow_cmd=(stow --dotfiles --dir "${DOTFILES_ROOT}" --target "$target_dir" --restow "${packages[@]}")
   local output
 
   if [[ "$force_override" -eq 1 ]]; then
@@ -169,6 +169,11 @@ link_dotfiles() {
         conflicts+=("${BASH_REMATCH[1]}")
       elif [[ "$line" =~ existing\ target\ is\ not\ owned\ by\ stow:\ (.+) ]]; then
         conflicts+=("${BASH_REMATCH[1]}")
+      elif [[ "$line" == "  * existing target is stowed to a different package: "* ]]; then
+        local conflict_target
+        conflict_target="${line#*: }"
+        conflict_target="${conflict_target%% => *}"
+        conflicts+=("$conflict_target")
       fi
     done <<< "$output"
 

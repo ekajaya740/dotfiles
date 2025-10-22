@@ -4,10 +4,12 @@ Run `./bootstrap.sh` to install GNU stow (if needed) and symlink packages into y
 
 During bootstrap a small set of CLI tools is installed when possible (`stow`, `tree-sitter` CLI, `hadolint`, `fzf`, `lazygit`, and `lazydocker`). If a package manager is not available for one of them you will see a warning so you can finish the install manually.
 
+Pass `--skip-tools` (or export `BOOTSTRAP_SKIP_TOOLS=1`) to bypass these installations when you only want to manage symlinks or are offline.
+
 By default it links every top-level directory in the repository (excluding `bootstrap/`). To explicitly control the set of packages, export `STOW_PACKAGES` before running the script, for example:
 
 ```bash
-STOW_PACKAGES="zsh git nvim" ./bootstrap.sh
+STOW_PACKAGES=".config .tmux .vscode" ./bootstrap.sh
 ```
 
 Set `STOW_TARGET` to override the destination directory. The default is your `$HOME`.

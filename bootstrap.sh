@@ -14,6 +14,24 @@ source "$LIB_PATH"
 
 main() {
   local os_id handler
+  local skip_tools_flag=0
+  local handler_args=()
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --skip-tools|--no-tools)
+        skip_tools_flag=1
+        ;;
+      *)
+        handler_args+=("$1")
+        ;;
+    esac
+    shift
+  done
+
+  if (( skip_tools_flag )); then
+    export BOOTSTRAP_SKIP_TOOLS=1
+  fi
 
   os_id="$(detect_os)"
   if [[ "$os_id" == "unknown" ]]; then
@@ -28,7 +46,7 @@ main() {
   fi
 
   export DOTFILES_ROOT="${SCRIPT_DIR}"
-  exec "$handler" "$@"
+  exec "$handler" "${handler_args[@]}"
 }
 
 main "$@"

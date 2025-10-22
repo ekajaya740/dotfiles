@@ -281,6 +281,18 @@ ensure_bootstrap_tools() {
   local tool
   local failed=0
   local tools=()
+  local skip_tools="${BOOTSTRAP_SKIP_TOOLS:-0}"
+
+  case "$skip_tools" in
+    1|true|TRUE|yes|YES|on|ON)
+      log_info "Skipping bootstrap tool installation (BOOTSTRAP_SKIP_TOOLS=${skip_tools})."
+      if ! command -v stow >/dev/null 2>&1; then
+        log_error "GNU stow is required but not available; install it or unset BOOTSTRAP_SKIP_TOOLS."
+        return 1
+      fi
+      return 0
+      ;;
+  esac
 
   if [[ -n "${BOOTSTRAP_TOOLS:-}" ]]; then
     # shellcheck disable=SC2206

@@ -102,6 +102,23 @@ EOF
 )
 BOOTSTRAP_UNAME_S=MINGW64_NT-10.0 run_test "detect_os_windows_msys" 0 "$windows_msys_script"
 
+skip_tools_script=$(cat <<'EOF'
+set -euo pipefail
+source "$1"
+tools_path="$(dirname "$1")/tools.sh"
+source "$tools_path"
+BOOTSTRAP_SKIP_TOOLS=1 ensure_bootstrap_tools
+EOF
+)
+skip_tmp="$(mktemp -d)"
+TMP_DIRS+=("$skip_tmp")
+cat > "${skip_tmp}/stow" <<'EOF'
+#!/usr/bin/env bash
+exit 0
+EOF
+chmod +x "${skip_tmp}/stow"
+PATH="${skip_tmp}:${PATH}" run_test "ensure_bootstrap_tools_skip_flag" 0 "$skip_tools_script"
+
 linux_fallback_script=$(cat <<'EOF'
 set -euo pipefail
 source "$1"
@@ -131,21 +148,22 @@ args=()
 while IFS= read -r line; do
   args+=("$line")
 done < "$STOW_STUB_OUTPUT"
-[[ "${args[0]}" == "--dir" ]]
-[[ "${args[1]}" == "$DOTFILES_ROOT" ]]
-[[ "${args[2]}" == "--target" ]]
-[[ "${args[3]}" == "$STOW_TARGET" ]]
-[[ "${args[4]}" == "--restow" ]]
+[[ "${args[0]}" == "--dotfiles" ]]
+[[ "${args[1]}" == "--dir" ]]
+[[ "${args[2]}" == "$DOTFILES_ROOT" ]]
+[[ "${args[3]}" == "--target" ]]
+[[ "${args[4]}" == "$STOW_TARGET" ]]
+[[ "${args[5]}" == "--restow" ]]
 [[ -d "$STOW_TARGET" ]]
 args_joined=" ${args[*]} "
-[[ "$args_joined" == *" zsh "* ]]
-[[ "$args_joined" == *" nvim "* ]]
-[[ "$args_joined" == *" tmux "* ]]
+[[ "$args_joined" == *" .config "* ]]
+[[ "$args_joined" == *" .tmux "* ]]
 EOF
 )
 link_tmp="$(mktemp -d)"
 TMP_DIRS+=("$link_tmp")
-mkdir -p "${link_tmp}/root/zsh" "${link_tmp}/root/nvim" "${link_tmp}/root/tmux" "${link_tmp}/root/bootstrap"
+mkdir -p "${link_tmp}/root/.config/nvim" "${link_tmp}/root/.tmux" "${link_tmp}/root/bootstrap"
+touch "${link_tmp}/root/.tmux/dot-tmux.conf"
 mkdir -p "${link_tmp}/bin"
 cat > "${link_tmp}/bin/stow" <<'EOF'
 #!/usr/bin/env bash
@@ -158,7 +176,16 @@ case "$mode" in
       pkg="${@: -1}"
       target_rel="${STOW_FORCE_TARGET_REL:-$(basename "$conflict_path")}"
       printf 'WARNING! stowing %s would cause conflicts:\n' "$pkg" >&2
-      printf '  * existing target is not owned by stow: %s\n' "$target_rel" >&2
+      conflict_type="${STOW_FORCE_CONFLICT_TYPE:-not_owned}"
+      case "$conflict_type" in
+        different_package)
+          alt_target="${STOW_FORCE_ALT_TARGET:-../other/.placeholder}"
+          printf '  * existing target is stowed to a different package: %s => %s\n' "$target_rel" "$alt_target" >&2
+          ;;
+        *)
+          printf '  * existing target is not owned by stow: %s\n' "$target_rel" >&2
+          ;;
+      esac
       exit 1
     fi
     ;;
@@ -183,19 +210,19 @@ while IFS= read -r line; do
 done < "$STOW_STUB_OUTPUT"
 count=${#args[@]}
 [[ $count -ge 2 ]]
-[[ "${args[count-2]}" == "vim" ]]
-[[ "${args[count-1]}" == "tmux" ]]
+[[ "${args[count-2]}" == ".config" ]]
+[[ "${args[count-1]}" == ".tmux" ]]
 EOF
 )
 export STOW_STUB_OUTPUT="${link_tmp}/stow_custom.txt"
-export STOW_PACKAGES="vim tmux"
+export STOW_PACKAGES=".config .tmux"
 run_test "link_dotfiles_custom_packages" 0 "$link_custom_script"
 unset STOW_PACKAGES
 
 link_force_script=$(cat <<'EOF'
 set -euo pipefail
 source "$1"
-link_dotfiles --force zsh
+link_dotfiles --force .tmux
 [[ ! -e "$STOW_FORCE_TARGET" ]]
 [[ ! -L "$STOW_FORCE_TARGET" ]]
 args=()
@@ -204,19 +231,37 @@ while IFS= read -r line; do
 done < "$STOW_STUB_OUTPUT"
 count=${#args[@]}
 [[ $count -ge 1 ]]
-[[ "${args[count-1]}" == "zsh" ]]
+[[ "${args[count-1]}" == ".tmux" ]]
 EOF
 )
 export STOW_STUB_OUTPUT="${link_tmp}/stow_force.txt"
 export STOW_STUB_MODE="conflict"
-export STOW_FORCE_TARGET="${STOW_TARGET}/.zshrc"
-export STOW_FORCE_TARGET_REL=".zshrc"
-export STOW_FORCE_SOURCE="../root/zsh/.zshrc"
+export STOW_FORCE_TARGET="${STOW_TARGET}/.tmux.conf"
+export STOW_FORCE_TARGET_REL=".tmux.conf"
+export STOW_FORCE_SOURCE="../root/.tmux/dot-tmux.conf"
 mkdir -p "$(dirname "$STOW_FORCE_TARGET")"
 printf 'existing' > "$STOW_FORCE_TARGET"
-touch "${DOTFILES_ROOT}/zsh/.zshrc"
+touch "${DOTFILES_ROOT}/.tmux/dot-tmux.conf"
 run_test "link_dotfiles_force_overrides_conflicts" 0 "$link_force_script"
 unset STOW_STUB_MODE STOW_FORCE_TARGET STOW_FORCE_TARGET_REL STOW_FORCE_SOURCE
+
+link_force_other_pkg_script=$(cat <<'EOF'
+set -euo pipefail
+source "$1"
+link_dotfiles --force .tmux
+[[ ! -e "$STOW_FORCE_TARGET" ]]
+[[ ! -L "$STOW_FORCE_TARGET" ]]
+EOF
+)
+export STOW_STUB_MODE="conflict"
+export STOW_FORCE_TARGET="${STOW_TARGET}/.tmux.conf_other"
+export STOW_FORCE_TARGET_REL=".tmux.conf_other"
+export STOW_FORCE_CONFLICT_TYPE="different_package"
+export STOW_FORCE_ALT_TARGET="../root/other/.tmux.conf_other"
+mkdir -p "$(dirname "$STOW_FORCE_TARGET")"
+ln -s "../root/other/.tmux.conf_other" "$STOW_FORCE_TARGET"
+run_test "link_dotfiles_force_handles_other_package_conflict" 0 "$link_force_other_pkg_script"
+unset STOW_STUB_MODE STOW_FORCE_TARGET STOW_FORCE_TARGET_REL STOW_FORCE_CONFLICT_TYPE STOW_FORCE_ALT_TARGET
 
 missing_stow_script=$(cat <<'EOF'
 set -euo pipefail
