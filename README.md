@@ -2,6 +2,8 @@
 
 Run `./bootstrap.sh` to install GNU stow (if needed) and symlink packages into your home directory. The script auto-detects macOS, Arch, Debian/Ubuntu, Void, and MSYS2/Git Bash on Windows. On other platforms the script attempts a best-effort install and prompts if manual steps are required.
 
+During bootstrap a small set of CLI tools is installed when possible (`stow`, `tree-sitter` CLI, `hadolint`, `fzf`, `lazygit`, and `lazydocker`). If a package manager is not available for one of them you will see a warning so you can finish the install manually.
+
 By default it links every top-level directory in the repository (excluding `bootstrap/`). To explicitly control the set of packages, export `STOW_PACKAGES` before running the script, for example:
 
 ```bash

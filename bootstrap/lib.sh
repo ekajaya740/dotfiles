@@ -167,6 +167,8 @@ link_dotfiles() {
     while IFS= read -r line; do
       if [[ "$line" =~ over\ existing\ target\ (.+)\ since ]]; then
         conflicts+=("${BASH_REMATCH[1]}")
+      elif [[ "$line" =~ existing\ target\ is\ not\ owned\ by\ stow:\ (.+) ]]; then
+        conflicts+=("${BASH_REMATCH[1]}")
       fi
     done <<< "$output"
 

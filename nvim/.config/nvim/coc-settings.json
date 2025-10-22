@@ -34,6 +34,25 @@
   "rust-analyzer.cargo.allFeatures": true,
   "rust-analyzer.checkOnSave.command": "clippy",
 
+  "solargraph.useBundler": true,
+  "solargraph.bundlerPath": "bundle",
+  "solargraph.diagnostics": true,
+  "solargraph.formatting": true,
+
+  "intelephense.format.enable": true,
+  "intelephense.diagnostics.enable": true,
+  "intelephense.environment.phpVersion": "8.2",
+
+  "laravel.languageServer.enable": true,
+
+  "astro.enable": true,
+
+  "kotlin.languageServer.path": "kotlin-language-server",
+  "kotlin.trace.server": "off",
+
+  "dart.analysisServer.additionalArgs": ["--lsp"],
+  "dart.enableAdditionalAnalyzerChecks": true,
+
   "java.jdt.ls.vmargs": "-Xms512m -Xmx4G -javaagent:~/.m2/repository/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar -XX:+UseG1GC -XX:+UseStringDeduplication",
   "java.import.gradle.enabled": false,
   "java.import.maven.enabled": true,

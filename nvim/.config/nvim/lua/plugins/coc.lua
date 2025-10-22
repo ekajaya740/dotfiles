@@ -20,9 +20,18 @@ return {
         "coc-rust-analyzer",
         "coc-java",
         "coc-sumneko-lua",
+        "coc-snippets",
         "coc-vetur",
         "coc-volar",
-        "coc-lua"
+        "coc-lua",
+        "coc-solargraph",
+        "coc-rails",
+        "coc-intelephense",
+        "coc-laravel",
+        "coc-astro",
+        "coc-kotlin",
+        "coc-dart",
+        "coc-flutter"
       }
 
       vim.fn.system({ "nvim", "--headless", "-c", "CocInstall -sync " .. table.concat(extensions, " ") .. " | qa" })

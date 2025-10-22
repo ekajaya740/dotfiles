@@ -157,9 +157,8 @@ case "$mode" in
     if [[ -n "$conflict_path" && ( -e "$conflict_path" || -L "$conflict_path" ) ]]; then
       pkg="${@: -1}"
       target_rel="${STOW_FORCE_TARGET_REL:-$(basename "$conflict_path")}"
-      source_rel="${STOW_FORCE_SOURCE:-../dotfiles/${pkg}/${target_rel}}"
       printf 'WARNING! stowing %s would cause conflicts:\n' "$pkg" >&2
-      printf '  * cannot stow %s over existing target %s since neither a link nor a directory and --adopt not specified\n' "$source_rel" "$target_rel" >&2
+      printf '  * existing target is not owned by stow: %s\n' "$target_rel" >&2
       exit 1
     fi
     ;;
