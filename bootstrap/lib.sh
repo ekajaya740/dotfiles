@@ -77,11 +77,15 @@ detect_os() {
 }
 
 default_stow_packages() {
-  local path
+  local root path
+  root="${DOTFILES_ROOT:-.}"
   while IFS= read -r -d '' path; do
     basename "$path"
-  done < <(find "${DOTFILES_ROOT:-.}" -mindepth 1 -maxdepth 1 -type d \
+  done < <(find "$root" -mindepth 1 -maxdepth 1 -type d \
     ! -name ".git" ! -name "bootstrap" -print0)
+  if [[ -f "${root}/.tmux.conf" ]]; then
+    echo ".tmux.conf"
+  fi
 }
 
 link_dotfiles() {
@@ -154,63 +158,112 @@ link_dotfiles() {
 
   log_info "Linking packages into ${target_dir}: ${packages[*]}"
 
-  local stow_cmd=(stow --dotfiles --dir "${DOTFILES_ROOT}" --target "$target_dir" --restow "${packages[@]}")
-  local output
-
-  if [[ "$force_override" -eq 1 ]]; then
-    if output=$("${stow_cmd[@]}" 2>&1); then
-      [[ -n "$output" ]] && printf '%s\n' "$output"
-      return 0
-    fi
-
-    local conflicts=()
-    while IFS= read -r line; do
-      if [[ "$line" =~ over\ existing\ target\ (.+)\ since ]]; then
-        conflicts+=("${BASH_REMATCH[1]}")
-      elif [[ "$line" =~ existing\ target\ is\ not\ owned\ by\ stow:\ (.+) ]]; then
-        conflicts+=("${BASH_REMATCH[1]}")
-      elif [[ "$line" == "  * existing target is stowed to a different package: "* ]]; then
-        local conflict_target
-        conflict_target="${line#*: }"
-        conflict_target="${conflict_target%% => *}"
-        conflicts+=("$conflict_target")
-      fi
-    done <<< "$output"
-
-    if [[ ${#conflicts[@]} -eq 0 ]]; then
-      printf '%s\n' "$output" >&2
+  local dotfiles_root="${DOTFILES_ROOT:-.}"
+  local stow_packages=()
+  local manual_links=()
+  local pkg pkg_path
+  for pkg in "${packages[@]}"; do
+    pkg_path="${dotfiles_root}/${pkg}"
+    if [[ -d "$pkg_path" ]]; then
+      stow_packages+=("$pkg")
+    elif [[ -f "$pkg_path" ]]; then
+      manual_links+=("$pkg")
+    else
+      log_error "Package '${pkg}' not found in ${dotfiles_root}."
       return 1
     fi
+  done
 
-    local conflict path_full trimmed_target
-    trimmed_target="${target_dir%/}"
-    for conflict in "${conflicts[@]}"; do
-      if [[ -z "$conflict" || "$conflict" == "." || "$conflict" == ".." || "$conflict" == /* || "$conflict" == *"../"* ]]; then
-        log_error "Refusing to remove suspicious conflict path '$conflict'."
-        printf '%s\n' "$output" >&2
-        return 1
-      fi
+  if [[ ${#stow_packages[@]} -gt 0 ]]; then
+    local stow_cmd=(stow --dotfiles --dir "${dotfiles_root}" --target "$target_dir" --restow "${stow_packages[@]}")
+    local output
 
-      if [[ -n "$trimmed_target" ]]; then
-        path_full="${trimmed_target}/${conflict}"
+    if [[ "$force_override" -eq 1 ]]; then
+      if output=$("${stow_cmd[@]}" 2>&1); then
+        [[ -n "$output" ]] && printf '%s\n' "$output"
       else
-        path_full="/${conflict}"
-      fi
+        local conflicts=()
+        while IFS= read -r line; do
+          if [[ "$line" =~ over\ existing\ target\ (.+)\ since ]]; then
+            conflicts+=("${BASH_REMATCH[1]}")
+          elif [[ "$line" =~ existing\ target\ is\ not\ owned\ by\ stow:\ (.+) ]]; then
+            conflicts+=("${BASH_REMATCH[1]}")
+          elif [[ "$line" == "  * existing target is stowed to a different package: "* ]]; then
+            local conflict_target
+            conflict_target="${line#*: }"
+            conflict_target="${conflict_target%% => *}"
+            conflicts+=("$conflict_target")
+          fi
+        done <<< "$output"
 
-      if [[ -e "$path_full" || -L "$path_full" ]]; then
-        log_warn "Removing conflicting path ${path_full} (force override)."
-        rm -rf -- "$path_full"
-      fi
-    done
+        if [[ ${#conflicts[@]} -eq 0 ]]; then
+          printf '%s\n' "$output" >&2
+          return 1
+        fi
 
-    if output=$("${stow_cmd[@]}" 2>&1); then
-      [[ -n "$output" ]] && printf '%s\n' "$output"
-      return 0
+        local conflict path_full trimmed_target
+        trimmed_target="${target_dir%/}"
+        for conflict in "${conflicts[@]}"; do
+          if [[ -z "$conflict" || "$conflict" == "." || "$conflict" == ".." || "$conflict" == /* || "$conflict" == *"../"* ]]; then
+            log_error "Refusing to remove suspicious conflict path '$conflict'."
+            printf '%s\n' "$output" >&2
+            return 1
+          fi
+
+          if [[ -n "$trimmed_target" ]]; then
+            path_full="${trimmed_target}/${conflict}"
+          else
+            path_full="/${conflict}"
+          fi
+
+          if [[ -e "$path_full" || -L "$path_full" ]]; then
+            log_warn "Removing conflicting path ${path_full} (force override)."
+            rm -rf -- "$path_full"
+          fi
+        done
+
+        if output=$("${stow_cmd[@]}" 2>&1); then
+          [[ -n "$output" ]] && printf '%s\n' "$output"
+        else
+          printf '%s\n' "$output" >&2
+          return 1
+        fi
+      fi
+    else
+      "${stow_cmd[@]}"
     fi
-
-    printf '%s\n' "$output" >&2
-    return 1
   fi
 
-  "${stow_cmd[@]}"
+  if [[ ${#manual_links[@]} -gt 0 ]]; then
+    local link_target link_source trimmed_target target_path
+    trimmed_target="${target_dir%/}"
+    for link_target in "${manual_links[@]}"; do
+      link_source="${dotfiles_root}/${link_target}"
+      if [[ -n "$trimmed_target" ]]; then
+        target_path="${trimmed_target}/${link_target}"
+      else
+        target_path="${link_target}"
+      fi
+
+      if [[ -e "$target_path" || -L "$target_path" ]]; then
+        if [[ -L "$target_path" ]]; then
+          local existing_link
+          existing_link="$(readlink "$target_path")"
+          if [[ "$existing_link" == "$link_source" ]]; then
+            continue
+          fi
+        fi
+        if [[ "$force_override" -eq 1 ]]; then
+          log_warn "Removing conflicting path ${target_path} (force override)."
+          rm -rf -- "$target_path"
+        else
+          log_error "Refusing to overwrite existing path ${target_path}. Use --force to override."
+          return 1
+        fi
+      fi
+
+      mkdir -p "$(dirname "$target_path")"
+      ln -s "$link_source" "$target_path"
+    done
+  fi
 }

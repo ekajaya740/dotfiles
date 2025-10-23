@@ -6,10 +6,10 @@ During bootstrap a small set of CLI tools is installed when possible (`stow`, `t
 
 Pass `--skip-tools` (or export `BOOTSTRAP_SKIP_TOOLS=1`) to bypass these installations when you only want to manage symlinks or are offline.
 
-By default it links every top-level directory in the repository (excluding `bootstrap/`). To explicitly control the set of packages, export `STOW_PACKAGES` before running the script, for example:
+By default it links every top-level directory in the repository (excluding `bootstrap/`) plus `.tmux.conf` if present. To explicitly control the set of packages, export `STOW_PACKAGES` before running the script, for example:
 
 ```bash
-STOW_PACKAGES=".config .tmux .vscode" ./bootstrap.sh
+STOW_PACKAGES=".config .tmux.conf .vscode" ./bootstrap.sh
 ```
 
 Set `STOW_TARGET` to override the destination directory. The default is your `$HOME`.

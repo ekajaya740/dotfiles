@@ -157,13 +157,15 @@ done < "$STOW_STUB_OUTPUT"
 [[ -d "$STOW_TARGET" ]]
 args_joined=" ${args[*]} "
 [[ "$args_joined" == *" .config "* ]]
-[[ "$args_joined" == *" .tmux "* ]]
+target="${STOW_TARGET}/.tmux.conf"
+[[ -L "$target" ]]
+[[ "$(readlink "$target")" == "${DOTFILES_ROOT}/.tmux.conf" ]]
 EOF
 )
 link_tmp="$(mktemp -d)"
 TMP_DIRS+=("$link_tmp")
-mkdir -p "${link_tmp}/root/.config/nvim" "${link_tmp}/root/.tmux" "${link_tmp}/root/bootstrap"
-touch "${link_tmp}/root/.tmux/dot-tmux.conf"
+mkdir -p "${link_tmp}/root/.config/nvim" "${link_tmp}/root/bootstrap"
+touch "${link_tmp}/root/.tmux.conf"
 mkdir -p "${link_tmp}/bin"
 cat > "${link_tmp}/bin/stow" <<'EOF'
 #!/usr/bin/env bash
@@ -209,57 +211,48 @@ while IFS= read -r line; do
   args+=("$line")
 done < "$STOW_STUB_OUTPUT"
 count=${#args[@]}
-[[ $count -ge 2 ]]
-[[ "${args[count-2]}" == ".config" ]]
-[[ "${args[count-1]}" == ".tmux" ]]
+[[ $count -ge 1 ]]
+[[ "${args[count-1]}" == ".config" ]]
+target="${STOW_TARGET}/.tmux.conf"
+[[ -L "$target" ]]
+[[ "$(readlink "$target")" == "${DOTFILES_ROOT}/.tmux.conf" ]]
 EOF
 )
 export STOW_STUB_OUTPUT="${link_tmp}/stow_custom.txt"
-export STOW_PACKAGES=".config .tmux"
+export STOW_PACKAGES=".config .tmux.conf"
 run_test "link_dotfiles_custom_packages" 0 "$link_custom_script"
 unset STOW_PACKAGES
 
 link_force_script=$(cat <<'EOF'
 set -euo pipefail
 source "$1"
-link_dotfiles --force .tmux
-[[ ! -e "$STOW_FORCE_TARGET" ]]
-[[ ! -L "$STOW_FORCE_TARGET" ]]
-args=()
-while IFS= read -r line; do
-  args+=("$line")
-done < "$STOW_STUB_OUTPUT"
-count=${#args[@]}
-[[ $count -ge 1 ]]
-[[ "${args[count-1]}" == ".tmux" ]]
+link_dotfiles --force .tmux.conf
+target="${STOW_TARGET}/.tmux.conf"
+[[ -L "$target" ]]
+[[ "$(readlink "$target")" == "${DOTFILES_ROOT}/.tmux.conf" ]]
 EOF
 )
-export STOW_STUB_OUTPUT="${link_tmp}/stow_force.txt"
-export STOW_STUB_MODE="conflict"
-export STOW_FORCE_TARGET="${STOW_TARGET}/.tmux.conf"
-export STOW_FORCE_TARGET_REL=".tmux.conf"
-export STOW_FORCE_SOURCE="../root/.tmux/dot-tmux.conf"
-mkdir -p "$(dirname "$STOW_FORCE_TARGET")"
-printf 'existing' > "$STOW_FORCE_TARGET"
-touch "${DOTFILES_ROOT}/.tmux/dot-tmux.conf"
+mkdir -p "$STOW_TARGET"
+rm -f "${STOW_TARGET}/.tmux.conf"
+printf 'existing' > "${STOW_TARGET}/.tmux.conf"
+touch "${DOTFILES_ROOT}/.tmux.conf"
 run_test "link_dotfiles_force_overrides_conflicts" 0 "$link_force_script"
-unset STOW_STUB_MODE STOW_FORCE_TARGET STOW_FORCE_TARGET_REL STOW_FORCE_SOURCE
 
 link_force_other_pkg_script=$(cat <<'EOF'
 set -euo pipefail
 source "$1"
-link_dotfiles --force .tmux
+link_dotfiles --force .config
 [[ ! -e "$STOW_FORCE_TARGET" ]]
 [[ ! -L "$STOW_FORCE_TARGET" ]]
 EOF
 )
 export STOW_STUB_MODE="conflict"
-export STOW_FORCE_TARGET="${STOW_TARGET}/.tmux.conf_other"
-export STOW_FORCE_TARGET_REL=".tmux.conf_other"
+export STOW_FORCE_TARGET="${STOW_TARGET}/.config/nvim/init.lua"
+export STOW_FORCE_TARGET_REL=".config/nvim/init.lua"
 export STOW_FORCE_CONFLICT_TYPE="different_package"
-export STOW_FORCE_ALT_TARGET="../root/other/.tmux.conf_other"
+export STOW_FORCE_ALT_TARGET="../root/other/.config/nvim/init.lua"
 mkdir -p "$(dirname "$STOW_FORCE_TARGET")"
-ln -s "../root/other/.tmux.conf_other" "$STOW_FORCE_TARGET"
+ln -s "../root/other/.config/nvim/init.lua" "$STOW_FORCE_TARGET"
 run_test "link_dotfiles_force_handles_other_package_conflict" 0 "$link_force_other_pkg_script"
 unset STOW_STUB_MODE STOW_FORCE_TARGET STOW_FORCE_TARGET_REL STOW_FORCE_CONFLICT_TYPE STOW_FORCE_ALT_TARGET
 
