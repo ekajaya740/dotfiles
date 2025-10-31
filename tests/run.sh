@@ -119,6 +119,28 @@ EOF
 chmod +x "${skip_tmp}/stow"
 PATH="${skip_tmp}:${PATH}" run_test "ensure_bootstrap_tools_skip_flag" 0 "$skip_tools_script"
 
+nvm_skip_install_script=$(cat <<'EOF'
+set -euo pipefail
+source "$1"
+tools_path="$(dirname "$1")/tools.sh"
+source "$tools_path"
+ensure_nvm
+EOF
+)
+nvm_tmp="$(mktemp -d)"
+TMP_DIRS+=("$nvm_tmp")
+cat > "${nvm_tmp}/nvm" <<'EOF'
+#!/usr/bin/env bash
+case "$1" in
+  install|alias|use)
+    exit 0
+    ;;
+esac
+exit 0
+EOF
+chmod +x "${nvm_tmp}/nvm"
+PATH="${nvm_tmp}:${PATH}" run_test "ensure_nvm_skips_install_when_available" 0 "$nvm_skip_install_script"
+
 linux_fallback_script=$(cat <<'EOF'
 set -euo pipefail
 source "$1"

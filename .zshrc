@@ -5,6 +5,18 @@ USE_POWERLINE="true"
 #    is not a diamond
 HAS_WIDECHARS="false"
 
+# Helper to source the first existing path.
+_zsh_source_first() {
+  local candidate
+  for candidate in "$@"; do
+    if [[ -f "$candidate" ]]; then
+      source "$candidate"
+      return 0
+    fi
+  done
+  return 1
+}
+
 # Source distro-provided zsh defaults when they exist (Manjaro, etc.).
 if [[ -e /usr/share/zsh/manjaro-zsh-config ]]; then
   source /usr/share/zsh/manjaro-zsh-config
@@ -61,6 +73,84 @@ fi
 if [[ -f "${HOME}/.p10k.zsh" ]]; then
   source "${HOME}/.p10k.zsh"
 fi
+
+typeset _zsh_custom_path="${ZSH_CUSTOM:-${HOME}/.oh-my-zsh/custom}"
+typeset _brew_prefix_common=""
+if command -v brew >/dev/null 2>&1; then
+  _brew_prefix_common="$(brew --prefix 2>/dev/null || true)"
+fi
+
+typeset -a _zsh_autosuggest_candidates=(
+  "${_zsh_custom_path}/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
+  "${_zsh_custom_path}/plugins/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh"
+  "${HOME}/.local/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
+  "${HOME}/.local/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+  "/usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
+  "/usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+  "/usr/local/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
+  "/usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+  "/opt/local/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
+  "/opt/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+  "/opt/homebrew/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
+  "/opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+)
+if [[ -n "${_brew_prefix_common}" ]]; then
+  _zsh_autosuggest_candidates+=(
+    "${_brew_prefix_common}/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
+    "${_brew_prefix_common}/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+  )
+fi
+_zsh_source_first "${_zsh_autosuggest_candidates[@]}" || true
+unset _zsh_autosuggest_candidates
+
+typeset -a _zsh_history_search_candidates=(
+  "${_zsh_custom_path}/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh"
+  "${_zsh_custom_path}/plugins/zsh-history-substring-search/zsh-history-substring-search.plugin.zsh"
+  "${HOME}/.local/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh"
+  "/usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh"
+  "/usr/local/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh"
+  "/opt/local/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh"
+  "/opt/homebrew/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh"
+)
+if [[ -n "${_brew_prefix_common}" ]]; then
+  _zsh_history_search_candidates+=(
+    "${_brew_prefix_common}/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh"
+    "${_brew_prefix_common}/share/zsh-history-substring-search/zsh-history-substring-search.zsh"
+  )
+fi
+if _zsh_source_first "${_zsh_history_search_candidates[@]}"; then
+  if (( $+functions[history-substring-search-up] )); then
+    bindkey '^[[A' history-substring-search-up
+  fi
+  if (( $+functions[history-substring-search-down] )); then
+    bindkey '^[[B' history-substring-search-down
+  fi
+fi
+unset _zsh_history_search_candidates
+
+typeset -a _zsh_highlight_candidates=(
+  "${_zsh_custom_path}/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+  "${_zsh_custom_path}/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.plugin.zsh"
+  "${HOME}/.local/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+  "/usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+  "/usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+  "/usr/local/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+  "/usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+  "/opt/local/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+  "/opt/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+  "/opt/homebrew/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+  "/opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+)
+if [[ -n "${_brew_prefix_common}" ]]; then
+  _zsh_highlight_candidates+=(
+    "${_brew_prefix_common}/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+    "${_brew_prefix_common}/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+  )
+fi
+_zsh_source_first "${_zsh_highlight_candidates[@]}" || true
+unset _zsh_highlight_candidates
+
+unset _zsh_custom_path _brew_prefix_common
 
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="$HOME/.sdkman"
