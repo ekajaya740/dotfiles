@@ -83,9 +83,19 @@ default_stow_packages() {
     basename "$path"
   done < <(find "$root" -mindepth 1 -maxdepth 1 -type d \
     ! -name ".git" ! -name "bootstrap" -print0)
-  if [[ -f "${root}/.tmux.conf" ]]; then
-    echo ".tmux.conf"
-  fi
+  local extra_files=(
+    ".tmux.conf"
+    ".zshrc"
+    ".zprofile"
+    ".zshenv"
+    ".p10k.zsh"
+  )
+  local extra
+  for extra in "${extra_files[@]}"; do
+    if [[ -e "${root}/${extra}" ]]; then
+      echo "$extra"
+    fi
+  done
 }
 
 link_dotfiles() {

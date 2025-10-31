@@ -5,7 +5,7 @@ set -euo pipefail
 # Requires bootstrap/lib.sh to be sourced first (for logging helpers and run_with_privilege).
 
 # tree-sitter-cli added because nvim-treesitter needs the CLI binary available.
-DEFAULT_BOOTSTRAP_TOOLS=(stow tree-sitter-cli hadolint fzf lazygit lazydocker)
+DEFAULT_BOOTSTRAP_TOOLS=(stow tree-sitter-cli hadolint fzf lazygit lazydocker tmux neovim powerlevel10k)
 
 APT_UPDATED=0
 APT_AVAILABLE=1
@@ -277,6 +277,167 @@ ensure_tree_sitter_cli() {
   return 1
 }
 
+powerlevel10k_theme_available() {
+  local -a candidates=(
+    "${HOME}/.oh-my-zsh/custom/themes/powerlevel10k/powerlevel10k.zsh-theme"
+    "${HOME}/.local/share/zsh/themes/powerlevel10k/powerlevel10k.zsh-theme"
+    "${HOME}/.local/share/zsh/plugins/powerlevel10k/powerlevel10k.zsh-theme"
+    "${HOME}/.local/share/powerlevel10k/powerlevel10k.zsh-theme"
+    "/usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme"
+    "/usr/share/zsh/plugins/powerlevel10k/powerlevel10k.zsh-theme"
+    "/usr/share/powerlevel10k/powerlevel10k.zsh-theme"
+    "/usr/local/share/powerlevel10k/powerlevel10k.zsh-theme"
+    "/opt/local/share/powerlevel10k/powerlevel10k.zsh-theme"
+    "/opt/local/share/zsh/site-functions/powerlevel10k.zsh-theme"
+    "/opt/homebrew/share/powerlevel10k/powerlevel10k.zsh-theme"
+    "/opt/homebrew/opt/powerlevel10k/share/powerlevel10k/powerlevel10k.zsh-theme"
+  )
+  local zsh_custom="${ZSH_CUSTOM:-}"
+  if [[ -z "$zsh_custom" ]]; then
+    zsh_custom="${HOME}/.oh-my-zsh/custom"
+  fi
+  if [[ -n "$zsh_custom" ]]; then
+    candidates+=("${zsh_custom}/themes/powerlevel10k/powerlevel10k.zsh-theme")
+  fi
+
+  if command -v brew >/dev/null 2>&1; then
+    local brew_prefix
+    brew_prefix="$(brew --prefix 2>/dev/null || true)"
+    if [[ -n "$brew_prefix" ]]; then
+      candidates+=("${brew_prefix}/share/powerlevel10k/powerlevel10k.zsh-theme")
+    fi
+    if brew --prefix powerlevel10k >/dev/null 2>&1; then
+      candidates+=("$(brew --prefix powerlevel10k)/share/powerlevel10k/powerlevel10k.zsh-theme")
+    fi
+  fi
+
+  local candidate
+  for candidate in "${candidates[@]}"; do
+    if [[ -f "$candidate" ]]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+ensure_powerlevel10k() {
+  if powerlevel10k_theme_available; then
+    return 0
+  fi
+
+  local installed=0
+
+  if command -v brew >/dev/null 2>&1; then
+    log_info "Installing powerlevel10k via Homebrew"
+    if brew install powerlevel10k; then
+      installed=1
+    else
+      log_warn "Homebrew install failed for powerlevel10k"
+    fi
+  fi
+
+  if (( ! installed )) && command -v apt-get >/dev/null 2>&1 && (( APT_AVAILABLE )); then
+    if (( ! APT_UPDATED )); then
+      log_info "Updating apt package index"
+      if run_with_privilege apt-get update; then
+        APT_UPDATED=1
+      else
+        log_warn "apt-get update failed; skipping further apt installs"
+        APT_AVAILABLE=0
+      fi
+    fi
+
+    if (( APT_AVAILABLE )); then
+      local apt_pkg
+      for apt_pkg in zsh-theme-powerlevel10k powerlevel10k; do
+        log_info "Installing ${apt_pkg} via apt-get"
+        if run_with_privilege apt-get install -y "$apt_pkg"; then
+          installed=1
+          break
+        else
+          log_warn "apt-get install failed for ${apt_pkg}"
+        fi
+      done
+    fi
+  fi
+
+  if (( ! installed )) && command -v pacman >/dev/null 2>&1; then
+    local pacman_pkg
+    for pacman_pkg in zsh-theme-powerlevel10k powerlevel10k; do
+      log_info "Installing ${pacman_pkg} via pacman"
+      if pacman -Sy --needed --noconfirm "$pacman_pkg"; then
+        installed=1
+        break
+      elif run_with_privilege pacman -Sy --needed --noconfirm "$pacman_pkg"; then
+        installed=1
+        break
+      else
+        log_warn "pacman install failed for ${pacman_pkg}"
+      fi
+    done
+  fi
+
+  if (( ! installed )) && command -v yay >/dev/null 2>&1; then
+    log_info "Installing powerlevel10k via yay"
+    if yay -Sy --needed --noconfirm powerlevel10k; then
+      installed=1
+    else
+      log_warn "yay install failed for powerlevel10k"
+    fi
+  fi
+
+  if (( ! installed )) && command -v paru >/dev/null 2>&1; then
+    log_info "Installing powerlevel10k via paru"
+    if paru -Sy --needed --noconfirm powerlevel10k; then
+      installed=1
+    else
+      log_warn "paru install failed for powerlevel10k"
+    fi
+  fi
+
+  if (( ! installed )) && command -v xbps-install >/dev/null 2>&1; then
+    log_info "Installing powerlevel10k via xbps-install"
+    if run_with_privilege xbps-install -Sy powerlevel10k; then
+      installed=1
+    else
+      log_warn "xbps-install failed for powerlevel10k"
+    fi
+  fi
+
+  if (( ! installed )) && command -v dnf >/dev/null 2>&1; then
+    log_info "Installing powerlevel10k via dnf"
+    if run_with_privilege dnf install -y powerlevel10k; then
+      installed=1
+    else
+      log_warn "dnf install failed for powerlevel10k"
+    fi
+  fi
+
+  if (( ! installed )) && command -v zypper >/dev/null 2>&1; then
+    log_info "Installing powerlevel10k via zypper"
+    if run_with_privilege zypper install -y powerlevel10k; then
+      installed=1
+    else
+      log_warn "zypper install failed for powerlevel10k"
+    fi
+  fi
+
+  if (( ! installed )); then
+    if powerlevel10k_theme_available; then
+      return 0
+    fi
+    log_warn "Unable to install powerlevel10k automatically. Install it manually via your plugin manager."
+    return 1
+  fi
+
+  if powerlevel10k_theme_available; then
+    return 0
+  fi
+
+  log_warn "powerlevel10k installation completed but theme files not found on expected paths."
+  return 1
+}
+
 ensure_bootstrap_tools() {
   local tool
   local failed=0
@@ -305,6 +466,18 @@ ensure_bootstrap_tools() {
     case "$tool" in
       tree-sitter-cli)
         if ! ensure_tree_sitter_cli; then
+          failed=1
+        fi
+        continue
+        ;;
+      neovim)
+        if ! ensure_tool_installed "$tool" "$tool" "nvim"; then
+          failed=1
+        fi
+        continue
+        ;;
+      powerlevel10k)
+        if ! ensure_powerlevel10k; then
           failed=1
         fi
         continue
