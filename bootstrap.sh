@@ -15,7 +15,7 @@ source "$LIB_PATH"
 main() {
   local os_id handler
   local skip_tools_flag=0
-  local handler_args=()
+  local -a handler_args=()
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -46,7 +46,11 @@ main() {
   fi
 
   export DOTFILES_ROOT="${SCRIPT_DIR}"
-  exec "$handler" "${handler_args[@]}"
+  if (( ${#handler_args[@]} )); then
+    exec "$handler" "${handler_args[@]}"
+  else
+    exec "$handler"
+  fi
 }
 
 main "$@"
