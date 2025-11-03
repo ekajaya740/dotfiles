@@ -562,7 +562,10 @@ zsh_plugin_available() {
   local plugin="$1"
   local script="$2"
   shift 2 || true
-  local -a extra_candidates=("$@")
+  local -a extra_candidates=()
+  if (( $# )); then
+    extra_candidates=("$@")
+  fi
   local zsh_custom="${ZSH_CUSTOM:-${HOME}/.oh-my-zsh/custom}"
   if [[ -z "$zsh_custom" ]]; then
     zsh_custom="${HOME}/.oh-my-zsh/custom"
