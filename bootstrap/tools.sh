@@ -562,10 +562,6 @@ zsh_plugin_available() {
   local plugin="$1"
   local script="$2"
   shift 2 || true
-  local -a extra_candidates=()
-  if (( $# )); then
-    extra_candidates=("$@")
-  fi
   local zsh_custom="${ZSH_CUSTOM:-${HOME}/.oh-my-zsh/custom}"
   if [[ -z "$zsh_custom" ]]; then
     zsh_custom="${HOME}/.oh-my-zsh/custom"
@@ -627,11 +623,14 @@ zsh_plugin_available() {
     done
   done
 
-  for candidate in "${extra_candidates[@]}"; do
-    if [[ -n "$candidate" && -f "$candidate" ]]; then
-      return 0
-    fi
-  done
+  if (( $# )); then
+    local candidate
+    for candidate in "$@"; do
+      if [[ -n "$candidate" && -f "$candidate" ]]; then
+        return 0
+      fi
+    done
+  fi
   return 1
 }
 
