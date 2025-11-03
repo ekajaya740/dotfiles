@@ -13,6 +13,44 @@ log_error() {
   printf '[ERROR] %s\n' "$*" >&2
 }
 
+resolve_path() {
+  local path="$1"
+
+  local py
+  for py in python3 python; do
+    if command -v "$py" >/dev/null 2>&1; then
+      if "$py" - "$path" <<'PY' 2>/dev/null; then
+import os
+import sys
+print(os.path.realpath(sys.argv[1]))
+PY
+        return 0
+      fi
+    fi
+  done
+
+  if command -v realpath >/dev/null 2>&1; then
+    if realpath "$path"; then
+      return 0
+    fi
+  fi
+
+  if command -v readlink >/dev/null 2>&1; then
+    local target
+    target="$(readlink "$path" 2>/dev/null)" || return 1
+    if [[ "$target" == /* ]]; then
+      printf '%s\n' "$target"
+      return 0
+    fi
+    local parent
+    parent="$(cd "$(dirname "$path")" 2>/dev/null && pwd -P)" || return 1
+    printf '%s/%s\n' "$parent" "$target"
+    return 0
+  fi
+
+  return 1
+}
+
 run_with_privilege() {
   if [[ $EUID -eq 0 ]]; then
     "$@"
@@ -163,13 +201,48 @@ link_dotfiles() {
     exit 1
   fi
 
+  local dotfiles_root="${DOTFILES_ROOT:-.}"
+  if [[ "$dotfiles_root" != /* ]]; then
+    if ! dotfiles_root="$(cd "$dotfiles_root" 2>/dev/null && pwd)"; then
+      log_error "Unable to resolve DOTFILES_ROOT path '${DOTFILES_ROOT:-.}'."
+      return 1
+    fi
+  fi
+
   local target_dir="${STOW_TARGET:-$HOME}"
   mkdir -p "$target_dir"
-  mkdir -p "${target_dir}/.config"
+
+  local config_path="${target_dir%/}/.config"
+  if [[ -L "$config_path" ]]; then
+    local config_real=""
+    if config_real="$(resolve_path "$config_path")"; then
+      :
+    else
+      config_real="$(readlink "$config_path" 2>/dev/null || true)"
+    fi
+
+    local config_target="$(readlink "$config_path" 2>/dev/null || true)"
+
+    if [[ -n "$config_real" && "$config_real" == "${dotfiles_root}"* ]]; then
+      log_warn "Replacing legacy .config symlink at ${config_path}."
+      rm -f "$config_path"
+    elif [[ "$config_target" == *"dotfiles"* ]]; then
+      log_warn "Replacing legacy .config symlink at ${config_path}."
+      rm -f "$config_path"
+    fi
+  fi
+
+  if [[ ! -e "$config_path" ]]; then
+    mkdir -p "${config_path}"
+  elif [[ -d "$config_path" ]]; then
+    :
+  else
+    log_error "Cannot prepare ${config_path}: not a directory."
+    return 1
+  fi
 
   log_info "Linking packages into ${target_dir}: ${packages[*]}"
 
-  local dotfiles_root="${DOTFILES_ROOT:-.}"
   local stow_packages=()
   local manual_links=()
   local pkg pkg_path
@@ -186,7 +259,8 @@ link_dotfiles() {
   done
 
   if [[ ${#stow_packages[@]} -gt 0 ]]; then
-    local stow_cmd=(stow --dotfiles --dir "${dotfiles_root}" --target "$target_dir" --restow "${stow_packages[@]}")
+    # --no-folding keeps parent directories like ~/.config from being replaced by symlinks.
+    local stow_cmd=(stow --dotfiles --no-folding --dir "${dotfiles_root}" --target "$target_dir" --restow "${stow_packages[@]}")
     local output
 
     if [[ "$force_override" -eq 1 ]]; then
@@ -241,7 +315,24 @@ link_dotfiles() {
         fi
       fi
     else
-      "${stow_cmd[@]}"
+      if output=$("${stow_cmd[@]}" 2>&1); then
+        [[ -n "$output" ]] && printf '%s\n' "$output"
+      else
+        if [[ "$output" == *"existing target is not owned by stow: .config"* ]] && [[ -L "$config_path" ]]; then
+          log_warn "Detected legacy .config symlink. Removing and retrying stow."
+          rm -f "$config_path"
+          mkdir -p "$config_path"
+          if output=$("${stow_cmd[@]}" 2>&1); then
+            [[ -n "$output" ]] && printf '%s\n' "$output"
+          else
+            printf '%s\n' "$output" >&2
+            return 1
+          fi
+        else
+          printf '%s\n' "$output" >&2
+          return 1
+        fi
+      fi
     fi
   fi
 

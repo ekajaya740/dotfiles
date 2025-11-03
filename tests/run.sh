@@ -171,11 +171,15 @@ while IFS= read -r line; do
   args+=("$line")
 done < "$STOW_STUB_OUTPUT"
 [[ "${args[0]}" == "--dotfiles" ]]
-[[ "${args[1]}" == "--dir" ]]
-[[ "${args[2]}" == "$DOTFILES_ROOT" ]]
-[[ "${args[3]}" == "--target" ]]
-[[ "${args[4]}" == "$STOW_TARGET" ]]
-[[ "${args[5]}" == "--restow" ]]
+[[ "${args[1]}" == "--no-folding" ]]
+[[ "${args[2]}" == "--dir" ]]
+[[ "${args[3]}" == "$DOTFILES_ROOT" ]]
+[[ "${args[4]}" == "--target" ]]
+[[ "${args[5]}" == "$STOW_TARGET" ]]
+[[ "${args[6]}" == "--restow" ]]
+config_dir="${STOW_TARGET}/.config"
+[[ -d "$config_dir" ]]
+[[ ! -L "$config_dir" ]]
 [[ -d "$STOW_TARGET" ]]
 args_joined=" ${args[*]} "
 [[ "$args_joined" == *" nvim "* ]]
@@ -222,6 +226,8 @@ export PATH="${link_tmp}/bin:${PATH}"
 export DOTFILES_ROOT="${link_tmp}/root"
 export STOW_TARGET="${link_tmp}/target"
 export STOW_STUB_OUTPUT="${link_tmp}/stow_args.txt"
+mkdir -p "$STOW_TARGET"
+ln -s ../root/nvim/.config "${STOW_TARGET}/.config"
 run_test "link_dotfiles_defaults" 0 "$link_default_script"
 
 link_custom_script=$(cat <<'EOF'
