@@ -178,7 +178,7 @@ done < "$STOW_STUB_OUTPUT"
 [[ "${args[5]}" == "--restow" ]]
 [[ -d "$STOW_TARGET" ]]
 args_joined=" ${args[*]} "
-[[ "$args_joined" == *" .config "* ]]
+[[ "$args_joined" == *" nvim "* ]]
 target="${STOW_TARGET}/.tmux.conf"
 [[ -L "$target" ]]
 [[ "$(readlink "$target")" == "${DOTFILES_ROOT}/.tmux.conf" ]]
@@ -186,7 +186,7 @@ EOF
 )
 link_tmp="$(mktemp -d)"
 TMP_DIRS+=("$link_tmp")
-mkdir -p "${link_tmp}/root/.config/nvim" "${link_tmp}/root/bootstrap"
+mkdir -p "${link_tmp}/root/nvim/.config/nvim" "${link_tmp}/root/bootstrap"
 touch "${link_tmp}/root/.tmux.conf"
 mkdir -p "${link_tmp}/bin"
 cat > "${link_tmp}/bin/stow" <<'EOF'
@@ -234,14 +234,14 @@ while IFS= read -r line; do
 done < "$STOW_STUB_OUTPUT"
 count=${#args[@]}
 [[ $count -ge 1 ]]
-[[ "${args[count-1]}" == ".config" ]]
+[[ "${args[count-1]}" == "nvim" ]]
 target="${STOW_TARGET}/.tmux.conf"
 [[ -L "$target" ]]
 [[ "$(readlink "$target")" == "${DOTFILES_ROOT}/.tmux.conf" ]]
 EOF
 )
 export STOW_STUB_OUTPUT="${link_tmp}/stow_custom.txt"
-export STOW_PACKAGES=".config .tmux.conf"
+export STOW_PACKAGES="nvim .tmux.conf"
 run_test "link_dotfiles_custom_packages" 0 "$link_custom_script"
 unset STOW_PACKAGES
 
@@ -263,7 +263,7 @@ run_test "link_dotfiles_force_overrides_conflicts" 0 "$link_force_script"
 link_force_other_pkg_script=$(cat <<'EOF'
 set -euo pipefail
 source "$1"
-link_dotfiles --force .config
+link_dotfiles --force nvim
 [[ ! -e "$STOW_FORCE_TARGET" ]]
 [[ ! -L "$STOW_FORCE_TARGET" ]]
 EOF

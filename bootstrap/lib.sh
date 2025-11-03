@@ -165,6 +165,7 @@ link_dotfiles() {
 
   local target_dir="${STOW_TARGET:-$HOME}"
   mkdir -p "$target_dir"
+  mkdir -p "${target_dir}/.config"
 
   log_info "Linking packages into ${target_dir}: ${packages[*]}"
 
