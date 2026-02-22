@@ -1,0 +1,45 @@
+{
+  "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json",
+  "google_auth": false,
+  "parallel_execution": true,
+  "agents": {
+    "sisyphus": {
+      "model": "ollama-cloud/glm-5"
+    },
+    "prometheus": {
+      "model": "openai/gpt-5.3-codex"
+    },
+    "atlas": {
+      "model": "ollama-cloud/glm-5"
+    },
+    "hephaestus": {
+      "model": "openai/gpt-5.3-codex"
+    },
+    "oracle": {
+      "model": "openai/gpt-5.2"
+    },
+    "librarian": {
+      "model": "ollama-cloud/kimi-k2.5"
+    },
+    "explore": {
+      "model": "ollama-cloud/minimax-m2.5"
+    },
+    "frontend-ui-ux-engineer": {
+      "model": "ollama-cloud/kimi-k2.5"
+    },
+    "document-writer": {
+      "model": "ollama-cloud/minimax-m2.5"
+    },
+    "multimodal-looker": {
+      "model": "ollama-cloud/minimax-m2.5"
+    }
+  },
+  "categories": {
+    "quick": {
+      "model": "ollama-cloud/minimax-m2.5"
+    },
+    "visual-engineering": {
+      "model": "ollama-cloud/minimax-m2.5"
+    }
+  }
+}

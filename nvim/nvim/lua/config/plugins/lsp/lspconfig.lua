@@ -93,6 +93,8 @@ lspconfig["tailwindcss"].setup({
 	},
 })
 
+lspconfig["prismals"].setup({})
+
 -- configure emmet language server
 lspconfig["emmet_ls"].setup({
 	capabilities = capabilities,
