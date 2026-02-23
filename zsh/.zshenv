@@ -42,3 +42,53 @@ fi
 if [[ -f "$HOME/.cargo/env" ]]; then
     source "$HOME/.cargo/env"
 fi
+
+
+## Platform detection
+if [[ -r /etc/os-release ]]; then
+    # shellcheck disable=SC1091
+    . /etc/os-release
+    export DOTFILES_OS_ID="${ID:-}"
+    export DOTFILES_OS_ID_LIKE="${ID_LIKE:-}"
+else
+    export DOTFILES_OS_ID=""
+    export DOTFILES_OS_ID_LIKE=""
+fi
+
+case "$DOTFILES_OS_ID" in
+    arch|archlinux|omarchy)
+        export DOTFILES_IS_ARCH="1"
+        ;;
+    *)
+        export DOTFILES_IS_ARCH="0"
+        ;;
+esac
+
+if [[ "$DOTFILES_OS_ID" == "manjaro" ]]; then
+    export DOTFILES_IS_MANJARO="1"
+else
+    export DOTFILES_IS_MANJARO="0"
+fi
+
+DOTFILES_OMARCHY_FLAG="0"
+if [[ "$DOTFILES_OS_ID" == "omarchy" ]]; then
+    DOTFILES_OMARCHY_FLAG="1"
+elif [[ -d "$HOME/.local/share/omarchy" ]]; then
+    DOTFILES_OMARCHY_FLAG="1"
+    export DOTFILES_OMARCHY_HOME="$HOME/.local/share/omarchy"
+elif [[ -d "$HOME/.config/omarchy" ]]; then
+    DOTFILES_OMARCHY_FLAG="1"
+    export DOTFILES_OMARCHY_HOME="$HOME/.config/omarchy"
+elif [[ "$XDG_CURRENT_DESKTOP" == "Hyprland" && -d "$HOME/.config/omarchy" ]]; then
+    DOTFILES_OMARCHY_FLAG="1"
+    export DOTFILES_OMARCHY_HOME="$HOME/.config/omarchy"
+else
+    unset DOTFILES_OMARCHY_HOME
+fi
+
+if [[ "$DOTFILES_OMARCHY_FLAG" == "1" ]]; then
+    export DOTFILES_IS_ARCH="1"
+fi
+
+export DOTFILES_IS_OMARCHY="$DOTFILES_OMARCHY_FLAG"
+unset DOTFILES_OMARCHY_FLAG

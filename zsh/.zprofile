@@ -1,8 +1,9 @@
 # ~/.zprofile - Login shell configuration
 # Sourced once for login shells
 
-# Start X on login (Linux only, if not already running)
-if [[ -z "$DISPLAY" && "$XDG_VTNR" -eq 1 && "$(uname)" == "Linux" ]]; then
+# Start X on login (Arch Linux only, if not already running)
+# Skipped for Omarchy which uses Wayland/Hyprland
+if [[ -z "$DISPLAY" && "$XDG_VTNR" -eq 1 && "$DOTFILES_IS_ARCH" == "1" && "$DOTFILES_IS_OMARCHY" != "1" ]]; then
     exec startx
 fi
 

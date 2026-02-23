@@ -43,16 +43,23 @@ source $ZSH/oh-my-zsh.sh
 # Powerlevel10k Theme
 # -----------------------------------------------------------------------------
 
-# OS detection for powerlevel10k installation path
-if [[ "$(uname)" == "Darwin" ]]; then
-    # macOS - Homebrew installation
-    if [[ -f "$(brew --prefix)/share/powerlevel10k/powerlevel10k.zsh-theme" ]]; then
-        source "$(brew --prefix)/share/powerlevel10k/powerlevel10k.zsh-theme"
+# Theme loading based on platform detection (set in ~/.zshenv)
+if [[ "$DOTFILES_IS_OMARCHY" == "1" ]]; then
+    # Omarchy - use bundled powerlevel10k if available, else system
+    if [[ -f "${DOTFILES_OMARCHY_HOME:-$HOME/.local/share/omarchy}/zsh/plugins/powerlevel10k/powerlevel10k.zsh-theme" ]]; then
+        source "${DOTFILES_OMARCHY_HOME}/zsh/plugins/powerlevel10k/powerlevel10k.zsh-theme"
+    elif [[ -f "/usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme" ]]; then
+        source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
     fi
-elif [[ "$(uname)" == "Linux" ]]; then
+elif [[ "$DOTFILES_IS_ARCH" == "1" ]]; then
     # Arch Linux - pacman/yay installation
     if [[ -f "/usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme" ]]; then
         source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
+    fi
+elif [[ "$(uname)" == "Darwin" ]]; then
+    # macOS - Homebrew installation
+    if [[ -f "$(brew --prefix)/share/powerlevel10k/powerlevel10k.zsh-theme" ]]; then
+        source "$(brew --prefix)/share/powerlevel10k/powerlevel10k.zsh-theme"
     fi
 fi
 

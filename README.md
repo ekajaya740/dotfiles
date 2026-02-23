@@ -41,6 +41,20 @@ Personal configuration for Neovim (LazyVim + coc.nvim), tmux, zsh, and OpenCode.
 
 ### Optional by environment
 
+### Platform Detection
+
+The zsh configuration automatically detects your platform:
+
+ **Omarchy** - Detected via `/etc/os-release` ID, `~/.local/share/omarchy`, `~/.config/omarchy`, or `Hyprland` desktop
+ **Arch Linux** - Detected via `/etc/os-release` ID matching `arch`, `archlinux`, or `omarchy`
+ **Manjaro** - Detected via `/etc/os-release` ID matching `manjaro`
+ **macOS** - Detected via `uname`
+
+Omarchy-specific behavior:
+ Uses bundled powerlevel10k from `$DOTFILES_OMARCHY_HOME/zsh/plugins/powerlevel10k` if available
+ Skips `startx` in `.zprofile` (Omarchy uses Wayland/Hyprland)
+ Sets `DOTFILES_IS_OMARCHY=1` and `DOTFILES_OMARCHY_HOME` environment variables
+
 - Linux clipboard helpers: `xclip` (X11) and/or `wl-clipboard` (Wayland)
 - Android/iOS simulator tools if you use `telescope-simulators.nvim`
 - JDK 17+ if you use Java via `coc-java`
