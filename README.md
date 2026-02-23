@@ -93,27 +93,4 @@ stow nvim tmux opencode
 
 ## For Agents
 
-Use this section for automation and CI-style setup.
-
-### Contract
-
-- Edit tracked files in this repo only, not resolved paths under `$HOME`.
-- Keep symlink mapping stable:
-  - `~/dotfiles/nvim/.config/nvim` <-> `~/.config/nvim`
-  - `~/dotfiles/tmux/.tmux.conf` <-> `~/.tmux.conf`
-  - `~/dotfiles/opencode/.config/opencode/opencode.json` <-> `~/.config/opencode/opencode.json`
-  - `~/dotfiles/opencode/.config/opencode/oh-my-opencode.json` <-> `~/.config/opencode/oh-my-opencode.json`
-
-### Idempotent checks
-
-```bash
-command -v git nvim tmux node npm bun jq >/dev/null
-jq empty opencode/.config/opencode/opencode.json opencode/.config/opencode/oh-my-opencode.json
-ls -l ~/.config/nvim ~/.tmux.conf ~/.config/opencode/opencode.json ~/.config/opencode/oh-my-opencode.json
-```
-
-### Safety
-
-- Do not commit secrets or tokens.
-- Preserve user model/provider choices unless explicitly requested.
-- Keep changes minimal and style-consistent.
+See [AGENTS.md](./AGENTS.md) for automation and CI-style setup guidelines.
