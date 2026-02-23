@@ -24,6 +24,9 @@
     "explore": {
       "model": "ollama-cloud/minimax-m2.5"
     },
+    "metis": {
+      "model": "ollama-cloud/kimi-k2.5"
+    },
     "frontend-ui-ux-engineer": {
       "model": "ollama-cloud/kimi-k2.5"
     },
