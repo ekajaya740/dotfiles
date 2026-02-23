@@ -6,6 +6,9 @@
     "sisyphus": {
       "model": "ollama-cloud/glm-5"
     },
+    "sisyphus-junior": {
+      "model": "ollama-cloud/kimi-k2.5"
+    },
     "prometheus": {
       "model": "openai/gpt-5.3-codex"
     },
@@ -39,6 +42,24 @@
   },
   "categories": {
     "quick": {
+      "model": "ollama-cloud/minimax-m2.5"
+    },
+    "unspecified-low": {
+      "model": "ollama-cloud/minimax-m2.5"
+    },
+    "unspecified-high": {
+      "model": "ollama-cloud/glm-5"
+    },
+    "deep": {
+      "model": "ollama-cloud/glm-5"
+    },
+    "ultrabrain": {
+      "model": "ollama-cloud/kimi-k2.5"
+    },
+    "artistry": {
+      "model": "ollama-cloud/kimi-k2.5"
+    },
+    "writing": {
       "model": "ollama-cloud/minimax-m2.5"
     },
     "visual-engineering": {
