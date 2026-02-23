@@ -30,6 +30,7 @@ treesitter.setup({
 		"vim",
 		"dockerfile",
 		"gitignore",
+		"java",
 		"dart",
 		"http",
 	},

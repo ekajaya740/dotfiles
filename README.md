@@ -1,19 +1,19 @@
 # dotfiles
 
-Personal configuration for Neovim, tmux, and OpenCode.
+Personal configuration for Neovim (LazyVim + coc.nvim), tmux, and OpenCode.
 
 ## Repository Layout
 
-- `nvim/nvim/` -> `~/.config/nvim`
+- `nvim/.config/nvim/` -> `~/.config/nvim`
 - `tmux/.tmux.conf` -> `~/.tmux.conf`
-- `opencode/opencode.json` -> `~/.config/opencode/opencode.json`
-- `opencode/oh-my-opencode.json` -> `~/.config/opencode/oh-my-opencode.json`
+- `opencode/.config/opencode/opencode.json` -> `~/.config/opencode/opencode.json`
+- `opencode/.config/opencode/oh-my-opencode.json` -> `~/.config/opencode/oh-my-opencode.json`
 
 ## Dependencies
 
 ### Required
 
-- `git`, `neovim`, `tmux`
+- `git`, `stow`, `neovim`, `tmux`
 - `node` (`npm` is included with Node on both macOS and Arch)
 - `bun` (OpenCode MCP commands use `bunx`)
 - `make` and a C/C++ toolchain (`telescope-fzf-native` uses `run = "make"`)
@@ -31,6 +31,7 @@ Personal configuration for Neovim, tmux, and OpenCode.
 
 - Linux clipboard helpers: `xclip` (X11) and/or `wl-clipboard` (Wayland)
 - Android/iOS simulator tools if you use `telescope-simulators.nvim`
+- JDK 17+ if you use Java via `coc-java`
 
 ## Install Dependencies
 
@@ -39,13 +40,13 @@ Personal configuration for Neovim, tmux, and OpenCode.
 ```bash
 xcode-select --install
 brew tap oven-sh/bun
-brew install git neovim tmux node yarn bun jq tidy-html5 ripgrep fd fzf tree-sitter lua-language-server stylua shellcheck shfmt graphviz chafa
+brew install git stow neovim tmux node yarn bun jq tidy-html5 ripgrep fd fzf tree-sitter lua-language-server stylua shellcheck shfmt graphviz chafa
 ```
 
 ### Arch Linux (pacman)
 
 ```bash
-sudo pacman -S --needed git neovim tmux nodejs npm yarn bun base-devel jq tidy ripgrep fd fzf tree-sitter lua-language-server stylua shellcheck shfmt graphviz chafa xclip wl-clipboard
+sudo pacman -S --needed git stow neovim tmux nodejs npm yarn bun base-devel jq tidy ripgrep fd fzf tree-sitter lua-language-server stylua shellcheck shfmt graphviz chafa xclip wl-clipboard
 ```
 
 ### Arch Linux (yay)
@@ -79,15 +80,14 @@ mkdir -p ~/.config/opencode
 ### 3) Symlink this repo into home config paths
 
 ```bash
-ln -sfn ~/dotfiles/nvim/nvim ~/.config/nvim
-ln -sfn ~/dotfiles/tmux/.tmux.conf ~/.tmux.conf
-ln -sfn ~/dotfiles/opencode/opencode.json ~/.config/opencode/opencode.json
-ln -sfn ~/dotfiles/opencode/oh-my-opencode.json ~/.config/opencode/oh-my-opencode.json
+cd ~/dotfiles
+stow nvim tmux opencode
 ```
 
 ### 4) First run
 
-- Open `nvim` and let plugins install (`packer.nvim` bootstrap is in config).
+- Open `nvim` and let `lazy.nvim` install plugins.
+- Coc will auto-install configured extensions on first startup (Java support comes from `coc-java`).
 - Install TPM if needed: `git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm`, then press `prefix + I` in tmux.
 - Restart OpenCode so provider/agent config reloads.
 
@@ -99,16 +99,16 @@ Use this section for automation and CI-style setup.
 
 - Edit tracked files in this repo only, not resolved paths under `$HOME`.
 - Keep symlink mapping stable:
-  - `~/dotfiles/nvim/nvim` <-> `~/.config/nvim`
+  - `~/dotfiles/nvim/.config/nvim` <-> `~/.config/nvim`
   - `~/dotfiles/tmux/.tmux.conf` <-> `~/.tmux.conf`
-  - `~/dotfiles/opencode/opencode.json` <-> `~/.config/opencode/opencode.json`
-  - `~/dotfiles/opencode/oh-my-opencode.json` <-> `~/.config/opencode/oh-my-opencode.json`
+  - `~/dotfiles/opencode/.config/opencode/opencode.json` <-> `~/.config/opencode/opencode.json`
+  - `~/dotfiles/opencode/.config/opencode/oh-my-opencode.json` <-> `~/.config/opencode/oh-my-opencode.json`
 
 ### Idempotent checks
 
 ```bash
 command -v git nvim tmux node npm bun jq >/dev/null
-jq empty opencode/opencode.json opencode/oh-my-opencode.json
+jq empty opencode/.config/opencode/opencode.json opencode/.config/opencode/oh-my-opencode.json
 ls -l ~/.config/nvim ~/.tmux.conf ~/.config/opencode/opencode.json ~/.config/opencode/oh-my-opencode.json
 ```
 

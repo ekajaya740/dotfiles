@@ -1,0 +1,10 @@
+{
+	"suggest.noselect": false,
+	"suggest.enablePreselect": true,
+	"java.jdt.ls.vmargs": "-Xmx2G -XX:+UseG1GC -XX:+UseStringDeduplication",
+	"java.format.enabled": true,
+	"java.completion.favoriteStaticMembers": [
+		"org.junit.jupiter.api.Assertions.*",
+		"org.mockito.Mockito.*"
+	]
+}

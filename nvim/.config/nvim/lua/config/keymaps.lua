@@ -52,5 +52,27 @@ keymap.set("n", "<leader>gfc", "<cmd>Telescope git_bcommits<cr>") -- list git co
 keymap.set("n", "<leader>gb", "<cmd>Telescope git_branches<cr>") -- list git branches (use <cr> to checkout) ["gb" for git branch]
 keymap.set("n", "<leader>gs", "<cmd>Telescope git_status<cr>") -- list current changes per file with diff preview ["gs" for git status]
 
--- restart lsp server (not on youtube nvim video)
-keymap.set("n", "<leader>rs", ":LspRestart<CR>") -- mapping to restart lsp if necessary
+----------------------
+-- Coc.nvim Keybinds
+----------------------
+
+keymap.set("n", "gd", "<Plug>(coc-definition)", { silent = true })
+keymap.set("n", "gy", "<Plug>(coc-type-definition)", { silent = true })
+keymap.set("n", "gi", "<Plug>(coc-implementation)", { silent = true })
+keymap.set("n", "gr", "<Plug>(coc-references)", { silent = true })
+keymap.set("n", "K", ":call CocActionAsync('doHover')<CR>", { silent = true })
+keymap.set("n", "<leader>rn", "<Plug>(coc-rename)", { silent = true })
+keymap.set("n", "<leader>ca", ":CocAction<CR>", { silent = true })
+keymap.set("n", "[g", "<Plug>(coc-diagnostic-prev)", { silent = true })
+keymap.set("n", "]g", "<Plug>(coc-diagnostic-next)", { silent = true })
+
+_G.check_back_space = function()
+	local col = vim.fn.col(".") - 1
+	return col == 0 or vim.fn.getline("."):sub(col, col):match("%s") ~= nil
+end
+
+keymap.set("i", "<TAB>", 'coc#pum#visible() ? coc#pum#next(1) : v:lua.check_back_space() ? "<TAB>" : coc#refresh()',
+	{ silent = true, noremap = true, expr = true, replace_keycodes = false })
+keymap.set("i", "<S-TAB>", 'coc#pum#visible() ? coc#pum#prev(1) : "<C-h>"',
+	{ silent = true, noremap = true, expr = true, replace_keycodes = false })
+keymap.set("i", "<C-Space>", "coc#refresh()", { silent = true, noremap = true, expr = true })
