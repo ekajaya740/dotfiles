@@ -1,1 +1,4 @@
 nvim/nvim/plugin/
+
+# Zsh local overrides (secrets, host-specific config)
+zsh/.zshenv.local

@@ -1,0 +1,11 @@
+# ShellCheck project defaults
+# Note: ShellCheck does not natively support zsh
+
+# Force bash interpretation (zsh not supported)
+shell=bash
+
+# Only show warnings and errors
+severity=warning
+
+# Disable sourcing checks that fail on dynamic paths
+disable=SC1090,SC1091
