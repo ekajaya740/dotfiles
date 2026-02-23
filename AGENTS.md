@@ -7,6 +7,7 @@ This document provides guidelines for AI agents and automation tools working wit
 - **Source of truth**: Edit files in this repo only, never resolved paths under `$HOME`
 - **Symlink management**: Use `stow` for creating/managing symlinks
 - **Validation**: Always run checks before and after changes
+ **Keybindings**: See [KEYBINDINGS.md](./KEYBINDINGS.md) for custom shortcuts
 
 ## Repository Structure
 

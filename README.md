@@ -149,6 +149,11 @@ Run shell linting with shellcheck:
 make lint-shell
 ```
 
+## Keybindings
+
+See [KEYBINDINGS.md](./KEYBINDINGS.md) for a complete reference of custom keybindings for tmux, Neovim, and zsh.
+
+
 ## For Agents
 
 See [AGENTS.md](./AGENTS.md) for automation and CI-style setup guidelines.

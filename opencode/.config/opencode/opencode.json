@@ -2,7 +2,8 @@
   "plugin": [
     "oh-my-opencode@3.8.3",
     "opencode-antigravity-auth@1.6.0",
-    "opencode-openai-codex-auth"
+    "opencode-openai-codex-auth",
+    "opencode-rate-limit-fallback"
   ],
   "provider": {
     "google": {
