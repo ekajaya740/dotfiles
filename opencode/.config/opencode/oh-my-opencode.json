@@ -1,6 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json",
   "google_auth": false,
+  "model_fallback": true,
   "parallel_execution": true,
   "agents": {
     "sisyphus": {
@@ -10,16 +11,19 @@
       "model": "ollama-cloud/kimi-k2.5"
     },
     "prometheus": {
-      "model": "openai/gpt-5.3-codex"
+      "model": "openai/gpt-5.3-codex",
+      "fallback_models": ["ollama-cloud/kimi-k2.5", "ollama-cloud/glm-5"]
     },
     "atlas": {
       "model": "ollama-cloud/glm-5"
     },
     "hephaestus": {
-      "model": "openai/gpt-5.3-codex"
+      "model": "openai/gpt-5.3-codex",
+      "fallback_models": ["ollama-cloud/glm-5", "ollama-cloud/kimi-k2.5"]
     },
     "oracle": {
-      "model": "openai/gpt-5.2"
+      "model": "openai/gpt-5.2",
+      "fallback_models": ["ollama-cloud/kimi-k2.5", "ollama-cloud/glm-5"]
     },
     "librarian": {
       "model": "ollama-cloud/kimi-k2.5"

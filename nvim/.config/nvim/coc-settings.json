@@ -6,5 +6,6 @@
 	"java.completion.favoriteStaticMembers": [
 		"org.junit.jupiter.api.Assertions.*",
 		"org.mockito.Mockito.*"
-	]
+  ],
+  "snippets.ultisnips.pythonPrompt": false
 }
