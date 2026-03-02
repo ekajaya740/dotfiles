@@ -53,26 +53,24 @@ keymap.set("n", "<leader>gb", "<cmd>Telescope git_branches<cr>") -- list git bra
 keymap.set("n", "<leader>gs", "<cmd>Telescope git_status<cr>") -- list current changes per file with diff preview ["gs" for git status]
 
 ----------------------
--- Coc.nvim Keybinds
+-- LSP Keybinds (set on attach)
 ----------------------
 
-keymap.set("n", "gd", "<Plug>(coc-definition)", { silent = true })
-keymap.set("n", "gy", "<Plug>(coc-type-definition)", { silent = true })
-keymap.set("n", "gi", "<Plug>(coc-implementation)", { silent = true })
-keymap.set("n", "gr", "<Plug>(coc-references)", { silent = true })
-keymap.set("n", "K", ":call CocActionAsync('doHover')<CR>", { silent = true })
-keymap.set("n", "<leader>rn", "<Plug>(coc-rename)", { silent = true })
-keymap.set("n", "<leader>ca", ":CocAction<CR>", { silent = true })
-keymap.set("n", "[g", "<Plug>(coc-diagnostic-prev)", { silent = true })
-keymap.set("n", "]g", "<Plug>(coc-diagnostic-next)", { silent = true })
-
-_G.check_back_space = function()
-	local col = vim.fn.col(".") - 1
-	return col == 0 or vim.fn.getline("."):sub(col, col):match("%s") ~= nil
-end
-
-keymap.set("i", "<TAB>", 'coc#pum#visible() ? coc#pum#next(1) : v:lua.check_back_space() ? "<TAB>" : coc#refresh()',
-	{ silent = true, noremap = true, expr = true, replace_keycodes = false })
-keymap.set("i", "<S-TAB>", 'coc#pum#visible() ? coc#pum#prev(1) : "<C-h>"',
-	{ silent = true, noremap = true, expr = true, replace_keycodes = false })
-keymap.set("i", "<C-Space>", "coc#refresh()", { silent = true, noremap = true, expr = true })
+vim.api.nvim_create_autocmd("LspAttach", {
+	group = vim.api.nvim_create_augroup("UserLspConfig", {}),
+	callback = function(ev)
+		local opts = { buffer = ev.buf, silent = true }
+		keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+		keymap.set("n", "gy", vim.lsp.buf.type_definition, opts)
+		keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
+		keymap.set("n", "gr", vim.lsp.buf.references, opts)
+		keymap.set("n", "K", vim.lsp.buf.hover, opts)
+		keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
+		keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
+		keymap.set("n", "[g", vim.diagnostic.goto_prev, opts)
+		keymap.set("n", "]g", vim.diagnostic.goto_next, opts)
+		keymap.set("n", "<leader>fm", function()
+			vim.lsp.buf.format({ async = true })
+		end, opts)
+	end,
+})

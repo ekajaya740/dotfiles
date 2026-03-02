@@ -90,3 +90,37 @@ cd ~/dotfiles && stow <package>
 | Broken symlinks | `stow -D <pkg> && stow <pkg>` |
 | Conflicts with existing files | Backup first: `mv ~/.config/<pkg> ~/.config/<pkg>.bak` |
 | Permission denied | Ensure repo is in `~` not system paths |
+
+## Neovim Plugin Notes
+
+- **Mason**: Use `mason-org/mason.nvim` (renamed from `williamboman/mason.nvim`)
+- **LSP**: LazyVim's built-in LSP stack is used (nvim-lspconfig, mason-lspconfig, nvim-cmp)
+- **Java**: Uses `jdtls` language server via Mason; semantic highlighting configured in `lua/config/plugins/semantic-highlight.lua`
+
+### Language Servers (auto-installed via Mason)
+
+| Language | LSP | Formatters/Linters |
+|----------|-----|-------------------|
+| TypeScript/JavaScript | `vtsls`, `typescript-language-server` | `prettierd`, `eslint_d` |
+| Vue | `vue-language-server` (volar) | `prettierd` |
+| Svelte | `svelte-language-server` | `prettierd` |
+| Astro | `astro-language-server` | `prettierd` |
+| React/JSX | Built-in via TS LSP | `prettierd`, `eslint_d` |
+| Tailwind CSS | `tailwindcss-language-server` | - |
+| Java | `jdtls` | - |
+| Python | `pyright` | `ruff` |
+| Go | `gopls` | `goimports`, `gofumpt` |
+| Rust | `rust-analyzer` | `rustfmt` |
+| C/C++ | `clangd` | `clang-format` |
+| C# | `omnisharp` | - |
+| PHP (Laravel/WordPress) | `intelephense` | `php-cs-fixer`, `phpcs` |
+| Ruby | `ruby-lsp` | `rubocop` |
+| Dart/Flutter | `dartls` | - |
+| Zig | `zls` | `zigfmt` |
+| Lua | `lua-language-server` | `stylua` |
+| Bash/Shell | `bash-language-server` | `shfmt`, `shellcheck` |
+| Docker | `dockerfile-language-server`, `docker-compose-language-service` | - |
+| Prisma | `prisma-language-server` | - |
+| GraphQL | `graphql-language-service-cli` | - |
+| JSON/YAML | `json-lsp`, `yaml-language-server` | `prettierd` |
+| HTML/CSS | `html-lsp`, `css-lsp` | `prettierd` |
