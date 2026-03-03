@@ -5,7 +5,7 @@ return {
 		dependencies = {
 			"mason-org/mason.nvim",
 			"mason-org/mason-lspconfig.nvim",
-			"hrsh7th/cmp-nvim-lsp",
+			"saghen/blink.cmp",
 			{ "j-hui/fidget.nvim", opts = {} },
 			{ "folke/neodev.nvim", opts = {} },
 			"b0o/schemastore.nvim",
@@ -50,24 +50,6 @@ return {
 				svelte = {},
 				astro = {},
 				solidity = {},
-				jdtls = {
-					settings = {
-						java = {
-							format = { enabled = true },
-							signatureHelp = { enabled = true },
-							implementationCodeLens = { enabled = true },
-							sources = {
-								organizeImports = { starThreshold = 5, staticStarThreshold = 3 },
-							},
-							completion = {
-								favoriteStaticMembers = {
-									"org.junit.jupiter.api.Assertions.*",
-									"org.mockito.Mockito.*",
-								},
-							},
-						},
-					},
-				},
 				pyright = {
 					settings = {
 						python = {
@@ -186,12 +168,16 @@ return {
 		config = function(_, opts)
 			local lspconfig = require("lspconfig")
 			local capabilities = vim.lsp.protocol.make_client_capabilities()
-			capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
+			capabilities = vim.tbl_deep_extend("force", capabilities, require("blink.cmp").get_lsp_capabilities())
 
 			for server, server_opts in pairs(opts.servers) do
-				server_opts.capabilities = capabilities
-				lspconfig[server].setup(server_opts)
+				if server ~= "jdtls" then
+					server_opts.capabilities = capabilities
+					lspconfig[server].setup(server_opts)
+				end
 			end
+
+			require("config.plugins.jdtls").setup()
 
 			vim.api.nvim_create_autocmd("BufWritePre", {
 				group = vim.api.nvim_create_augroup("LspFormatting", {}),
