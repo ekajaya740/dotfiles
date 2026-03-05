@@ -235,6 +235,44 @@
             }
           }
         },
+        "gpt-5.3-codex": {
+          "name": "GPT 5.3 Codex (OAuth)",
+          "limit": {
+            "context": 272000,
+            "output": 128000
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "variants": {
+            "low": {
+              "reasoningEffort": "low",
+              "reasoningSummary": "auto",
+              "textVerbosity": "medium"
+            },
+            "medium": {
+              "reasoningEffort": "medium",
+              "reasoningSummary": "auto",
+              "textVerbosity": "medium"
+            },
+            "high": {
+              "reasoningEffort": "high",
+              "reasoningSummary": "detailed",
+              "textVerbosity": "medium"
+            },
+            "xhigh": {
+              "reasoningEffort": "xhigh",
+              "reasoningSummary": "detailed",
+              "textVerbosity": "medium"
+            }
+          }
+        },
         "gpt-5.1-codex-max": {
           "name": "GPT 5.1 Codex Max (OAuth)",
           "limit": {
@@ -293,6 +331,9 @@
         },
         "kimi-k2.5": {
           "name": "kimi-k2.5"
+        },
+        "qwen3-coder-next": {
+          "name": "qwen3-coder-next"
         }
       }
     },
@@ -306,43 +347,70 @@
         "glm-5": {
           "name": "glm-5:cloud",
           "limit": {
-            "context": 120000,
+            "context": 200000,
             "output": 32000
           }
         },
         "glm-5:cloud": {
           "name": "glm-5:cloud",
           "limit": {
-            "context": 120000,
+            "context": 200000,
             "output": 32000
           }
         },
         "minimax-m2.5": {
           "name": "minimax-m2.5:cloud",
           "limit": {
-            "context": 120000,
+            "context": 200000,
             "output": 32000
           }
         },
         "minimax-m2.5:cloud": {
           "name": "minimax-m2.5:cloud",
           "limit": {
-            "context": 120000,
+            "context": 200000,
             "output": 32000
           }
         },
         "kimi-k2.5": {
           "name": "kimi-k2.5:cloud",
           "limit": {
-            "context": 120000,
+            "context": 200000,
             "output": 32000
           }
         },
         "kimi-k2.5:cloud": {
           "name": "kimi-k2.5:cloud",
           "limit": {
-            "context": 120000,
+            "context": 200000,
             "output": 32000
+          }
+        },
+        "gemini-3-flash-preview": {
+          "name": "gemini-3-flash-preview:cloud",
+          "limit": {
+            "context": 200000,
+            "output": 32000
+          }
+        }
+      }
+    },
+    "mistral": {
+      "npm": "@ai-sdk/mistral",
+      "name": "Mistral",
+      "models": {
+        "devstral-2512": {
+          "name": "Devstral 2512",
+          "limit": {
+            "context": 128000,
+            "output": 32000
+          }
+        },
+        "devstral-small-2512": {
+          "name": "Devstral Small 2512",
+          "limit": {
+            "context": 128000,
+            "output": 16000
           }
         }
       }
@@ -360,16 +428,6 @@
       "enabled": true,
       "timeout": 20000
     },
-    "tanstack": {
-      "type": "local",
-      "command": [
-        "bunx",
-        "@tanstack/cli",
-        "mcp"
-      ],
-      "enabled": false,
-      "timeout": 20000
-    },
     "astro-docs": {
       "type": "local",
       "command": [
@@ -384,11 +442,21 @@
     "shadcn": {
       "type": "local",
       "command": [
-        "npx",
+        "bunx",
+        "-y",
         "shadcn@latest",
         "mcp"
       ],
       "enabled": true
+    },
+    "obsidian": {
+      "type": "local",
+      "command": [
+        "bunx",
+        "-y",
+        "@mauricio.wolff/mcp-obsidian@latest",
+        "/Users/ekajaya740/Documents/03-Resource"
+      ]
     }
   },
   "model": "openai/gpt-5.3-codex"
