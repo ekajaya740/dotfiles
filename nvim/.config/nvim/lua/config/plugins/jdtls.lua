@@ -2,9 +2,8 @@ local M = {}
 
 function M.setup()
 	local lspconfig = require("lspconfig")
-	local mason_registry = require("mason-registry")
 
-	local jdtls_path = mason_registry.get_package("jdtls"):get_install_path()
+	local jdtls_path = vim.fn.stdpath("data") .. "/mason/packages/jdtls"
 	local lombok_jar = vim.fn.expand("~/.local/share/nvim/lombok.jar")
 
 	local cmd = { jdtls_path .. "/bin/jdtls" }
