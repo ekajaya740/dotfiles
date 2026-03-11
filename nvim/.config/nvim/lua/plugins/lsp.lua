@@ -168,6 +168,21 @@ return {
 		config = function(_, opts)
 			local lspconfig = require("lspconfig")
 			local capabilities = vim.lsp.protocol.make_client_capabilities()
+			local function normalize_html_doctype(bufnr)
+				if vim.bo[bufnr].filetype ~= "html" then
+					return
+				end
+
+				local first_line = vim.api.nvim_buf_get_lines(bufnr, 0, 1, false)[1]
+				if not first_line then
+					return
+				end
+
+				if first_line:match("^<![Dd][Oo][Cc][Tt][Yy][Pp][Ee]%s+html>$") and first_line ~= "<!DOCTYPE html>" then
+					vim.api.nvim_buf_set_lines(bufnr, 0, 1, false, { "<!DOCTYPE html>" })
+				end
+			end
+
 			capabilities = vim.tbl_deep_extend("force", capabilities, require("blink.cmp").get_lsp_capabilities())
 
 			for server, server_opts in pairs(opts.servers) do
@@ -181,8 +196,9 @@ return {
 
 			vim.api.nvim_create_autocmd("BufWritePre", {
 				group = vim.api.nvim_create_augroup("LspFormatting", {}),
-				callback = function()
-					vim.lsp.buf.format({ timeout_ms = 2000 })
+				callback = function(args)
+					vim.lsp.buf.format({ bufnr = args.buf, timeout_ms = 2000 })
+					normalize_html_doctype(args.buf)
 				end,
 			})
 		end,
