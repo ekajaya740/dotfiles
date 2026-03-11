@@ -34,3 +34,6 @@ opt.splitright = true
 opt.splitbelow = true
 
 opt.iskeyword:append("-")
+
+vim.g.netrw_list_hide = ""
+vim.g.netrw_hide = 0

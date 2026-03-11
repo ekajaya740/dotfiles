@@ -10,6 +10,11 @@ vim.g.loaded_netrwPlugin = 1
 vim.cmd([[highlight NvimTreeIndentMarker guifg=#3FC5FF]])
 
 nvimtree.setup({
+  filters = {
+    enable = false,
+    dotfiles = false,
+    git_ignored = false,
+  },
   renderer = {
     icons = {
       glyphs = {
