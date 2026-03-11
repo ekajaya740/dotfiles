@@ -438,6 +438,17 @@
       ],
       "enabled": true,
       "timeout": 20000
+    },
+    "notion": {
+      "type": "local",
+      "command": [
+        "bunx",
+        "-y",
+        "mcp-remote",
+        "https://mcp.notion.com/mcp"
+      ],
+      "enabled": true,
+      "timeout": 20000
     }
   },
   "model": "openai/gpt-5.3-codex"
