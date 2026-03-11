@@ -18,8 +18,14 @@
             "output": 65535
           },
           "modalities": {
-            "input": ["text", "image", "pdf"],
-            "output": ["text"]
+            "input": [
+              "text",
+              "image",
+              "pdf"
+            ],
+            "output": [
+              "text"
+            ]
           }
         },
         "antigravity-gemini-3-pro-low": {
@@ -31,8 +37,14 @@
             "output": 65535
           },
           "modalities": {
-            "input": ["text", "image", "pdf"],
-            "output": ["text"]
+            "input": [
+              "text",
+              "image",
+              "pdf"
+            ],
+            "output": [
+              "text"
+            ]
           }
         },
         "antigravity-gemini-3-flash": {
@@ -43,8 +55,14 @@
             "output": 65536
           },
           "modalities": {
-            "input": ["text", "image", "pdf"],
-            "output": ["text"]
+            "input": [
+              "text",
+              "image",
+              "pdf"
+            ],
+            "output": [
+              "text"
+            ]
           }
         },
         "antigravity-claude-sonnet-4-5": {
@@ -54,8 +72,14 @@
             "output": 64000
           },
           "modalities": {
-            "input": ["text", "image", "pdf"],
-            "output": ["text"]
+            "input": [
+              "text",
+              "image",
+              "pdf"
+            ],
+            "output": [
+              "text"
+            ]
           }
         },
         "antigravity-claude-sonnet-4-5-thinking": {
@@ -65,8 +89,14 @@
             "output": 64000
           },
           "modalities": {
-            "input": ["text", "image", "pdf"],
-            "output": ["text"]
+            "input": [
+              "text",
+              "image",
+              "pdf"
+            ],
+            "output": [
+              "text"
+            ]
           },
           "variants": {
             "low": {
@@ -88,8 +118,14 @@
             "output": 64000
           },
           "modalities": {
-            "input": ["text", "image", "pdf"],
-            "output": ["text"]
+            "input": [
+              "text",
+              "image",
+              "pdf"
+            ],
+            "output": [
+              "text"
+            ]
           },
           "variants": {
             "low": {
@@ -112,7 +148,9 @@
         "reasoningEffort": "medium",
         "reasoningSummary": "auto",
         "textVerbosity": "medium",
-        "include": ["reasoning.encrypted_content"],
+        "include": [
+          "reasoning.encrypted_content"
+        ],
         "store": false
       },
       "models": {
@@ -123,8 +161,13 @@
             "output": 128000
           },
           "modalities": {
-            "input": ["text", "image"],
-            "output": ["text"]
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
           },
           "variants": {
             "none": {
@@ -161,8 +204,13 @@
             "output": 128000
           },
           "modalities": {
-            "input": ["text", "image"],
-            "output": ["text"]
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
           },
           "variants": {
             "low": {
@@ -194,8 +242,13 @@
             "output": 128000
           },
           "modalities": {
-            "input": ["text", "image"],
-            "output": ["text"]
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
           },
           "variants": {
             "low": {
@@ -227,8 +280,13 @@
             "output": 128000
           },
           "modalities": {
-            "input": ["text", "image"],
-            "output": ["text"]
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
           },
           "variants": {
             "low": {
@@ -351,27 +409,15 @@
   },
   "$schema": "https://opencode.ai/config.json",
   "mcp": {
-    "chrome-devtools": {
-      "type": "local",
-      "command": ["bunx", "-y", "chrome-devtools-mcp@latest"],
-      "enabled": true,
-      "timeout": 20000
-    },
-    "astro-docs": {
+    "grep_app": {
       "type": "local",
       "command": [
         "bunx",
         "-y",
-        "mcp-remote",
-        "https://mcp.docs.astro.build/mcp"
+        "@modelcontextprotocol/server-github"
       ],
       "enabled": true,
       "timeout": 20000
-    },
-    "shadcn": {
-      "type": "local",
-      "command": ["bunx", "-y", "shadcn@latest", "mcp"],
-      "enabled": true
     },
     "obsidian": {
       "type": "local",
@@ -379,8 +425,19 @@
         "bunx",
         "-y",
         "@mauricio.wolff/mcp-obsidian@latest",
-        "/Users/ekajaya740/Documents/03-Resource"
-      ]
+        "$HOME/Documents/03-Resources/Second Brain"
+      ],
+      "enabled": true,
+      "timeout": 20000
+    },
+    "notebooklm": {
+      "type": "local",
+      "command": [
+        "bunx",
+        "notebooklm-mcp@latest"
+      ],
+      "enabled": true,
+      "timeout": 20000
     }
   },
   "model": "openai/gpt-5.3-codex"
