@@ -17,22 +17,22 @@ return {
 
 			opts.picker.sources.files = vim.tbl_deep_extend("force", opts.picker.sources.files or {}, {
 				hidden = true,
-				ignored = true,
+				ignored = false,
 			})
 
 			opts.picker.sources.grep = vim.tbl_deep_extend("force", opts.picker.sources.grep or {}, {
 				hidden = true,
-				ignored = true,
+				ignored = false,
 			})
 
 			opts.picker.sources.grep_word = vim.tbl_deep_extend("force", opts.picker.sources.grep_word or {}, {
 				hidden = true,
-				ignored = true,
+				ignored = false,
 			})
 
 			opts.picker.sources.explorer = vim.tbl_deep_extend("force", opts.picker.sources.explorer or {}, {
 				hidden = true,
-				ignored = true,
+				ignored = false,
 			})
 
 			return opts

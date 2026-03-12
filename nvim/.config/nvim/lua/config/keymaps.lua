@@ -42,14 +42,14 @@ local function set_file_picker_keymaps()
 	end
 
 	keymap.set("n", "<leader>e", "<cmd>NvimTreeToggle<CR>")
-	keymap.set("n", "<leader>fe", "<cmd>lua Snacks.explorer({ cwd = LazyVim.root(), hidden = true, ignored = true })<CR>")
-	keymap.set("n", "<leader>fE", "<cmd>lua Snacks.explorer({ hidden = true, ignored = true })<CR>")
+	keymap.set("n", "<leader>fe", "<cmd>lua Snacks.explorer({ cwd = LazyVim.root(), hidden = true, ignored = false })<CR>")
+	keymap.set("n", "<leader>fE", "<cmd>lua Snacks.explorer({ hidden = true, ignored = false })<CR>")
 	keymap.set("n", "<leader>E", "<leader>fE", { remap = true })
-	keymap.set("n", "<leader><space>", "<cmd>Telescope find_files hidden=true no_ignore=true no_ignore_parent=true<cr>")
-	keymap.set("n", "<leader>/", "<cmd>Telescope live_grep hidden=true no_ignore=true no_ignore_parent=true<cr>")
-	keymap.set("n", "<leader>ff", "<cmd>Telescope find_files hidden=true no_ignore=true no_ignore_parent=true<cr>")
-	keymap.set("n", "<leader>fs", "<cmd>Telescope live_grep hidden=true no_ignore=true no_ignore_parent=true<cr>")
-	keymap.set("n", "<leader>fc", "<cmd>Telescope grep_string hidden=true no_ignore=true no_ignore_parent=true<cr>")
+	keymap.set("n", "<leader><space>", "<cmd>Telescope find_files hidden=true<cr>")
+	keymap.set("n", "<leader>/", "<cmd>Telescope live_grep hidden=true<cr>")
+	keymap.set("n", "<leader>ff", "<cmd>Telescope find_files hidden=true<cr>")
+	keymap.set("n", "<leader>fs", "<cmd>Telescope live_grep hidden=true<cr>")
+	keymap.set("n", "<leader>fc", "<cmd>Telescope grep_string hidden=true<cr>")
 end
 
 set_file_picker_keymaps()

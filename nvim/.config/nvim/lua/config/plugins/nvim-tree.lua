@@ -11,9 +11,9 @@ vim.cmd([[highlight NvimTreeIndentMarker guifg=#3FC5FF]])
 
 nvimtree.setup({
   filters = {
-    enable = false,
+    enable = true,
     dotfiles = false,
-    git_ignored = false,
+    git_ignored = true,
   },
   renderer = {
     icons = {
