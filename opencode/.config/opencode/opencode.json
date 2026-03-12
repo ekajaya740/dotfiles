@@ -383,6 +383,13 @@
             "context": 200000,
             "output": 32000
           }
+        },
+        "nemotron-3-super": {
+          "name": "nemotron-3-super:cloud",
+          "limit": {
+            "context": 256000,
+            "output": 32000
+          }
         }
       }
     },
