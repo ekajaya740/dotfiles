@@ -168,19 +168,17 @@ return {
 		config = function(_, opts)
 			local lspconfig = require("lspconfig")
 			local capabilities = vim.lsp.protocol.make_client_capabilities()
-			local function normalize_html_doctype(bufnr)
-				if vim.bo[bufnr].filetype ~= "html" then
-					return
+			local function is_autoformat_enabled(bufnr)
+				if vim.bo[bufnr].filetype == "html" then
+					return false
 				end
 
-				local first_line = vim.api.nvim_buf_get_lines(bufnr, 0, 1, false)[1]
-				if not first_line then
-					return
-				end
+				local global_autoformat = vim.g.autoformat
+				local buffer_autoformat = vim.b[bufnr].autoformat
+				local global_enabled = global_autoformat == nil or global_autoformat
+				local buffer_enabled = buffer_autoformat == nil or buffer_autoformat
 
-				if first_line:match("^<![Dd][Oo][Cc][Tt][Yy][Pp][Ee]%s+html>$") and first_line ~= "<!DOCTYPE html>" then
-					vim.api.nvim_buf_set_lines(bufnr, 0, 1, false, { "<!DOCTYPE html>" })
-				end
+				return global_enabled and buffer_enabled
 			end
 
 			capabilities = vim.tbl_deep_extend("force", capabilities, require("blink.cmp").get_lsp_capabilities())
@@ -194,11 +192,22 @@ return {
 
 			require("config.plugins.jdtls").setup()
 
+			vim.api.nvim_create_autocmd("FileType", {
+				group = vim.api.nvim_create_augroup("DisableHtmlAutoformat", {}),
+				pattern = { "html" },
+				callback = function(args)
+					vim.b[args.buf].autoformat = false
+				end,
+			})
+
 			vim.api.nvim_create_autocmd("BufWritePre", {
 				group = vim.api.nvim_create_augroup("LspFormatting", {}),
 				callback = function(args)
+					if not is_autoformat_enabled(args.buf) then
+						return
+					end
+
 					vim.lsp.buf.format({ bufnr = args.buf, timeout_ms = 2000 })
-					normalize_html_doctype(args.buf)
 				end,
 			})
 		end,
