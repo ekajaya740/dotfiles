@@ -6,6 +6,7 @@
   "agents": {
     "sisyphus": {
       "model": "ollama-cloud/kimi-k2.5",
+      "temperature": 0.3,
       "fallback_models": [
         "ollama-cloud/glm-5",
         "ollama-cloud/minimax-k2.5"
@@ -13,12 +14,14 @@
     },
     "sisyphus-junior": {
       "model": "ollama-cloud/minimax-m2.5",
+      "temperature": 0.3,
       "fallback_models": [
         "ollama-cloud/nemotron-3-nano"
       ]
     },
     "prometheus": {
       "model": "ollama-cloud/kimi-k2.5",
+      "temperature": 0.3,
       "fallback_models": [
         "ollama-cloud/glm-5",
         "ollama-cloud/minimax-k2.5"
@@ -26,6 +29,7 @@
     },
     "atlas": {
       "model": "ollama-cloud/kimi-k2.5",
+      "temperature": 0.3,
       "fallback_models": [
         "ollama-cloud/glm-5",
         "ollama-cloud/minimax-m2.5"
@@ -33,6 +37,7 @@
     },
     "hephaestus": {
       "model": "ollama-cloud/qwen3-coder-next",
+      "temperature": 0.5,
       "fallback_models": [
         "ollama-cloud/nemotron-3-super",
         "ollama-cloud/kimi-k2.5"
@@ -41,6 +46,7 @@
     "oracle": {
       "model": "ollama-cloud/nemotron-3-super",
       "variant": "high",
+      "temperature": 0.2,
       "fallback_models": [
         "ollama-cloud/minimax-k2.5",
         "ollama-cloud/glm-5"
@@ -48,6 +54,7 @@
     },
     "librarian": {
       "model": "ollama-cloud/minimax-m2.5",
+      "temperature": 0.1,
       "fallback_models": [
         "ollama-cloud/nemotron-3-nano",
         "ollama-cloud/glm-5"
@@ -55,12 +62,14 @@
     },
     "explore": {
       "model": "ollama-cloud/minimax-m2.5",
+      "temperature": 0.1,
       "fallback_models": [
         "ollama-cloud/nemotron-3-nano"
       ]
     },
     "metis": {
       "model": "ollama-cloud/glm-5",
+      "temperature": 0.7,
       "fallback_models": [
         "ollama-cloud/kimi-k2.5",
         "ollama-cloud/minimax-m2.5"
@@ -68,7 +77,8 @@
     },
     "momus": {
       "model": "ollama-cloud/nemotron-3-super",
-      "variant": "high",
+      "variant": "medium",
+      "temperature": 0.1,
       "fallback_models": [
         "ollama-cloud/minimax-k2.5",
         "ollama-cloud/glm-5"
@@ -76,6 +86,7 @@
     },
     "frontend-ui-ux-engineer": {
       "model": "ollama-cloud/gemini-3-flash-preview",
+      "temperature": 0.7,
       "fallback_models": [
         "ollama-cloud/qwen3.5",
         "ollama-cloud/minimax-m2.5"
@@ -83,12 +94,14 @@
     },
     "document-writer": {
       "model": "ollama-cloud/minimax-m2.5",
+      "temperature": 0.5,
       "fallback_models": [
         "ollama-cloud/qwen3.5"
       ]
     },
     "multimodal-looker": {
       "model": "ollama-cloud/kimi-k2.5",
+      "temperature": 0.2,
       "fallback_models": [
         "ollama-cloud/qwen3.5",
         "ollama-cloud/gemini-3-flash-preview"
