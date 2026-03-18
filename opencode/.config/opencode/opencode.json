@@ -1,147 +1,10 @@
 {
   "plugin": [
     "oh-my-opencode@3.8.3",
-    "opencode-antigravity-auth@1.6.0",
     "opencode-openai-codex-auth",
     "opencode-rate-limit-fallback"
   ],
   "provider": {
-    "google": {
-      "name": "Google",
-      "models": {
-        "antigravity-gemini-3-pro-high": {
-          "name": "Gemini 3 Pro High (Antigravity)",
-          "thinking": true,
-          "attachment": true,
-          "limit": {
-            "context": 1048576,
-            "output": 65535
-          },
-          "modalities": {
-            "input": [
-              "text",
-              "image",
-              "pdf"
-            ],
-            "output": [
-              "text"
-            ]
-          }
-        },
-        "antigravity-gemini-3-pro-low": {
-          "name": "Gemini 3 Pro Low (Antigravity)",
-          "thinking": true,
-          "attachment": true,
-          "limit": {
-            "context": 1048576,
-            "output": 65535
-          },
-          "modalities": {
-            "input": [
-              "text",
-              "image",
-              "pdf"
-            ],
-            "output": [
-              "text"
-            ]
-          }
-        },
-        "antigravity-gemini-3-flash": {
-          "name": "Gemini 3 Flash (Antigravity)",
-          "attachment": true,
-          "limit": {
-            "context": 1048576,
-            "output": 65536
-          },
-          "modalities": {
-            "input": [
-              "text",
-              "image",
-              "pdf"
-            ],
-            "output": [
-              "text"
-            ]
-          }
-        },
-        "antigravity-claude-sonnet-4-5": {
-          "name": "Claude Sonnet 4.5 (Antigravity)",
-          "limit": {
-            "context": 200000,
-            "output": 64000
-          },
-          "modalities": {
-            "input": [
-              "text",
-              "image",
-              "pdf"
-            ],
-            "output": [
-              "text"
-            ]
-          }
-        },
-        "antigravity-claude-sonnet-4-5-thinking": {
-          "name": "Claude Sonnet 4.5 Thinking (Antigravity)",
-          "limit": {
-            "context": 200000,
-            "output": 64000
-          },
-          "modalities": {
-            "input": [
-              "text",
-              "image",
-              "pdf"
-            ],
-            "output": [
-              "text"
-            ]
-          },
-          "variants": {
-            "low": {
-              "thinkingConfig": {
-                "thinkingBudget": 8192
-              }
-            },
-            "max": {
-              "thinkingConfig": {
-                "thinkingBudget": 32768
-              }
-            }
-          }
-        },
-        "antigravity-claude-opus-4-6-thinking": {
-          "name": "Claude Opus 4.6 Thinking (Antigravity)",
-          "limit": {
-            "context": 200000,
-            "output": 64000
-          },
-          "modalities": {
-            "input": [
-              "text",
-              "image",
-              "pdf"
-            ],
-            "output": [
-              "text"
-            ]
-          },
-          "variants": {
-            "low": {
-              "thinkingConfig": {
-                "thinkingBudget": 8192
-              }
-            },
-            "max": {
-              "thinkingConfig": {
-                "thinkingBudget": 32768
-              }
-            }
-          }
-        }
-      }
-    },
     "openai": {
       "name": "OpenAI",
       "options": {
@@ -335,13 +198,6 @@
         "baseURL": "https://ollama.com/v1"
       },
       "models": {
-        "glm-5": {
-          "name": "glm-5:cloud",
-          "limit": {
-            "context": 200000,
-            "output": 32000
-          }
-        },
         "glm-5:cloud": {
           "name": "glm-5:cloud",
           "limit": {
@@ -349,22 +205,8 @@
             "output": 32000
           }
         },
-        "minimax-m2.5": {
-          "name": "minimax-m2.5:cloud",
-          "limit": {
-            "context": 200000,
-            "output": 32000
-          }
-        },
         "minimax-m2.5:cloud": {
           "name": "minimax-m2.5:cloud",
-          "limit": {
-            "context": 200000,
-            "output": 32000
-          }
-        },
-        "kimi-k2.5": {
-          "name": "kimi-k2.5:cloud",
           "limit": {
             "context": 200000,
             "output": 32000
@@ -392,26 +234,6 @@
           }
         }
       }
-    },
-    "mistral": {
-      "npm": "@ai-sdk/mistral",
-      "name": "Mistral",
-      "models": {
-        "devstral-2512": {
-          "name": "Devstral 2512",
-          "limit": {
-            "context": 128000,
-            "output": 32000
-          }
-        },
-        "devstral-small-2512": {
-          "name": "Devstral Small 2512",
-          "limit": {
-            "context": 128000,
-            "output": 16000
-          }
-        }
-      }
     }
   },
   "$schema": "https://opencode.ai/config.json",
@@ -422,17 +244,6 @@
         "bunx",
         "-y",
         "@modelcontextprotocol/server-github"
-      ],
-      "enabled": true,
-      "timeout": 20000
-    },
-    "obsidian": {
-      "type": "local",
-      "command": [
-        "bunx",
-        "-y",
-        "@mauricio.wolff/mcp-obsidian@latest",
-        "$HOME/Documents/03-Resources/Second Brain"
       ],
       "enabled": true,
       "timeout": 20000
@@ -456,7 +267,17 @@
       ],
       "enabled": true,
       "timeout": 20000
+    },
+    "linear": {
+      "type": "local",
+      "command": [
+        "bunx",
+        "-y",
+        "@linear/mcp-server"
+      ],
+      "enabled": true,
+      "timeout": 20000
     }
   },
-  "model": "openai/gpt-5.3-codex"
+  "model": "ollama-cloud/minimax-m2.5:cloud"
 }

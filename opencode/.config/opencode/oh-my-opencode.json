@@ -1,96 +1,97 @@
 {
-  "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json",
+  "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-openagent/master/assets/oh-my-openagent.schema.json",
   "google_auth": false,
   "model_fallback": true,
   "parallel_execution": true,
   "agents": {
     "sisyphus": {
-      "model": "ollama-cloud/nemotron-3-super",
+      "model": "ollama-cloud/kimi-k2.5",
       "fallback_models": [
-        "ollama-cloud/minimax-m2.5",
-        "ollama-cloud/glm-5"
+        "ollama-cloud/glm-5",
+        "ollama-cloud/minimax-k2.5"
       ]
     },
     "sisyphus-junior": {
       "model": "ollama-cloud/minimax-m2.5",
       "fallback_models": [
-        "openai/gpt-5.3-codex"
+        "ollama-cloud/nemotron-3-nano"
       ]
     },
     "prometheus": {
-      "model": "openai/gpt-5.3-codex",
-      "variant": "xhigh",
+      "model": "ollama-cloud/kimi-k2.5",
       "fallback_models": [
-        "openai/gpt-5.2",
-        "ollama-cloud/minimax-m2.5"
+        "ollama-cloud/glm-5",
+        "ollama-cloud/minimax-k2.5"
       ]
     },
     "atlas": {
-      "model": "ollama-cloud/nemotron-3-super",
+      "model": "ollama-cloud/kimi-k2.5",
       "fallback_models": [
-        "ollama-cloud/minimax-m2.5",
-        "ollama-cloud/glm-5"
-      ]
-    },
-    "hephaestus": {
-      "model": "openai/gpt-5.3-codex",
-      "variant": "xhigh",
-      "fallback_models": [
-        "ollama-cloud/devstral-2",
+        "ollama-cloud/glm-5",
         "ollama-cloud/minimax-m2.5"
       ]
     },
-    "oracle": {
-      "model": "openai/gpt-5.3-codex",
+    "hephaestus": {
+      "model": "ollama-cloud/qwen3-coder-next",
       "fallback_models": [
-        "ollama-cloud/minimax-m2.5",
+        "ollama-cloud/nemotron-3-super",
+        "ollama-cloud/kimi-k2.5"
+      ]
+    },
+    "oracle": {
+      "model": "ollama-cloud/nemotron-3-super",
+      "variant": "high",
+      "fallback_models": [
+        "ollama-cloud/minimax-k2.5",
         "ollama-cloud/glm-5"
       ]
     },
     "librarian": {
       "model": "ollama-cloud/minimax-m2.5",
       "fallback_models": [
-        "ollama-cloud/nemotron-3-super",
-        "ollama-cloud/devstral-2"
-      ]
-    },
-    "explore": {
-      "model": "ollama-cloud/devstral-2",
-      "fallback_models": [
+        "ollama-cloud/nemotron-3-nano",
         "ollama-cloud/glm-5"
       ]
     },
-    "metis": {
-      "model": "openai/gpt-5.3-codex",
-      "variant": "xhigh",
+    "explore": {
+      "model": "ollama-cloud/minimax-m2.5",
       "fallback_models": [
+        "ollama-cloud/nemotron-3-nano"
+      ]
+    },
+    "metis": {
+      "model": "ollama-cloud/glm-5",
+      "fallback_models": [
+        "ollama-cloud/kimi-k2.5",
         "ollama-cloud/minimax-m2.5"
       ]
     },
     "momus": {
-      "model": "openai/gpt-5.3-codex",
-      "variant": "xhigh",
+      "model": "ollama-cloud/nemotron-3-super",
+      "variant": "high",
       "fallback_models": [
-        "ollama-cloud/minimax-m2.5"
+        "ollama-cloud/minimax-k2.5",
+        "ollama-cloud/glm-5"
       ]
     },
     "frontend-ui-ux-engineer": {
       "model": "ollama-cloud/gemini-3-flash-preview",
       "fallback_models": [
-        "ollama-cloud/devstral-2",
+        "ollama-cloud/qwen3.5",
         "ollama-cloud/minimax-m2.5"
       ]
     },
     "document-writer": {
       "model": "ollama-cloud/minimax-m2.5",
       "fallback_models": [
-        "ollama-cloud/glm-5"
+        "ollama-cloud/qwen3.5"
       ]
     },
     "multimodal-looker": {
-      "model": "ollama-cloud/gemini-3-flash-preview",
+      "model": "ollama-cloud/kimi-k2.5",
       "fallback_models": [
-        "ollama-cloud/minimax-m2.5"
+        "ollama-cloud/qwen3.5",
+        "ollama-cloud/gemini-3-flash-preview"
       ]
     }
   },
@@ -102,17 +103,17 @@
       "model": "ollama-cloud/minimax-m2.5"
     },
     "unspecified-high": {
-      "model": "ollama-cloud/minimax-k2.5"
+      "model": "ollama-cloud/kimi-k2.5"
     },
     "deep": {
-      "model": "ollama-cloud/glm-5"
+      "model": "ollama-cloud/qwen3-coder-next"
     },
     "ultrabrain": {
-      "model": "openai/gpt-5.3-codex",
-      "variant": "xhigh"
+      "model": "ollama-cloud/nemotron-3-super",
+      "variant": "high"
     },
     "artistry": {
-      "model": "ollama-cloud/minimax-m2.5"
+      "model": "ollama-cloud/gemini-3-flash-preview"
     },
     "writing": {
       "model": "ollama-cloud/minimax-m2.5"
