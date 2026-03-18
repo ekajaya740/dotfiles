@@ -25,7 +25,8 @@
       "fallback_models": [
         "ollama-cloud/glm-5",
         "ollama-cloud/minimax-k2.5"
-      ]
+      ],
+      "prompt_append": "You are a PLANNER. You MUST NOT modify, create, or edit any files. Your job is to interview the user, explore the codebase using read-only tools, identify scope and ambiguities, and produce a detailed verified plan. Hand off ALL implementation to execution agents."
     },
     "atlas": {
       "model": "ollama-cloud/kimi-k2.5",
