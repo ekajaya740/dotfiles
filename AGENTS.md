@@ -15,7 +15,8 @@ This document provides guidelines for AI agents and automation tools working wit
 ~/dotfiles/
 ├── nvim/.config/nvim/          → ~/.config/nvim
 ├── tmux/.tmux.conf             → ~/.tmux.conf
-└── opencode/.config/opencode/  → ~/.config/opencode/
+├── opencode/.config/opencode/  → ~/.config/opencode/
+└── claude/.claude/             → ~/.claude
 ```
 
 ## Workflow
@@ -33,7 +34,7 @@ This document provides guidelines for AI agents and automation tools working wit
 jq empty opencode/.config/opencode/*.json
 
 # Verify symlinks
-ls -l ~/.config/nvim ~/.tmux.conf ~/.config/opencode/
+ls -l ~/.config/nvim ~/.tmux.conf ~/.config/opencode/ ~/.claude/
 
 # Test configs
 nvim --headless -c 'quit' 2>/dev/null && echo "nvim OK"
@@ -46,8 +47,8 @@ If symlinks break or need refresh:
 
 ```bash
 cd ~/dotfiles
-stow -D nvim tmux opencode  # Unstow
-stow nvim tmux opencode      # Restow
+stow -D nvim tmux opencode claude  # Unstow
+stow nvim tmux opencode claude     # Restow
 ```
 
 ## Safety Rules
@@ -68,6 +69,15 @@ vim ~/dotfiles/opencode/.config/opencode/oh-my-opencode.json
 
 # Validate
 jq empty ~/dotfiles/opencode/.config/opencode/oh-my-opencode.json
+
+# Changes apply immediately (symlinked)
+```
+
+### Update Claude config
+
+```bash
+# Edit in repo
+vim ~/dotfiles/claude/.claude/CLAUDE.md
 
 # Changes apply immediately (symlinked)
 ```

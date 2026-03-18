@@ -12,6 +12,8 @@ Personal configuration for Neovim (LazyVim + coc.nvim), tmux, zsh, and OpenCode.
 - `zsh/.p10k.zsh` -> `~/.p10k.zsh` (placeholder, run `p10k configure` to generate)
 - `opencode/.config/opencode/opencode.json` -> `~/.config/opencode/opencode.json`
 - `opencode/.config/opencode/oh-my-opencode.json` -> `~/.config/opencode/oh-my-opencode.json`
+- `claude/.claude/CLAUDE.md` -> `~/.claude/CLAUDE.md`
+- `claude/.claude/.omc-config.json` -> `~/.claude/.omc-config.json`
 
 ## Dependencies
 
@@ -124,13 +126,15 @@ mkdir -p ~/.config/opencode
 [ -e ~/.p10k.zsh ] && mv ~/.p10k.zsh ~/.p10k.zsh.bak.$(date +%Y%m%d-%H%M%S)
 [ -e ~/.config/opencode/opencode.json ] && mv ~/.config/opencode/opencode.json ~/.config/opencode/opencode.json.bak.$(date +%Y%m%d-%H%M%S)
 [ -e ~/.config/opencode/oh-my-opencode.json ] && mv ~/.config/opencode/oh-my-opencode.json ~/.config/opencode/oh-my-opencode.json.bak.$(date +%Y%m%d-%H%M%S)
+[ -e ~/.claude/CLAUDE.md ] && mv ~/.claude/CLAUDE.md ~/.claude/CLAUDE.md.bak.$(date +%Y%m%d-%H%M%S)
+[ -e ~/.claude/.omc-config.json ] && mv ~/.claude/.omc-config.json ~/.claude/.omc-config.json.bak.$(date +%Y%m%d-%H%M%S)
 ```
 
 ### 3) Symlink this repo into home config paths
 
 ```bash
 cd ~/dotfiles
-stow nvim tmux zsh opencode
+stow nvim tmux zsh opencode claude
 ```
 
 ### 4) First run
