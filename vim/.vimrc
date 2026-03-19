@@ -76,24 +76,24 @@ nnoremap <leader>fb :Buffers<CR>
 
 " ALE
 let g:ale_linters = {
-\   'javascript': ['eslint'],
-\   'typescript': ['eslint'],
-\   'python': ['ruff'],
-\   'go': ['gofmt'],
-\   'rust': ['rustfmt'],
-\   'json': ['jq'],
-\   'yaml': ['yamllint'],
-\}
+    \ 'javascript': ['eslint'],
+    \ 'typescript': ['eslint'],
+    \ 'python': ['ruff'],
+    \ 'go': ['gofmt'],
+    \ 'rust': ['rustfmt'],
+    \ 'json': ['jq'],
+    \ 'yaml': ['yamllint'],
+\ }
 
 let g:ale_fixers = {
-\   'javascript': ['prettier', 'eslint'],
-\   'typescript': ['prettier', 'eslint'],
-\   'python': ['black'],
-\   'go': ['gofmt'],
-\   'rust': ['rustfmt'],
-\   'json': ['jq'],
-\   'yaml': ['yamlfix'],
-\}
+    \ 'javascript': ['prettier', 'eslint'],
+    \ 'typescript': ['prettier', 'eslint'],
+    \ 'python': ['black'],
+    \ 'go': ['gofmt'],
+    \ 'rust': ['rustfmt'],
+    \ 'json': ['jq'],
+    \ 'yaml': ['yamlfix'],
+\ }
 
 let g:ale_fix_on_save = 1
 nnoremap <leader>fm :ALEFix<CR>

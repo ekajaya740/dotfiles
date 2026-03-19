@@ -5,3 +5,6 @@ zsh/.zshenv.local
 
 # Sisyphus agent drafts and plans
 .sisyphus/
+
+# Vim plugin directory - installed by vim-plug
+vim/.vim/plugged/

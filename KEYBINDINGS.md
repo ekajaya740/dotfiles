@@ -141,6 +141,70 @@ Leader: `Space`
 
 ---
 
+## Vim
+
+Leader: `Space`
+
+### General
+
+| Key | Mode | Action |
+|-----|------|--------|
+| `Space n h` | Normal | Clear search highlights |
+| `Space +` | Normal | Increment number under cursor |
+| `Space -` | Normal | Decrement number under cursor |
+| `x` | Normal | Delete character without yanking |
+
+### Window Management
+
+| Key | Mode | Action |
+|-----|------|--------|
+| `Space s v` | Normal | Split window vertically |
+| `Space s h` | Normal | Split window horizontally |
+| `Space s e` | Normal | Make split windows equal size |
+| `Space s x` | Normal | Close current split window |
+
+### Tab Management
+
+| Key | Mode | Action |
+|-----|------|--------|
+| `Space t o` | Normal | Open new tab |
+| `Space t x` | Normal | Close current tab |
+| `Space t n` | Normal | Go to next tab |
+| `Space t p` | Normal | Go to previous tab |
+
+### File Explorer (NERDTree)
+
+| Key | Mode | Action |
+|-----|------|--------|
+| `Space e` | Normal | Toggle file explorer |
+
+### FZF
+
+| Key | Mode | Action |
+|-----|------|--------|
+| `Space f f` | Normal | Find files |
+| `Space /` | Normal | Live grep (search string) |
+| `Space f b` | Normal | List open buffers |
+
+### LSP (ALE)
+
+| Key | Mode | Action |
+|-----|------|--------|
+| `g d` | Normal | Go to definition |
+| `K` | Normal | Show hover documentation |
+| `Space f m` | Normal | Format code (ALEFix) |
+| `[ g` | Normal | Go to previous diagnostic |
+| `] g` | Normal | Go to next diagnostic |
+
+### Editor
+
+| Key | Mode | Action |
+|-----|------|--------|
+| `g c c` | Normal | Toggle comment line |
+| `g c` | Visual | Toggle comment selection |
+
+---
+
 ## Zsh
 
 Configured via Oh My Zsh with the following plugins:
