@@ -5,43 +5,43 @@
   "parallel_execution": true,
   "agents": {
     "sisyphus": {
-      "model": "ollama-cloud/kimi-k2.5",
+      "model": "ollama-cloud/kimi-k2.5:cloud",
       "temperature": 0.3,
       "fallback_models": [
-        "ollama-cloud/glm-5",
-        "ollama-cloud/minimax-m2.7"
+        "ollama-cloud/glm-5:cloud",
+        "ollama-cloud/minimax-m2.7:cloud"
       ]
     },
     "sisyphus-junior": {
-      "model": "ollama-cloud/minimax-m2.7",
+      "model": "ollama-cloud/minimax-m2.7:cloud",
       "temperature": 0.3,
       "fallback_models": [
-        "ollama-cloud/nemotron-3-nano"
+        "ollama-cloud/nemotron-3-super"
       ]
     },
     "prometheus": {
-      "model": "ollama-cloud/minimax-m2.7",
+      "model": "ollama-cloud/minimax-m2.7:cloud",
       "temperature": 0.3,
       "fallback_models": [
-        "ollama-cloud/glm-5",
-        "ollama-cloud/minimax-m2.7"
+        "ollama-cloud/glm-5:cloud",
+        "ollama-cloud/minimax-m2.7:cloud"
       ],
       "prompt_append": "You are a PLANNER. You MUST NOT modify, create, or edit any files. Your job is to interview the user, explore the codebase using read-only tools, identify scope and ambiguities, and produce a detailed verified plan. Hand off ALL implementation to execution agents."
     },
     "atlas": {
-      "model": "ollama-cloud/kimi-k2.5",
+      "model": "ollama-cloud/kimi-k2.5:cloud",
       "temperature": 0.3,
       "fallback_models": [
-        "ollama-cloud/glm-5",
-        "ollama-cloud/minimax-m2.7"
+        "ollama-cloud/glm-5:cloud",
+        "ollama-cloud/minimax-m2.7:cloud"
       ]
     },
     "hephaestus": {
-      "model": "ollama-cloud/qwen3-coder-next",
+      "model": "ollama-cloud/glm-5:cloud",
       "temperature": 0.5,
       "fallback_models": [
         "ollama-cloud/nemotron-3-super",
-        "ollama-cloud/kimi-k2.5"
+        "ollama-cloud/kimi-k2.5:cloud"
       ]
     },
     "oracle": {
@@ -49,31 +49,31 @@
       "variant": "high",
       "temperature": 0.2,
       "fallback_models": [
-        "ollama-cloud/minimax-m2.7",
-        "ollama-cloud/glm-5"
+        "ollama-cloud/minimax-m2.7:cloud",
+        "ollama-cloud/glm-5:cloud"
       ]
     },
     "librarian": {
-      "model": "ollama-cloud/minimax-m2.7",
+      "model": "ollama-cloud/minimax-m2.7:cloud",
       "temperature": 0.1,
       "fallback_models": [
-        "ollama-cloud/nemotron-3-nano",
-        "ollama-cloud/glm-5"
+        "ollama-cloud/nemotron-3-super",
+        "ollama-cloud/glm-5:cloud"
       ]
     },
     "explore": {
-      "model": "ollama-cloud/minimax-m2.7",
+      "model": "ollama-cloud/minimax-m2.7:cloud",
       "temperature": 0.1,
       "fallback_models": [
-        "ollama-cloud/nemotron-3-nano"
+        "ollama-cloud/nemotron-3-super"
       ]
     },
     "metis": {
-      "model": "ollama-cloud/glm-5",
+      "model": "ollama-cloud/glm-5:cloud",
       "temperature": 0.7,
       "fallback_models": [
-        "ollama-cloud/kimi-k2.5",
-        "ollama-cloud/minimax-m2.7"
+        "ollama-cloud/kimi-k2.5:cloud",
+        "ollama-cloud/minimax-m2.7:cloud"
       ]
     },
     "momus": {
@@ -81,46 +81,46 @@
       "variant": "medium",
       "temperature": 0.1,
       "fallback_models": [
-        "ollama-cloud/minimax-m2.7",
-        "ollama-cloud/glm-5"
+        "ollama-cloud/minimax-m2.7:cloud",
+        "ollama-cloud/glm-5:cloud"
       ]
     },
     "frontend-ui-ux-engineer": {
       "model": "ollama-cloud/gemini-3-flash-preview",
       "temperature": 0.7,
       "fallback_models": [
-        "ollama-cloud/qwen3.5",
-        "ollama-cloud/minimax-m2.7"
+        "ollama-cloud/glm-5:cloud",
+        "ollama-cloud/minimax-m2.7:cloud"
       ]
     },
     "document-writer": {
-      "model": "ollama-cloud/minimax-m2.7",
+      "model": "ollama-cloud/minimax-m2.7:cloud",
       "temperature": 0.5,
       "fallback_models": [
-        "ollama-cloud/qwen3.5"
+        "ollama-cloud/glm-5:cloud"
       ]
     },
     "multimodal-looker": {
-      "model": "ollama-cloud/kimi-k2.5",
+      "model": "ollama-cloud/kimi-k2.5:cloud",
       "temperature": 0.2,
       "fallback_models": [
-        "ollama-cloud/qwen3.5",
+        "ollama-cloud/glm-5:cloud",
         "ollama-cloud/gemini-3-flash-preview"
       ]
     }
   },
   "categories": {
     "quick": {
-      "model": "ollama-cloud/minimax-m2.7"
+      "model": "ollama-cloud/minimax-m2.7:cloud"
     },
     "unspecified-low": {
-      "model": "ollama-cloud/minimax-m2.7"
+      "model": "ollama-cloud/minimax-m2.7:cloud"
     },
     "unspecified-high": {
-      "model": "ollama-cloud/kimi-k2.5"
+      "model": "ollama-cloud/kimi-k2.5:cloud"
     },
     "deep": {
-      "model": "ollama-cloud/qwen3-coder-next"
+      "model": "ollama-cloud/glm-5:cloud"
     },
     "ultrabrain": {
       "model": "ollama-cloud/nemotron-3-super",
@@ -130,7 +130,7 @@
       "model": "ollama-cloud/gemini-3-flash-preview"
     },
     "writing": {
-      "model": "ollama-cloud/minimax-m2.7"
+      "model": "ollama-cloud/minimax-m2.7:cloud"
     },
     "visual-engineering": {
       "model": "ollama-cloud/gemini-3-flash-preview"
