@@ -212,6 +212,13 @@
             "output": 32000
           }
         },
+        "minimax-m2.7:cloud": {
+          "name": "minimax-m2.7:cloud",
+          "limit": {
+            "context": 200000,
+            "output": 32000
+          }
+        },
         "kimi-k2.5:cloud": {
           "name": "kimi-k2.5:cloud",
           "limit": {
@@ -279,5 +286,5 @@
       "timeout": 20000
     }
   },
-  "model": "ollama-cloud/minimax-m2.5:cloud"
+  "model": "ollama-cloud/minimax-m2.7:cloud"
 }
