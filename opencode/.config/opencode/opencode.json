@@ -2,7 +2,9 @@
   "plugin": [
     "oh-my-opencode@3.8.3",
     "opencode-openai-codex-auth",
-    "opencode-rate-limit-fallback"
+    "opencode-rate-limit-fallback",
+    "opencode-agent-skills",
+    "superpowers@git+https://github.com/obra/superpowers.git"
   ],
   "provider": {
     "openai": {
@@ -38,6 +40,44 @@
               "reasoningSummary": "auto",
               "textVerbosity": "medium"
             },
+            "low": {
+              "reasoningEffort": "low",
+              "reasoningSummary": "auto",
+              "textVerbosity": "medium"
+            },
+            "medium": {
+              "reasoningEffort": "medium",
+              "reasoningSummary": "auto",
+              "textVerbosity": "medium"
+            },
+            "high": {
+              "reasoningEffort": "high",
+              "reasoningSummary": "detailed",
+              "textVerbosity": "medium"
+            },
+            "xhigh": {
+              "reasoningEffort": "xhigh",
+              "reasoningSummary": "detailed",
+              "textVerbosity": "medium"
+            }
+          }
+        },
+        "gpt-5.4": {
+          "name": "GPT 5.4 (OAuth)",
+          "limit": {
+            "context": 1050000,
+            "output": 128000
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "variants": {
             "low": {
               "reasoningEffort": "low",
               "reasoningSummary": "auto",
@@ -241,6 +281,32 @@
           }
         }
       }
+    },
+    "claude-code": {
+      "npm": "file:///Users/ekajaya740/opencode-claude-code-plugin",
+      "models": {
+        "haiku": {
+          "name": "Claude Code Haiku",
+          "attachment": false,
+          "limit": { "context": 200000, "output": 8192 },
+          "capabilities": { "reasoning": false, "toolcall": true }
+        },
+        "sonnet": {
+          "name": "Claude Code Sonnet",
+          "attachment": false,
+          "limit": { "context": 1000000, "output": 16384 },
+          "capabilities": { "reasoning": true, "toolcall": true }
+        },
+        "opus": {
+          "name": "Claude Code Opus",
+          "attachment": false,
+          "limit": { "context": 1000000, "output": 16384 },
+          "capabilities": { "reasoning": true, "toolcall": true }
+        }
+      },
+      "options": {
+        "cliPath": "claude"
+      }
     }
   },
   "$schema": "https://opencode.ai/config.json",
@@ -284,6 +350,24 @@
       ],
       "enabled": true,
       "timeout": 20000
+    },
+    "browsermcp": {
+      "type": "local",
+      "command": [
+        "npx",
+        "@browsermcp/mcp@latest"
+      ],
+      "enabled": true,
+      "timeout": 20000
+    },
+    "pencil": {
+      "command": [
+        "/Applications/Pencil.app/Contents/Resources/app.asar.unpacked/out/mcp-server-darwin-arm64",
+        "--app",
+        "desktop"
+      ],
+      "enabled": true,
+      "type": "local"
     }
   },
   "model": "ollama-cloud/minimax-m2.7:cloud"
