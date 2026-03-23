@@ -106,7 +106,6 @@ alias gdiff='git diff'
 
 # Editor aliases
 alias v='nvim'
-alias vim='nvim'
 
 # -----------------------------------------------------------------------------
 # fzf Configuration
