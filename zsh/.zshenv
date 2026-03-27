@@ -92,3 +92,6 @@ fi
 
 export DOTFILES_IS_OMARCHY="$DOTFILES_OMARCHY_FLAG"
 unset DOTFILES_OMARCHY_FLAG
+
+# Source local overrides (not tracked in dotfiles)
+[[ -f "$HOME/.zshenv.local" ]] && source "$HOME/.zshenv.local"

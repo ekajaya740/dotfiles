@@ -2,6 +2,9 @@
 
 Personal configuration for Neovim (LazyVim + coc.nvim), tmux, zsh, and OpenCode.
 
+**Neovim includes:**
+- [rest.nvim](https://github.com/rest-nvim/rest.nvim) - HTTP client for testing APIs directly from `.http` files (see [AGENTS.md](./AGENTS.md) for usage)
+
 ## Repository Layout
 
 - `nvim/.config/nvim/` -> `~/.config/nvim`

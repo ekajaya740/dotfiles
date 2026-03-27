@@ -68,6 +68,10 @@ keymap.set("n", "<leader>fb", "<cmd>Telescope buffers<cr>") -- list open buffers
 keymap.set("n", "<leader>fh", "<cmd>Telescope help_tags<cr>") -- list available help tags
 keymap.set("n", "<leader>fm", "<cmd>Telescope media_files<cr>") -- list media files in current working directory
 
+keymap.set("n", "<leader>rr", ":Rest run<cr>")
+keymap.set("n", "<leader>rl", ":Rest last<cr>")
+keymap.set("n", "<leader>ro", ":Rest open<cr>")
+
 -- telescope git commands (not on youtube nvim video)
 keymap.set("n", "<leader>gc", "<cmd>Telescope git_commits<cr>") -- list all git commits (use <cr> to checkout) ["gc" for git commits]
 keymap.set("n", "<leader>gfc", "<cmd>Telescope git_bcommits<cr>") -- list git commits for current file/buffer (use <cr> to checkout) ["gfc" for git file commits]

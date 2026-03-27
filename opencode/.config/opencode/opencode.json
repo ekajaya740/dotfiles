@@ -4,7 +4,8 @@
     "opencode-openai-codex-auth",
     "opencode-rate-limit-fallback",
     "opencode-agent-skills",
-    "superpowers@git+https://github.com/obra/superpowers.git"
+    "superpowers@git+https://github.com/obra/superpowers.git",
+    "understand-anything@git+https://github.com/Lum1104/Understand-Anything.git"
   ],
   "provider": {
     "openai": {
@@ -338,55 +339,6 @@
       ],
       "enabled": true,
       "timeout": 20000
-    },
-    "notebooklm": {
-      "type": "local",
-      "command": [
-        "bunx",
-        "notebooklm-mcp@latest"
-      ],
-      "enabled": true,
-      "timeout": 20000
-    },
-    "notion": {
-      "type": "local",
-      "command": [
-        "bunx",
-        "-y",
-        "mcp-remote",
-        "https://mcp.notion.com/mcp"
-      ],
-      "enabled": true,
-      "timeout": 20000
-    },
-    "linear": {
-      "type": "local",
-      "command": [
-        "bunx",
-        "-y",
-        "@linear/mcp-server"
-      ],
-      "enabled": true,
-      "timeout": 20000
-    },
-    "browsermcp": {
-      "type": "local",
-      "command": [
-        "npx",
-        "@browsermcp/mcp@latest"
-      ],
-      "enabled": true,
-      "timeout": 20000
-    },
-    "pencil": {
-      "command": [
-        "/Applications/Pencil.app/Contents/Resources/app.asar.unpacked/out/mcp-server-darwin-arm64",
-        "--app",
-        "desktop"
-      ],
-      "enabled": true,
-      "type": "local"
     }
-  },
-  "model": "ollama-cloud/minimax-m2.7:cloud"
+  }
 }

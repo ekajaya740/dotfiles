@@ -3,4 +3,10 @@ if not status then
   return
 end
 
-lualine.setup()
+lualine.setup({
+	sections = {
+		lualine_x = {
+			"rest",
+		},
+	},
+})

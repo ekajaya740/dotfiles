@@ -131,6 +131,14 @@ Leader: `Space`
 | `[ g` | Normal | Go to previous diagnostic |
 | `] g` | Normal | Go to next diagnostic |
 
+### rest.nvim (HTTP Client)
+
+| Key | Mode | Action |
+|-----|------|--------|
+| `Space r r` | Normal | Run request under cursor |
+| `Space r l` | Normal | Run last request |
+| `Space r o` | Normal | Open result pane |
+
 ### Completion (coc.nvim)
 
 | Key | Mode | Action |

@@ -8,3 +8,13 @@ zsh/.zshenv.local
 
 # Vim plugin directory - installed by vim-plug
 vim/.vim/plugged/
+
+# OMC (OhMyOpenCode) state files
+.omc/
+
+# Vite build output
+dist/
+.vite/
+
+# Understand-Anything generated files
+.understand-anything/
