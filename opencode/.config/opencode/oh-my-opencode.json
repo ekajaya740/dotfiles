@@ -5,7 +5,7 @@
   "parallel_execution": true,
   "agents": {
     "sisyphus": {
-      "model": "ollama-cloud/kimi-k2.5:cloud",
+      "model": "ollama-cloud/minimax-m2.7:cloud",
       "temperature": 0.3,
       "fallback_models": [
         "ollama-cloud/glm-5:cloud",
