@@ -159,3 +159,6 @@ setopt CORRECT
 
 # OpenClaw Completion
 source "/home/recreation/.openclaw/completions/openclaw.zsh"
+
+[ -s ~/.luaver/luaver ] && . ~/.luaver/luaver
+
