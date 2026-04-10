@@ -162,3 +162,4 @@ source "/home/recreation/.openclaw/completions/openclaw.zsh"
 
 [ -s ~/.luaver/luaver ] && . ~/.luaver/luaver
 
+export PATH="$HOME/.local/bin:$PATH"

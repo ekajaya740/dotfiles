@@ -14,7 +14,7 @@ Personal configuration for Neovim (LazyVim + coc.nvim), tmux, zsh, and OpenCode.
 - `zsh/.zshrc` -> `~/.zshrc`
 - `zsh/.p10k.zsh` -> `~/.p10k.zsh` (placeholder, run `p10k configure` to generate)
 - `opencode/.config/opencode/opencode.json` -> `~/.config/opencode/opencode.json`
-- `opencode/.config/opencode/oh-my-opencode.json` -> `~/.config/opencode/oh-my-opencode.json`
+- `opencode/.config/opencode/oh-my-openagent.json` -> `~/.config/opencode/oh-my-openagent.json`
 - `claude/.claude/CLAUDE.md` -> `~/.claude/CLAUDE.md`
 - `claude/.claude/.omc-config.json` -> `~/.claude/.omc-config.json`
 
@@ -128,7 +128,7 @@ mkdir -p ~/.config/opencode
 [ -e ~/.zshrc ] && mv ~/.zshrc ~/.zshrc.bak.$(date +%Y%m%d-%H%M%S)
 [ -e ~/.p10k.zsh ] && mv ~/.p10k.zsh ~/.p10k.zsh.bak.$(date +%Y%m%d-%H%M%S)
 [ -e ~/.config/opencode/opencode.json ] && mv ~/.config/opencode/opencode.json ~/.config/opencode/opencode.json.bak.$(date +%Y%m%d-%H%M%S)
-[ -e ~/.config/opencode/oh-my-opencode.json ] && mv ~/.config/opencode/oh-my-opencode.json ~/.config/opencode/oh-my-opencode.json.bak.$(date +%Y%m%d-%H%M%S)
+[ -e ~/.config/opencode/oh-my-openagent.json ] && mv ~/.config/opencode/oh-my-openagent.json ~/.config/opencode/oh-my-openagent.json.bak.$(date +%Y%m%d-%H%M%S)
 [ -e ~/.claude/CLAUDE.md ] && mv ~/.claude/CLAUDE.md ~/.claude/CLAUDE.md.bak.$(date +%Y%m%d-%H%M%S)
 [ -e ~/.claude/.omc-config.json ] && mv ~/.claude/.omc-config.json ~/.claude/.omc-config.json.bak.$(date +%Y%m%d-%H%M%S)
 ```

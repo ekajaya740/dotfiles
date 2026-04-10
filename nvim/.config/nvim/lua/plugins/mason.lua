@@ -41,6 +41,7 @@ return {
 
 				-- Java
 				"jdtls",
+				"java-debug-adapter",
 
 				-- Python
 				"pyright",

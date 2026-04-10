@@ -1,7 +1,7 @@
 {
   "enabled": true,
   "fallbackModels": [
-    "ollama-cloud/glm-5",
+    "ollama-cloud/glm-5.1",
     "ollama-cloud/kimi-k2.5"
   ],
   "cooldownMs": 300000,

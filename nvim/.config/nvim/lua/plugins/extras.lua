@@ -64,4 +64,11 @@ return {
 			"nvim-treesitter/nvim-treesitter",
 		},
 	},
+	{
+		"erichlf/devcontainer-cli.nvim",
+		dependencies = { "akinsho/toggleterm.nvim" },
+		config = function()
+			require("config.plugins.devcontainer-cli")
+		end,
+	},
 }
