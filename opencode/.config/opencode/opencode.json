@@ -1,11 +1,11 @@
 {
   "plugin": [
-    "oh-my-opencode@3.8.3",
     "opencode-openai-codex-auth",
     "opencode-rate-limit-fallback",
     "opencode-agent-skills",
     "superpowers@git+https://github.com/obra/superpowers.git",
-    "understand-anything@git+https://github.com/Lum1104/Understand-Anything.git"
+    "understand-anything@git+https://github.com/Lum1104/Understand-Anything.git",
+    "oh-my-openagent@latest"
   ],
   "provider": {
     "openai": {

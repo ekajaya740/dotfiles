@@ -1,41 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-openagent/master/assets/oh-my-openagent.schema.json",
-  "google_auth": false,
-  "model_fallback": true,
-  "parallel_execution": true,
   "agents": {
-    "sisyphus": {
-      "model": "ollama-cloud/minimax-m2.7:cloud",
-      "temperature": 0.3,
-      "fallback_models": [
-        "ollama-cloud/glm-5.1:cloud",
-        "ollama-cloud/minimax-m2.7:cloud"
-      ]
-    },
-    "sisyphus-junior": {
-      "model": "ollama-cloud/minimax-m2.7:cloud",
-      "temperature": 0.3,
-      "fallback_models": [
-        "ollama-cloud/nemotron-3-super"
-      ]
-    },
-    "prometheus": {
-      "model": "ollama-cloud/minimax-m2.7:cloud",
-      "temperature": 0.3,
-      "fallback_models": [
-        "ollama-cloud/glm-5.1:cloud",
-        "ollama-cloud/minimax-m2.7:cloud"
-      ],
-      "prompt_append": "You are a PLANNER. You MUST NOT modify, create, or edit any files. Your job is to interview the user, explore the codebase using read-only tools, identify scope and ambiguities, and produce a detailed verified plan. Hand off ALL implementation to execution agents."
-    },
-    "atlas": {
-      "model": "ollama-cloud/kimi-k2.5:cloud",
-      "temperature": 0.3,
-      "fallback_models": [
-        "ollama-cloud/glm-5.1:cloud",
-        "ollama-cloud/minimax-m2.7:cloud"
-      ]
-    },
     "hephaestus": {
       "model": "ollama-cloud/gpt-oss:120b-cloud",
       "temperature": 0.5,
@@ -68,6 +33,23 @@
         "ollama-cloud/nemotron-3-super"
       ]
     },
+    "multimodal-looker": {
+      "model": "ollama-cloud/kimi-k2.5:cloud",
+      "temperature": 0.2,
+      "fallback_models": [
+        "ollama-cloud/glm-5.1:cloud",
+        "ollama-cloud/gemma4:31b-cloud"
+      ]
+    },
+    "prometheus": {
+      "model": "ollama-cloud/minimax-m2.7:cloud",
+      "temperature": 0.3,
+      "fallback_models": [
+        "ollama-cloud/glm-5.1:cloud",
+        "ollama-cloud/minimax-m2.7:cloud"
+      ],
+      "prompt_append": "You are a PLANNER. You MUST NOT modify, create, or edit any files. Your job is to interview the user, explore the codebase using read-only tools, identify scope and ambiguities, and produce a detailed verified plan. Hand off ALL implementation to execution agents."
+    },
     "metis": {
       "model": "ollama-cloud/glm-5.1:cloud",
       "temperature": 0.7,
@@ -85,6 +67,29 @@
         "ollama-cloud/glm-5.1:cloud"
       ]
     },
+    "atlas": {
+      "model": "ollama-cloud/kimi-k2.5:cloud",
+      "temperature": 0.3,
+      "fallback_models": [
+        "ollama-cloud/glm-5.1:cloud",
+        "ollama-cloud/minimax-m2.7:cloud"
+      ]
+    },
+    "sisyphus-junior": {
+      "model": "ollama-cloud/minimax-m2.7:cloud",
+      "temperature": 0.3,
+      "fallback_models": [
+        "ollama-cloud/nemotron-3-super"
+      ]
+    },
+    "sisyphus": {
+      "model": "ollama-cloud/minimax-m2.7:cloud",
+      "temperature": 0.3,
+      "fallback_models": [
+        "ollama-cloud/glm-5.1:cloud",
+        "ollama-cloud/minimax-m2.7:cloud"
+      ]
+    },
     "frontend-ui-ux-engineer": {
       "model": "ollama-cloud/gemma4:31b-cloud",
       "temperature": 0.7,
@@ -99,17 +104,22 @@
       "fallback_models": [
         "ollama-cloud/glm-5.1:cloud"
       ]
-    },
-    "multimodal-looker": {
-      "model": "ollama-cloud/kimi-k2.5:cloud",
-      "temperature": 0.2,
-      "fallback_models": [
-        "ollama-cloud/glm-5.1:cloud",
-        "ollama-cloud/gemma4:31b-cloud"
-      ]
     }
   },
   "categories": {
+    "visual-engineering": {
+      "model": "ollama-cloud/gemma4:31b-cloud"
+    },
+    "ultrabrain": {
+      "model": "ollama-cloud/nemotron-3-super",
+      "variant": "high"
+    },
+    "deep": {
+      "model": "ollama-cloud/glm-5.1:cloud"
+    },
+    "artistry": {
+      "model": "ollama-cloud/gemma4:31b-cloud"
+    },
     "quick": {
       "model": "ollama-cloud/minimax-m2.7:cloud"
     },
@@ -119,21 +129,11 @@
     "unspecified-high": {
       "model": "ollama-cloud/kimi-k2.5:cloud"
     },
-    "deep": {
-      "model": "ollama-cloud/glm-5.1:cloud"
-    },
-    "ultrabrain": {
-      "model": "ollama-cloud/nemotron-3-super",
-      "variant": "high"
-    },
-    "artistry": {
-      "model": "ollama-cloud/gemma4:31b-cloud"
-    },
     "writing": {
       "model": "ollama-cloud/minimax-m2.7:cloud"
-    },
-    "visual-engineering": {
-      "model": "ollama-cloud/gemma4:31b-cloud"
     }
-  }
+  },
+  "google_auth": false,
+  "model_fallback": true,
+  "parallel_execution": true
 }
