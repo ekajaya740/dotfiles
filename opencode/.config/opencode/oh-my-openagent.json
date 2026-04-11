@@ -59,8 +59,8 @@
       ]
     },
     "momus": {
-      "model": "ollama-cloud/nemotron-3-super",
-      "variant": "medium",
+      "model": "ollama-cloud/gpt-oss:120b-cloud",
+      "variant": "high",
       "temperature": 0.1,
       "fallback_models": [
         "ollama-cloud/minimax-m2.7:cloud",
