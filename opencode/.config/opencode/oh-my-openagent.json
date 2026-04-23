@@ -15,11 +15,11 @@
       "temperature": 0.1
     },
     "explore": {
-      "model": "ollama-cloud/kimi-k2.6:cloud",
+      "model": "ollama-cloud/minimax-m2.7:cloud",
       "temperature": 0.1
     },
     "multimodal-looker": {
-      "model": "ollama-cloud/kimi-k2.6:cloud",
+      "model": "gemma4:31b-cloud:cloud",
       "temperature": 0.2
     },
     "prometheus": {
@@ -54,7 +54,7 @@
       "temperature": 0.5
     },
     "document-writer": {
-      "model": "ollama-cloud/kimi-k2.6:cloud",
+      "model": "ollama-cloud/minimax-m2.7:cloud",
       "temperature": 0.5
     }
   },
@@ -73,16 +73,16 @@
       "model": "ollama-cloud/gemma4:31b-cloud"
     },
     "quick": {
-      "model": "ollama-cloud/kimi-k2.6:cloud"
+      "model": "ollama-cloud/minimax-m2.7:cloud"
     },
     "unspecified-low": {
-      "model": "ollama-cloud/kimi-k2.6:cloud"
+      "model": "ollama-cloud/minimax-m2.7:cloud"
     },
     "unspecified-high": {
       "model": "ollama-cloud/kimi-k2.6:cloud"
     },
     "writing": {
-      "model": "ollama-cloud/kimi-k2.6:cloud"
+      "model": "ollama-cloud/minimax-m2.7:cloud"
     }
   },
   "google_auth": false,
