@@ -39,9 +39,8 @@ return {
 				-- Solidity
 				"solidity",
 
-				-- Java
-				"jdtls",
-				"java-debug-adapter",
+				-- Java (managed by nvim-java, not Mason)
+				-- "jdtls",
 
 				-- Python
 				"pyright",
@@ -105,6 +104,10 @@ return {
 		dependencies = { "mason-org/mason.nvim" },
 		opts = {
 			automatic_installation = true,
+			handlers = {
+				jdtls = function() end,
+				stylua = function() end,
+			},
 		},
 	},
 }

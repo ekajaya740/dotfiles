@@ -105,7 +105,7 @@ cd ~/dotfiles && stow <package>
 
 - **Mason**: Use `mason-org/mason.nvim` (renamed from `williamboman/mason.nvim`)
 - **LSP**: LazyVim's built-in LSP stack is used (nvim-lspconfig, mason-lspconfig, nvim-cmp)
-- **Java**: Uses `jdtls` language server via Mason; semantic highlighting configured in `lua/config/plugins/semantic-highlight.lua`
+- **Java**: Uses `nvim-java/nvim-java` (wraps jdtls with code actions, DAP, Spring Boot, test runner); NOT managed via Mason/lspconfig
 
 ## rest.nvim HTTP Client
 
@@ -196,7 +196,7 @@ print(json.message)
 | Astro | `astro-language-server` | `prettierd` |
 | React/JSX | Built-in via TS LSP | `prettierd`, `eslint_d` |
 | Tailwind CSS | `tailwindcss-language-server` | - |
-| Java | `jdtls` | - |
+| Java | `jdtls` (via nvim-java) | - |
 | Python | `pyright` | `ruff` |
 | Go | `gopls` | `goimports`, `gofumpt` |
 | Rust | `rust-analyzer` | `rustfmt` |

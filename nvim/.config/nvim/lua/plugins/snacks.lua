@@ -1,4 +1,4 @@
-return {
+	return {
 	{
 		"folke/snacks.nvim",
 		keys = {
@@ -12,6 +12,7 @@ return {
 		},
 		opts = function(_, opts)
 			opts = opts or {}
+
 			opts.picker = opts.picker or {}
 			opts.picker.sources = opts.picker.sources or {}
 

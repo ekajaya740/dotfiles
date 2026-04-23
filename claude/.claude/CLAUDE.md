@@ -84,4 +84,8 @@ Say "setup omc" or run `/oh-my-claudecode:omc-setup`.
 
 <!-- OMC:END -->
 
+## Initial Load
+
+Run `/caveman ultra` on every new session start to ensure all skill capabilities are active.
+
 @RTK.md

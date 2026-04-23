@@ -184,13 +184,9 @@ return {
 			capabilities = vim.tbl_deep_extend("force", capabilities, require("blink.cmp").get_lsp_capabilities())
 
 			for server, server_opts in pairs(opts.servers) do
-				if server ~= "jdtls" then
-					server_opts.capabilities = capabilities
-					lspconfig[server].setup(server_opts)
-				end
+				server_opts.capabilities = capabilities
+				lspconfig[server].setup(server_opts)
 			end
-
-			require("config.plugins.jdtls").setup()
 
 			vim.api.nvim_create_autocmd("FileType", {
 				group = vim.api.nvim_create_augroup("DisableHtmlAutoformat", {}),
@@ -204,6 +200,10 @@ return {
 				group = vim.api.nvim_create_augroup("LspFormatting", {}),
 				callback = function(args)
 					if not is_autoformat_enabled(args.buf) then
+						return
+					end
+
+					if vim.b[args.buf].editorconfig then
 						return
 					end
 

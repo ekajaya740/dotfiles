@@ -71,4 +71,75 @@ return {
 			require("config.plugins.devcontainer-cli")
 		end,
 	},
+	{
+		"nvim-java/nvim-java",
+		ft = "java",
+		dependencies = {
+			"MunifTanjim/nui.nvim",
+			"mfussenegger/nvim-dap",
+			{
+				"JavaHello/spring-boot.nvim",
+				version = "*",
+			},
+		},
+		config = function()
+			require("java").setup({
+				jdk = {
+					auto_install = false,
+				},
+				spring_boot_tools = {
+					enable = true,
+				},
+				java_test = {
+					enable = true,
+				},
+				java_debug_adapter = {
+					enable = true,
+				},
+			})
+
+			vim.lsp.config("jdtls", {
+				cmd_env = {
+					_JAVA_OPTIONS = "-Xmx2g -XX:+UseG1GC -XX:+UseStringDeduplication",
+				},
+				settings = {
+					java = {
+						autobuild = { enabled = false },
+						format = {
+							enabled = true,
+							settings = {
+								url = vim.fn.stdpath("config") .. "/java/eclipse-formatter.xml",
+								profile = "KandR",
+							},
+						},
+						codeGeneration = {
+							useBlocks = true,
+							toString = {
+								template = "${class.name}(${field.name}=${field.value}, ${otherFields})",
+							},
+							hashCodeEquals = {
+								useJava7Objects = true,
+							},
+							insertLocation = "after",
+						},
+						completion = {
+							favoriteStaticMembers = {
+								"org.junit.jupiter.api.Assertions.*",
+								"org.mockito.Mockito.*",
+								"java.util.Collections.*",
+							},
+						},
+						sources = {
+							organizeImports = {
+								starThreshold = 5,
+								staticStarThreshold = 3,
+							},
+						},
+					},
+				},
+			})
+
+			vim.lsp.enable("jdtls")
+		end,
+	},
 }

@@ -100,3 +100,22 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		end, opts)
 	end,
 })
+
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "java",
+	group = vim.api.nvim_create_augroup("JavaKeymaps", {}),
+	callback = function(ev)
+		local opts = { buffer = ev.buf, silent = true }
+		keymap.set("n", "<leader>co", "<cmd>JavaBuildBuildWorkspace<cr>", vim.tbl_extend("force", opts, { desc = "Organize Imports" }))
+		keymap.set("n", "<leader>cj", vim.lsp.buf.code_action, vim.tbl_extend("force", opts, { desc = "Java Code Action" }))
+		keymap.set("n", "<leader>cem", "<cmd>JavaRefactorExtractMethod<cr>", vim.tbl_extend("force", opts, { desc = "Extract Method" }))
+		keymap.set("n", "<leader>cev", "<cmd>JavaRefactorExtractVariable<cr>", vim.tbl_extend("force", opts, { desc = "Extract Variable" }))
+		keymap.set("n", "<leader>ceV", "<cmd>JavaRefactorExtractVariableAllOccurrence<cr>", vim.tbl_extend("force", opts, { desc = "Extract Variable All" }))
+		keymap.set("n", "<leader>cec", "<cmd>JavaRefactorExtractConstant<cr>", vim.tbl_extend("force", opts, { desc = "Extract Constant" }))
+		keymap.set("n", "<leader>cef", "<cmd>JavaRefactorExtractField<cr>", vim.tbl_extend("force", opts, { desc = "Extract Field" }))
+		keymap.set("n", "<leader>dr", "<cmd>JavaRunnerRunMain<cr>", vim.tbl_extend("force", opts, { desc = "Run Main" }))
+		keymap.set("n", "<leader>ds", "<cmd>JavaRunnerStopMain<cr>", vim.tbl_extend("force", opts, { desc = "Stop Main" }))
+		keymap.set("n", "<leader>dt", "<cmd>JavaTestRunCurrentClass<cr>", vim.tbl_extend("force", opts, { desc = "Test Current Class" }))
+		keymap.set("n", "<leader>dT", "<cmd>JavaTestDebugCurrentClass<cr>", vim.tbl_extend("force", opts, { desc = "Debug Current Class" }))
+	end,
+})
