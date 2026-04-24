@@ -72,6 +72,23 @@ return {
 		end,
 	},
 	{
+		"esensar/nvim-dev-container",
+		dependencies = { "nvim-treesitter/nvim-treesitter" },
+		cmd = {
+			"DevcontainerStart",
+			"DevcontainerAttach",
+			"DevcontainerExec",
+			"DevcontainerStop",
+			"DevcontainerStopAll",
+			"DevcontainerRemoveAll",
+			"DevcontainerLogs",
+			"DevcontainerEditNearestConfig",
+		},
+		config = function()
+			require("config.plugins.nvim-dev-container")
+		end,
+	},
+	{
 		"nvim-java/nvim-java",
 		ft = "java",
 		dependencies = {

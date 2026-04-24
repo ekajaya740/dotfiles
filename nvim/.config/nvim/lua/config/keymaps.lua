@@ -72,6 +72,14 @@ keymap.set("n", "<leader>rr", ":Rest run<cr>")
 keymap.set("n", "<leader>rl", ":Rest last<cr>")
 keymap.set("n", "<leader>ro", ":Rest open<cr>")
 
+keymap.set("n", "<leader>du", "<cmd>DevcontainerStart<cr>")
+keymap.set("n", "<leader>dd", "<cmd>DevcontainerStop<cr>")
+keymap.set("n", "<leader>db", "<cmd>DevcontainerStart<cr>")
+keymap.set("n", "<leader>da", "<cmd>DevcontainerAttach<cr>")
+keymap.set("n", "<leader>dD", "<cmd>DevcontainerStopAll<cr>")
+keymap.set("n", "<leader>dl", "<cmd>DevcontainerLogs<cr>")
+keymap.set("n", "<leader>de", "<cmd>DevcontainerEditNearestConfig<cr>")
+
 -- telescope git commands (not on youtube nvim video)
 keymap.set("n", "<leader>gc", "<cmd>Telescope git_commits<cr>") -- list all git commits (use <cr> to checkout) ["gc" for git commits]
 keymap.set("n", "<leader>gfc", "<cmd>Telescope git_bcommits<cr>") -- list git commits for current file/buffer (use <cr> to checkout) ["gfc" for git file commits]
