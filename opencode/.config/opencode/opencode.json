@@ -298,6 +298,13 @@
             "context": 256000,
             "output": 32000
           }
+        },
+        "qwen3.5:cloud": {
+          "name": "qwen3.5:cloud",
+          "limit": {
+            "context": 200000,
+            "output": 32000
+          }
         }
       }
     },

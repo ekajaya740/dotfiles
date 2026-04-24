@@ -19,11 +19,11 @@
       "temperature": 0.1
     },
     "multimodal-looker": {
-      "model": "gemma4:31b-cloud:cloud",
+      "model": "ollama-cloud/qwen3.5:cloud",
       "temperature": 0.2
     },
     "prometheus": {
-      "model": "ollama-cloud/kimi-k2.6:cloud",
+      "model": "ollama-cloud/glm-5.1:cloud",
       "temperature": 0.3,
       "prompt_append": "You are a PLANNER. You MUST NOT modify, create, or edit any files. Your job is to interview the user, explore the codebase using read-only tools, identify scope and ambiguities, and produce a detailed verified plan. Hand off ALL implementation to execution agents."
     },
@@ -37,7 +37,7 @@
       "temperature": 0.2
     },
     "atlas": {
-      "model": "ollama-cloud/kimi-k2.6:cloud",
+      "model": "ollama-cloud/glm-5.1:cloud",
       "temperature": 0.3
     },
     "sisyphus-junior": {
@@ -45,7 +45,7 @@
       "temperature": 0.3
     },
     "sisyphus": {
-      "model": "ollama-cloud/kimi-k2.6:cloud",
+      "model": "ollama-cloud/glm-5.1:cloud",
       "temperature": 0.3,
       "system_prompt": "Run /caveman ultra first before proceeding with any response."
     },
