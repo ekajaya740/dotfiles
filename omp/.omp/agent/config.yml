@@ -1,0 +1,31 @@
+Models: 
+  - ollama-cloud/*
+modelRoles: 
+  default: ollama-cloud/glm-5.1:cloud
+  smol: ollama-cloud/minimax-m2.7:cloud
+  plan: ollama-cloud/kimi-k2.6:cloud
+  commit: ollama-cloud/minimax-m2.7:cloud
+defaultThinkingLevel: medium
+steeringMode: one-at-a-time
+followUpMode: auto
+interruptMode: immediate
+hideThinkingBlock: false
+collapseChangelog: true
+display: 
+  tabWidth: 4
+compaction: 
+  enabled: true
+  reserveTokens: 16384
+  keepRecentTokens: 20000
+retry: 
+  networkOnly: true
+  maxRetries: 3
+  baseDelayMs: 2000
+task: 
+  eager: false
+  merge: patch
+async: 
+  enabled: false
+skills: 
+  showImages: true
+lastChangelogVersion: 14.5.12

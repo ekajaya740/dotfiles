@@ -1,0 +1,105 @@
+providers:
+  ollama-cloud:
+    baseUrl: https://ollama.com/v1
+    api: openai-completions
+    authHeader: true
+    models:
+      - id: kimi-k2.6:cloud
+        name: Kimi K2.6 Cloud
+        reasoning: false
+        input: [text]
+        cost:
+          input: 0
+          output: 0
+          cacheRead: 0
+          cacheWrite: 0
+        contextWindow: 200000
+        maxTokens: 32000
+      - id: glm-5.1:cloud
+        name: GLM 5.1 Cloud
+        reasoning: false
+        input: [text]
+        cost:
+          input: 0
+          output: 0
+          cacheRead: 0
+          cacheWrite: 0
+        contextWindow: 198000
+        maxTokens: 32000
+      - id: minimax-m2.5:cloud
+        name: MiniMax M2.5 Cloud
+        reasoning: false
+        input: [text]
+        cost:
+          input: 0
+          output: 0
+          cacheRead: 0
+          cacheWrite: 0
+        contextWindow: 200000
+        maxTokens: 32000
+      - id: minimax-m2.7:cloud
+        name: MiniMax M2.7 Cloud
+        reasoning: false
+        input: [text]
+        cost:
+          input: 0
+          output: 0
+          cacheRead: 0
+          cacheWrite: 0
+        contextWindow: 200000
+        maxTokens: 32000
+      - id: kimi-k2.5:cloud
+        name: Kimi K2.5 Cloud
+        reasoning: false
+        input: [text]
+        cost:
+          input: 0
+          output: 0
+          cacheRead: 0
+          cacheWrite: 0
+        contextWindow: 200000
+        maxTokens: 32000
+      - id: gemma4:31b-cloud
+        name: Gemma 4 31B Cloud
+        reasoning: false
+        input: [text]
+        cost:
+          input: 0
+          output: 0
+          cacheRead: 0
+          cacheWrite: 0
+        contextWindow: 200000
+        maxTokens: 32000
+      - id: gpt-oss:120b-cloud
+        name: GPT OSS 120B Cloud
+        reasoning: false
+        input: [text]
+        cost:
+          input: 0
+          output: 0
+          cacheRead: 0
+          cacheWrite: 0
+        contextWindow: 200000
+        maxTokens: 32000
+      - id: nemotron-3-super
+        name: Nemotron 3 Super Cloud
+        reasoning: false
+        input: [text]
+        cost:
+          input: 0
+          output: 0
+          cacheRead: 0
+          cacheWrite: 0
+        contextWindow: 256000
+        maxTokens: 32000
+      - id: qwen3.5:cloud
+        name: Qwen 3.5 Cloud
+        reasoning: false
+        input: [text]
+        cost:
+          input: 0
+          output: 0
+          cacheRead: 0
+          cacheWrite: 0
+        contextWindow: 200000
+        maxTokens: 32000
