@@ -1,9 +1,12 @@
 # dotfiles
 
-Personal configuration for Neovim (LazyVim + coc.nvim), tmux, zsh, and OpenCode.
+Personal configuration for Neovim (LazyVim + coc.nvim), tmux, zsh, OpenCode, and [oh-my-pi](https://github.com/can1357/oh-my-pi).
 
 **Neovim includes:**
 - [rest.nvim](https://github.com/rest-nvim/rest.nvim) - HTTP client for testing APIs directly from `.http` files (see [AGENTS.md](./AGENTS.md) for usage)
+
+**oh-my-pi (OMP)** includes:
+- [oh-my-pi](https://github.com/can1357/oh-my-pi) - AI coding agent for the terminal (`omp` CLI), configured with ollama-cloud models (see [AGENTS.md](./AGENTS.md) for details)
 
 ## Repository Layout
 
@@ -17,6 +20,8 @@ Personal configuration for Neovim (LazyVim + coc.nvim), tmux, zsh, and OpenCode.
 - `opencode/.config/opencode/oh-my-openagent.json` -> `~/.config/opencode/oh-my-openagent.json`
 - `claude/.claude/CLAUDE.md` -> `~/.claude/CLAUDE.md`
 - `claude/.claude/.omc-config.json` -> `~/.claude/.omc-config.json`
+- `omp/.omp/agent/config.yml` -> `~/.omp/agent/config.yml` (settings, model roles)
+- `omp/.omp/agent/models.yml` -> `~/.omp/agent/models.yml` (custom providers & models)
 
 ## Dependencies
 
@@ -28,6 +33,7 @@ Personal configuration for Neovim (LazyVim + coc.nvim), tmux, zsh, and OpenCode.
 - `make` and a C/C++ toolchain (`telescope-fzf-native` uses `run = "make"`)
 - `jq` and `tidy` (`rest.nvim` formatters)
 - `yarn` (used by some Node-based Neovim plugin installers)
+- `bun` ≥ 1.3.7 (required by oh-my-pi; also used by OpenCode MCP commands via `bunx`)
 
 ### Recommended
 
@@ -131,13 +137,15 @@ mkdir -p ~/.config/opencode
 [ -e ~/.config/opencode/oh-my-openagent.json ] && mv ~/.config/opencode/oh-my-openagent.json ~/.config/opencode/oh-my-openagent.json.bak.$(date +%Y%m%d-%H%M%S)
 [ -e ~/.claude/CLAUDE.md ] && mv ~/.claude/CLAUDE.md ~/.claude/CLAUDE.md.bak.$(date +%Y%m%d-%H%M%S)
 [ -e ~/.claude/.omc-config.json ] && mv ~/.claude/.omc-config.json ~/.claude/.omc-config.json.bak.$(date +%Y%m%d-%H%M%S)
+[ -e ~/.omp/agent/config.yml ] && mv ~/.omp/agent/config.yml ~/.omp/agent/config.yml.bak.$(date +%Y%m%d-%H%M%S)
+[ -e ~/.omp/agent/models.yml ] && mv ~/.omp/agent/models.yml ~/.omp/agent/models.yml.bak.$(date +%Y%m%d-%H%M%S)
 ```
 
 ### 3) Symlink this repo into home config paths
 
 ```bash
 cd ~/dotfiles
-stow nvim tmux zsh opencode claude
+stow nvim tmux zsh opencode claude omp
 ```
 
 ### 4) First run
@@ -147,6 +155,8 @@ stow nvim tmux zsh opencode claude
 - Install TPM if needed: `git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm`, then press `prefix + I` in tmux.
 - Run `p10k configure` to set up your powerlevel10k prompt (installs Meslo Nerd Font for icons).
 - Restart OpenCode so provider/agent config reloads.
+- Run `omp` once before stowing to create `~/.omp/agent/` with local state, then `stow omp` to symlink config files.
+- Install oh-my-pi: `bun install -g @oh-my-pi/pi-coding-agent` or `curl -fsSL https://raw.githubusercontent.com/can1357/oh-my-pi/main/scripts/install.sh | sh`.
 
 ## Linting
 

@@ -16,7 +16,8 @@ This document provides guidelines for AI agents and automation tools working wit
 ├── nvim/.config/nvim/          → ~/.config/nvim
 ├── tmux/.tmux.conf             → ~/.tmux.conf
 ├── opencode/.config/opencode/  → ~/.config/opencode/
-└── claude/.claude/             → ~/.claude
+├── claude/.claude/             → ~/.claude
+└── omp/.omp/agent/            → ~/.omp/agent (config + models only)
 ```
 
 ## Workflow
@@ -47,8 +48,8 @@ If symlinks break or need refresh:
 
 ```bash
 cd ~/dotfiles
-stow -D nvim tmux opencode claude  # Unstow
-stow nvim tmux opencode claude     # Restow
+stow -D nvim tmux opencode claude omp  # Unstow
+stow nvim tmux opencode claude omp     # Restow
 ```
 
 ## Safety Rules
@@ -100,6 +101,75 @@ cd ~/dotfiles && stow <package>
 | Broken symlinks | `stow -D <pkg> && stow <pkg>` |
 | Conflicts with existing files | Backup first: `mv ~/.config/<pkg> ~/.config/<pkg>.bak` |
 | Permission denied | Ensure repo is in `~` not system paths |
+
+## oh-my-pi (OMP)
+
+[oh-my-pi](https://github.com/can1357/oh-my-pi) — AI coding agent for the terminal. CLI command: `omp`.
+
+### Config Files Managed in This Repo
+
+- `omp/.omp/agent/config.yml` → `~/.omp/agent/config.yml` (settings, model roles)
+- `omp/.omp/agent/models.yml` → `~/.omp/agent/models.yml` (custom providers & models)
+- `omp/.omp/agent/mcp.json` → `~/.omp/agent/mcp.json` (MCP servers)
+
+### NOT Managed (machine-local state)
+
+- `~/.omp/agent/agent.db` (credentials DB)
+- `~/.omp/agent/sessions/` (session history)
+- `~/.omp/agent/memories/` (autonomous memory)
+- `~/.omp/logs/` (debug logs)
+
+### Model Configuration
+
+Models use the `ollama-cloud` provider (matching the OpenCode `oh-my-openagent.json` pattern):
+
+| Role | Model | Purpose |
+|------|-------|---------|
+| default | `ollama-cloud/glm-5.1:cloud` | Primary agent |
+| smol | `ollama-cloud/minimax-m2.7:cloud` | Quick/light tasks |
+| plan | `ollama-cloud/kimi-k2.6:cloud` | Planning & architecture |
+| commit | `ollama-cloud/minimax-m2.7:cloud` | Commit generation |
+
+### Update OMP config
+
+```bash
+# Edit in repo
+vim ~/dotfiles/omp/.omp/agent/config.yml
+vim ~/dotfiles/omp/.omp/agent/models.yml
+
+# Validate YAML syntax
+python3 -c "import yaml; yaml.safe_load(open('omp/.omp/agent/config.yml')); print('config.yml OK')"
+python3 -c "import yaml; yaml.safe_load(open('omp/.omp/agent/models.yml')); print('models.yml OK')"
+
+# Changes apply immediately (symlinked)
+# Restart omp to reload: /config reload or restart session
+```
+
+### Stowing
+
+Run `omp` at least once before stowing to create `~/.omp/agent/` with local state:
+
+```bash
+cd ~/dotfiles
+stow omp
+```
+
+### MCP Servers
+
+Configured in `omp/.omp/agent/mcp.json` (oMP) and `opencode/.config/opencode/opencode.json` (OpenCode):
+
+| Server | Type | Command | Purpose |
+|--------|------|---------|---------|
+| lightpanda | stdio | `lightpanda mcp` | Native headless browser MCP — markdown, semantic tree, structured data, JS eval |
+| grep_app | stdio | `bunx -y @modelcontextprotocol/server-github` | GitHub API access |
+
+**[Lightpanda](https://lightpanda.io)** must be installed separately. The binary at `~/.local/bin/lightpanda` exposes a native MCP server:
+
+```bash
+# Install (see https://lightpanda.io/docs/quickstart/installation-and-setup)
+# Then verify:
+lightpanda --version
+```
 
 ## Neovim Plugin Notes
 
