@@ -364,6 +364,14 @@
       ],
       "enabled": true,
       "timeout": 20000
+    },
+    "lightpanda": {
+      "type": "local",
+      "command": [
+        "/Users/ekajaya740/.local/bin/lightpanda",
+        "mcp"
+      ],
+      "enabled": true
     }
   }
 }
