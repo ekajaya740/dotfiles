@@ -7,9 +7,15 @@ return {
 			"mason-org/mason-lspconfig.nvim",
 			"saghen/blink.cmp",
 			{ "j-hui/fidget.nvim", opts = {} },
-			{ "folke/neodev.nvim", opts = {} },
 			"b0o/schemastore.nvim",
 		},
+		init = function()
+			-- Prevent nvim-lspconfig's lsp/jdtls.lua from overriding nvim-java's config
+			-- by pre-registering an empty jdtls config that nvim-java will fill later
+			if vim.lsp.config and vim.lsp.config._configs then
+				vim.lsp.config._configs["jdtls"] = {}
+			end
+		end,
 		opts = {
 			servers = {
 				vtsls = {
@@ -184,8 +190,10 @@ return {
 			capabilities = vim.tbl_deep_extend("force", capabilities, require("blink.cmp").get_lsp_capabilities())
 
 			for server, server_opts in pairs(opts.servers) do
-				server_opts.capabilities = capabilities
-				lspconfig[server].setup(server_opts)
+				if server ~= "*" and type(server_opts) == "table" and server_opts.enabled ~= false then
+					server_opts.capabilities = capabilities
+					lspconfig[server].setup(server_opts)
+				end
 			end
 
 			vim.api.nvim_create_autocmd("FileType", {

@@ -99,15 +99,4 @@ return {
 			},
 		},
 	},
-	{
-		"mason-org/mason-lspconfig.nvim",
-		dependencies = { "mason-org/mason.nvim" },
-		opts = {
-			automatic_installation = true,
-			handlers = {
-				jdtls = function() end,
-				stylua = function() end,
-			},
-		},
-	},
 }

@@ -94,10 +94,7 @@ return {
 		dependencies = {
 			"MunifTanjim/nui.nvim",
 			"mfussenegger/nvim-dap",
-			{
-				"JavaHello/spring-boot.nvim",
-				version = "*",
-			},
+			"JavaHello/spring-boot.nvim",
 		},
 		config = function()
 			require("java").setup({
