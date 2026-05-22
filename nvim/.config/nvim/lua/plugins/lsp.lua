@@ -59,12 +59,26 @@ return {
 				pyright = {
 					settings = {
 						python = {
+							venvPath = ".",
+							pythonPath = ".venv/bin/python",
 							analysis = {
 								typeCheckingMode = "basic",
 								autoImportCompletions = true,
+								diagnosticMode = "workspace",
+								useLibraryCodeForTypes = true,
 							},
 						},
 					},
+					before_init = function(_, config)
+						local root = config.root_dir or vim.fn.getcwd()
+						local venv = root .. "/.venv/bin/python"
+						if vim.fn.filereadable(venv) == 1 then
+							config.settings.python.pythonPath = venv
+							config.settings.python.venvPath = root
+						else
+							config.settings.python.pythonPath = "python3"
+						end
+					end,
 				},
 				gopls = {
 					settings = {
