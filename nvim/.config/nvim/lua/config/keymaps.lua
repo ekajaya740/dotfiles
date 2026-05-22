@@ -41,7 +41,7 @@ local function set_file_picker_keymaps()
 		pcall(vim.keymap.del, "n", lhs)
 	end
 
-	keymap.set("n", "<leader>e", "<cmd>NvimTreeToggle<CR>")
+	keymap.set("n", "<leader>e", "<cmd>lua Snacks.explorer({ cwd = LazyVim.root(), hidden = true, ignored = false })<CR>")
 	keymap.set("n", "<leader>fe", "<cmd>lua Snacks.explorer({ cwd = LazyVim.root(), hidden = true, ignored = false })<CR>")
 	keymap.set("n", "<leader>fE", "<cmd>lua Snacks.explorer({ hidden = true, ignored = false })<CR>")
 	keymap.set("n", "<leader>E", "<leader>fE", { remap = true })
