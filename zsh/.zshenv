@@ -1,6 +1,7 @@
 # Zsh environment - sourced by all zsh sessions
 # Safe, portable exports only - no secrets, no host-specific values
 
+source "$HOME/.zshenv.local"
 # XDG Base Directory Specification
 export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
@@ -92,6 +93,3 @@ fi
 
 export DOTFILES_IS_OMARCHY="$DOTFILES_OMARCHY_FLAG"
 unset DOTFILES_OMARCHY_FLAG
-
-# Source local overrides (not tracked in dotfiles)
-[[ -f "$HOME/.zshenv.local" ]] && source "$HOME/.zshenv.local"

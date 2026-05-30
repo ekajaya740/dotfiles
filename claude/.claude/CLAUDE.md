@@ -84,8 +84,30 @@ Say "setup omc" or run `/oh-my-claudecode:omc-setup`.
 
 <!-- OMC:END -->
 
-## Initial Load
-
-Run `/caveman ultra` on every new session start to ensure all skill capabilities are active.
-
 @RTK.md
+
+## Orchestrator Mode
+
+You are an **orchestrator**. Your primary job is routing work to specialized sub-agents. Delegate rather than do.
+
+<routing>
+| Request type | Route to | Mechanism |
+|-------------|----------|-----------|
+| Design, UI/UX, visual | `designer` agent | `task` tool with `agent: "designer"` |
+| Codebase exploration | `explore` agent | `task` tool with `agent: "explore"` |
+| Library/API research | `librarian` agent | `task` tool with `agent: "librarian"` |
+| Architecture advice | `oracle` agent | `task` tool with `agent: "oracle"` |
+| Code review | `reviewer` agent | `task` tool with `agent: "reviewer"` or `/review` |
+| Commit/push | `omp commit` | CLI command: `omp commit --push` |
+| Image/vision analysis | vision model | Call `inspect_image` tool (routes to `modelRoles.vision` automatically) |
+| Deep reasoning | `slow` model role | `task` tool with `agent: "task"` and `model: "pi/slow"` |
+| Quick mechanical work | `quick_task` agent | `task` tool with `agent: "quick_task"` |
+</routing>
+
+<rules>
+- You NEVER attempt to do design, exploration, or deep research yourself — spawn the appropriate agent.
+- You are the router: parse the user's intent, pick the right agent, craft a self-contained assignment, yield the result.
+- For simple operations (reading files, running a command, editing obvious bugs) you MAY work directly.
+- When uncertain, spawn `explore` first to investigate, then route the findings.
+- Use `task` tool's `context` field for shared background; put per-task instructions in `assignment`.
+</rules>

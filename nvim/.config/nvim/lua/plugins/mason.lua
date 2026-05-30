@@ -51,6 +51,7 @@ return {
 				"gopls",
 				"goimports",
 				"gofumpt",
+				"delve",
 
 				-- Rust
 				"rust-analyzer",

@@ -5,6 +5,21 @@
       "command": "/Users/ekajaya740/.local/bin/lightpanda",
       "args": ["mcp"],
       "enabled": true
+    },
+    "figma": {
+      "type": "http",
+      "url": "https://mcp.figma.com/mcp",
+      "enabled": true
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"],
+      "enabled": true
+    },
+    "exa": {
+      "type": "http",
+      "url": "https://mcp.exa.ai/mcp",
+      "enabled": true
     }
   }
 }

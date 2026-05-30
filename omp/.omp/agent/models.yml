@@ -1,5 +1,58 @@
 providers:
+  deepseek:
+    baseUrl: https://api.deepseek.com
+    api: openai-completions
+    apiKey: DEEPSEEK_API_KEY
+    authHeader: true
+    models:
+      - id: deepseek-v4-pro
+        name: DeepSeek V4 Pro
+        reasoning: true
+        thinking:
+          minLevel: high
+          maxLevel: xhigh
+          mode: effort
+        input: [text]
+        contextWindow: 1000000
+        maxTokens: 384000
+        compat:
+          supportsDeveloperRole: false
+          supportsReasoningEffort: true
+          maxTokensField: max_tokens
+          reasoningEffortMap:
+            high: high
+            xhigh: max
+          supportsToolChoice: false
+          requiresReasoningContentForToolCalls: true
+          requiresAssistantContentForToolCalls: true
+          extraBody:
+            thinking:
+              type: enabled
+      - id: deepseek-v4-flash
+        name: DeepSeek V4 Flash
+        reasoning: true
+        thinking:
+          minLevel: high
+          maxLevel: xhigh
+          mode: effort
+        input: [text]
+        contextWindow: 1000000
+        maxTokens: 384000
+        compat:
+          supportsDeveloperRole: false
+          supportsReasoningEffort: true
+          maxTokensField: max_tokens
+          reasoningEffortMap:
+            high: high
+            xhigh: max
+          supportsToolChoice: false
+          requiresReasoningContentForToolCalls: true
+          requiresAssistantContentForToolCalls: true
+          extraBody:
+            thinking:
+              type: enabled
   ollama-cloud:
+    apiKey: OLLAMA_API_KEY
     baseUrl: https://ollama.com/v1
     api: openai-completions
     authHeader: true
@@ -7,7 +60,7 @@ providers:
       - id: kimi-k2.6:cloud
         name: Kimi K2.6 Cloud
         reasoning: false
-        input: [text]
+        input: [text, image]
         cost:
           input: 0
           output: 0
@@ -26,30 +79,8 @@ providers:
           cacheWrite: 0
         contextWindow: 198000
         maxTokens: 32000
-      - id: minimax-m2.5:cloud
-        name: MiniMax M2.5 Cloud
-        reasoning: false
-        input: [text]
-        cost:
-          input: 0
-          output: 0
-          cacheRead: 0
-          cacheWrite: 0
-        contextWindow: 200000
-        maxTokens: 32000
       - id: minimax-m2.7:cloud
         name: MiniMax M2.7 Cloud
-        reasoning: false
-        input: [text]
-        cost:
-          input: 0
-          output: 0
-          cacheRead: 0
-          cacheWrite: 0
-        contextWindow: 200000
-        maxTokens: 32000
-      - id: kimi-k2.5:cloud
-        name: Kimi K2.5 Cloud
         reasoning: false
         input: [text]
         cost:
@@ -70,28 +101,6 @@ providers:
           cacheWrite: 0
         contextWindow: 200000
         maxTokens: 32000
-      - id: gpt-oss:120b-cloud
-        name: GPT OSS 120B Cloud
-        reasoning: false
-        input: [text]
-        cost:
-          input: 0
-          output: 0
-          cacheRead: 0
-          cacheWrite: 0
-        contextWindow: 200000
-        maxTokens: 32000
-      - id: nemotron-3-super
-        name: Nemotron 3 Super Cloud
-        reasoning: false
-        input: [text]
-        cost:
-          input: 0
-          output: 0
-          cacheRead: 0
-          cacheWrite: 0
-        contextWindow: 256000
-        maxTokens: 32000
       - id: qwen3.5:cloud
         name: Qwen 3.5 Cloud
         reasoning: false
@@ -103,3 +112,25 @@ providers:
           cacheWrite: 0
         contextWindow: 200000
         maxTokens: 32000
+      - id: deepseek-v4-pro
+        name: DeepSeek V4 Pro
+        reasoning: true
+        input: [text]
+        cost:
+          input: 0
+          output: 0
+          cacheRead: 0
+          cacheWrite: 0
+        contextWindow: 1000000
+        maxTokens: 384000
+      - id: deepseek-v4-flash
+        name: DeepSeek V4 Flash
+        reasoning: true
+        input: [text]
+        cost:
+          input: 0
+          output: 0
+          cacheRead: 0
+          cacheWrite: 0
+        contextWindow: 1000000
+        maxTokens: 384000

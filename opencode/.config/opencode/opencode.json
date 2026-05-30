@@ -257,22 +257,8 @@
             "output": 32000
           }
         },
-        "minimax-m2.5:cloud": {
-          "name": "minimax-m2.5:cloud",
-          "limit": {
-            "context": 200000,
-            "output": 32000
-          }
-        },
         "minimax-m2.7:cloud": {
           "name": "minimax-m2.7:cloud",
-          "limit": {
-            "context": 200000,
-            "output": 32000
-          }
-        },
-        "kimi-k2.5:cloud": {
-          "name": "kimi-k2.5:cloud",
           "limit": {
             "context": 200000,
             "output": 32000
@@ -285,25 +271,25 @@
             "output": 32000
           }
         },
-        "gpt-oss:120b-cloud": {
-          "name": "gpt-oss:120b-cloud",
-          "limit": {
-            "context": 200000,
-            "output": 32000
-          }
-        },
-        "nemotron-3-super": {
-          "name": "nemotron-3-super:cloud",
-          "limit": {
-            "context": 256000,
-            "output": 32000
-          }
-        },
         "qwen3.5:cloud": {
           "name": "qwen3.5:cloud",
           "limit": {
             "context": 200000,
             "output": 32000
+          }
+        },
+        "deepseek-v4-pro": {
+          "name": "deepseek-v4-pro",
+          "limit": {
+            "context": 1000000,
+            "output": 384000
+          }
+        },
+        "deepseek-v4-flash": {
+          "name": "deepseek-v4-flash",
+          "limit": {
+            "context": 1000000,
+            "output": 384000
           }
         }
       }
@@ -366,12 +352,31 @@
       "timeout": 20000
     },
     "lightpanda": {
-      "type": "local",
-      "command": [
-        "/Users/ekajaya740/.local/bin/lightpanda",
-        "mcp"
-      ],
-      "enabled": true
-    }
+			"type": "local",
+			"command": [
+				"/Users/ekajaya740/.local/bin/lightpanda",
+				"mcp"
+			],
+			"enabled": true
+		},
+		"figma": {
+			"type": "remote",
+			"url": "https://mcp.figma.com/mcp",
+			"enabled": true
+		},
+		"context7": {
+			"type": "local",
+			"command": [
+				"npx",
+				"-y",
+				"@upstash/context7-mcp"
+			],
+			"enabled": true
+		},
+		"exa": {
+			"type": "remote",
+			"url": "https://mcp.exa.ai/mcp",
+			"enabled": true
+		}
   }
 }

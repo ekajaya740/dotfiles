@@ -17,7 +17,8 @@ This document provides guidelines for AI agents and automation tools working wit
 ├── tmux/.tmux.conf             → ~/.tmux.conf
 ├── opencode/.config/opencode/  → ~/.config/opencode/
 ├── claude/.claude/             → ~/.claude
-└── omp/.omp/agent/            → ~/.omp/agent (config + models only)
+├── omp/.omp/agent/            → ~/.omp/agent (config + models only)
+└── agent/.agent/commands/     → ~/.agent/commands (custom omp commands)
 ```
 
 ## Workflow
@@ -48,8 +49,8 @@ If symlinks break or need refresh:
 
 ```bash
 cd ~/dotfiles
-stow -D nvim tmux opencode claude omp  # Unstow
-stow nvim tmux opencode claude omp     # Restow
+stow -D nvim tmux opencode claude omp agent  # Unstow
+stow nvim tmux opencode claude omp agent     # Restow
 ```
 
 ## Safety Rules
@@ -151,7 +152,7 @@ Run `omp` at least once before stowing to create `~/.omp/agent/` with local stat
 
 ```bash
 cd ~/dotfiles
-stow omp
+stow omp agent
 ```
 
 ### MCP Servers
@@ -170,6 +171,53 @@ Configured in `omp/.omp/agent/mcp.json` (oMP) and `opencode/.config/opencode/ope
 # Then verify:
 lightpanda --version
 ```
+
+### Custom Commands (`.agent/commands/`)
+
+User-level custom omp commands that dispatch directly to a specific agent, bypassing the default model's interpretation.
+
+| Command | File | Effect |
+|---------|------|--------|
+| `/designer` | `~/.agent/commands/designer.md` | Forwards your prompt to the `designer` agent with zero deviation |
+
+Usage: `/designer <your design prompt>` — the designer agent runs on `ollama-cloud/glm-5.1:cloud` (configured via `modelRoles.designer`).
+
+The `$@` placeholder in the command body passes your inline arguments straight to the agent assignment. The body is rigid — the main model has no room to paraphrase or re-route.
+
+#### Adding new commands
+
+Create `agent/.agent/commands/<name>.md` with YAML frontmatter:
+```markdown
+---
+name: <name>
+description: <description shown in help>
+---
+
+Use the task tool with the following parameters — do not paraphrase or change the agent name:
+- agent: "<agent-name>"
+- tasks: [{ id: "main", description: "<desc>", assignment: "$@" }]
+```
+
+Then stow: `stow agent`.
+
+### Orchestrator Mode (default agent routing)
+
+The default omp agent is configured as an **orchestrator** — it routes specialized work to sub-agents via the `task` tool rather than doing everything itself.
+
+| Route | Agent | Enables |
+|-------|-------|---------|
+| UI/UX design | `designer` | Re-enabled from `task.disabledAgents` |
+| Codebase exploration | `explore` | Re-enabled from `task.disabledAgents` |
+| Code review | `reviewer` | Always available (`/review` or task) |
+| Commit/push | CLI `omp commit` | CLI tool, not a task agent |
+| Vision analysis | `inspect_image` tool | Routes to `modelRoles.vision` automatically |
+
+Instructions are in `~/.claude/CLAUDE.md` (`## Orchestrator Mode`). The default agent reads these and delegates:
+- Design/UI work → spawn `designer` agent
+- Exploration → spawn `explore` agent
+- Simple ops → do directly (reading files, running commands)
+
+To add an agent to the routing table, remove it from `task.disabledAgents` in `config.yml` and add a row to the routing table in `~/.claude/CLAUDE.md`.
 
 ## Neovim Plugin Notes
 

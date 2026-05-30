@@ -2,21 +2,29 @@
   "env": {
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
-  "permissions": {
-    "allow": [
-      "mcp__pencil"
-    ]
-  },
   "statusLine": {
     "type": "command",
     "command": "node $HOME/.claude/hud/omc-hud.mjs"
   },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/ekajaya740/.claude/hooks/rtk-rewrite.sh"
+          }
+        ]
+      }
+    ]
+  },
   "enabledPlugins": {
-    "oh-my-claudecode@omc": true,
-    "typescript-lsp@claude-plugins-official": true
+	"oh-my-claudecode@omc": true,
+	"typescript-lsp@claude-plugins-official": true
   },
   "alwaysThinkingEnabled": true,
   "skipDangerousModePermissionPrompt": true,
-  "includeCoAuthoredBy": false,
-  "gitAttribution": false
+  "gitAttribution": false,
+  "includeCoAuthoredBy": false
 }
