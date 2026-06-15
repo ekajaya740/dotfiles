@@ -8,6 +8,9 @@ Personal configuration for Neovim (LazyVim + coc.nvim), tmux, zsh, OpenCode, and
 **oh-my-pi (OMP)** includes:
 - [oh-my-pi](https://github.com/can1357/oh-my-pi) - AI coding agent for the terminal (`omp` CLI), configured with ollama-cloud models (see [AGENTS.md](./AGENTS.md) for details)
 
+**Pi agent extensions:**
+- [pi-notify-pp](https://github.com/kim0/pi-notify-pp) - Native terminal notifications for Pi agent turns (OSC 777, works with Ghostty/iTerm2)
+
 ## Repository Layout
 
 - `nvim/.config/nvim/` -> `~/.config/nvim`
@@ -22,6 +25,7 @@ Personal configuration for Neovim (LazyVim + coc.nvim), tmux, zsh, OpenCode, and
 - `claude/.claude/.omc-config.json` -> `~/.claude/.omc-config.json`
 - `omp/.omp/agent/config.yml` -> `~/.omp/agent/config.yml` (settings, model roles)
 - `omp/.omp/agent/models.yml` -> `~/.omp/agent/models.yml` (custom providers & models)
+- `pi/.pi/agent/extensions/pi-notify-pp/` -> `~/.pi/agent/extensions/pi-notify-pp/` (Pi Notify++ extension)
 
 ## Dependencies
 
@@ -145,7 +149,7 @@ mkdir -p ~/.config/opencode
 
 ```bash
 cd ~/dotfiles
-stow nvim tmux zsh opencode claude omp
+stow nvim tmux zsh opencode claude omp pi
 ```
 
 ### 4) First run
