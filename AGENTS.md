@@ -18,6 +18,7 @@ This document provides guidelines for AI agents and automation tools working wit
 ├── opencode/.config/opencode/  → ~/.config/opencode/
 ├── claude/.claude/             → ~/.claude
 ├── omp/.omp/agent/            → ~/.omp/agent (config + models only)
+├── pi/.pi/agent/extensions/   → ~/.pi/agent/extensions (pi-notify-pp)
 └── agent/.agent/commands/     → ~/.agent/commands (custom omp commands)
 ```
 
@@ -49,8 +50,8 @@ If symlinks break or need refresh:
 
 ```bash
 cd ~/dotfiles
-stow -D nvim tmux opencode claude omp agent  # Unstow
-stow nvim tmux opencode claude omp agent     # Restow
+stow -D nvim tmux opencode claude omp agent pi  # Unstow
+stow nvim tmux opencode claude omp agent pi     # Restow
 ```
 
 ## Safety Rules
@@ -126,10 +127,11 @@ Models use the `ollama-cloud` provider (matching the OpenCode `oh-my-openagent.j
 
 | Role | Model | Purpose |
 |------|-------|---------|
-| default | `ollama-cloud/glm-5.1:cloud` | Primary agent |
-| smol | `ollama-cloud/minimax-m2.7:cloud` | Quick/light tasks |
+| default | `ollama-cloud/kimi-k2.7-code:cloud` | Primary agent |
+| smol | `ollama-cloud/deepseek-v4-flash` | Quick/light tasks |
 | plan | `ollama-cloud/kimi-k2.6:cloud` | Planning & architecture |
-| commit | `ollama-cloud/minimax-m2.7:cloud` | Commit generation |
+| teacher | `ollama-cloud/kimi-k2.6:cloud` | Concept explanation & learning |
+| commit | `ollama-cloud/deepseek-v4-flash` | Commit generation |
 
 ### Update OMP config
 
@@ -179,8 +181,10 @@ User-level custom omp commands that dispatch directly to a specific agent, bypas
 | Command | File | Effect |
 |---------|------|--------|
 | `/designer` | `~/.agent/commands/designer.md` | Forwards your prompt to the `designer` agent with zero deviation |
+| `/learn` | `~/.agent/commands/learn.md` | Forwards your prompt to the `teacher` agent for explanations and learning |
 
 Usage: `/designer <your design prompt>` — the designer agent runs on `ollama-cloud/glm-5.1:cloud` (configured via `modelRoles.designer`).
+Usage: `/learn <your question>` — the teacher agent runs on `deepseek/deepseek-v4-pro` (configured via `modelRoles.teacher`).
 
 The `$@` placeholder in the command body passes your inline arguments straight to the agent assignment. The body is rigid — the main model has no room to paraphrase or re-route.
 
@@ -207,6 +211,7 @@ The default omp agent is configured as an **orchestrator** — it routes special
 | Route | Agent | Enables |
 |-------|-------|---------|
 | UI/UX design | `designer` | Re-enabled from `task.disabledAgents` |
+| Concept explanation, learning | `teacher` | Routes via `model: "teacher"` on task agent |
 | Codebase exploration | `explore` | Re-enabled from `task.disabledAgents` |
 | Code review | `reviewer` | Always available (`/review` or task) |
 | Commit/push | CLI `omp commit` | CLI tool, not a task agent |
@@ -215,9 +220,31 @@ The default omp agent is configured as an **orchestrator** — it routes special
 Instructions are in `~/.claude/CLAUDE.md` (`## Orchestrator Mode`). The default agent reads these and delegates:
 - Design/UI work → spawn `designer` agent
 - Exploration → spawn `explore` agent
+- Learning/understanding concepts → spawn `teacher` agent (auto-detected or via `/learn`)
 - Simple ops → do directly (reading files, running commands)
 
 To add an agent to the routing table, remove it from `task.disabledAgents` in `config.yml` and add a row to the routing table in `~/.claude/CLAUDE.md`.
+
+## Pi Coding Agent Extensions
+
+### pi-notify-pp
+
+[Pi Notify++](https://github.com/kim0/pi-notify-pp) sends native terminal notifications when the Pi agent completes a turn. Uses OSC 777 escape sequences (supported by Ghostty, iTerm2, rxvt-unicode, Kitty).
+
+**Location**: `pi/.pi/agent/extensions/pi-notify-pp/` → `~/.pi/agent/extensions/pi-notify-pp/`
+
+Features:
+- **Smart status**: ✅ success, ❌ error, ⚠️ truncated
+- **Time-aware**: Duration shown only for tasks >1 minute
+- **Contextual metadata**: Tool count, last action, error details, session name
+- **Click-to-focus**: Clicking the notification brings the terminal to foreground
+
+**Stowing**:
+```bash
+cd ~/dotfiles && stow pi
+```
+
+**Editing**: Modify `index.ts` in the repo to change icons, thresholds, or formatting. Changes apply immediately via symlink.
 
 ## Neovim Plugin Notes
 

@@ -2,14 +2,15 @@ Models:
   - deepseek/*
   - ollama-cloud/*
 modelRoles: 
-  default: deepseek/deepseek-v4-pro
-  smol: deepseek/deepseek-v4-flash
-  plan: deepseek/deepseek-v4-flash
-  commit: deepseek/deepseek-v4-flash
-  slow: deepseek/deepseek-v4-pro
-  designer: ollama-cloud/glm-5.1:cloud
-  task: deepseek/deepseek-v4-pro
-  vision: ollama-cloud/kimi-k2.6:cloud
+  default: ollama-cloud/kimi-k2.7-code:cloud
+  smol: ollama-cloud/deepseek-v4-flash
+  plan: ollama-cloud/kimi-k2.6:cloud
+  commit: ollama-cloud/deepseek-v4-flash
+  slow: ollama-cloud/deepseek-v4-pro
+  designer: ollama-cloud/minimax-m3:cloud
+  teacher: ollama-cloud/kimi-k2.6:cloud
+  vision: ollama-cloud/gemma4:31b-cloud
+  task: ollama-cloud/deepseek-v4-flash
 defaultThinkingLevel: medium
 steeringMode: one-at-a-time
 followUpMode: auto
@@ -26,31 +27,12 @@ retry:
   networkOnly: true
   maxRetries: 3
   baseDelayMs: 2000
-task: 
-  eager: false
-  merge: patch
-  disabledAgents: 
-    - analyst
-    - architect
-    - code-reviewer
-    - code-simplifier
-    - critic
-    - debugger
-    - document-specialist
-    - executor
-    - git-master
-    - planner
-    - qa-tester
-    - scientist
-    - security-reviewer
-    - test-engineer
-    - tracer
-    - verifier
-    - writer
 async: 
   enabled: false
 skills: 
   showImages: true
 inspect_image: 
   enabled: true
-lastChangelogVersion: 15.3.2
+providers: 
+  webSearch: auto
+setupVersion: 1
