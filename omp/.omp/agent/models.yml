@@ -144,6 +144,12 @@ providers:
           cacheWrite: 0
         contextWindow: 198000
         maxTokens: 32000
+      - id: glm-5.2:cloud
+        name: GLM 5.2 Cloud
+        reasoning: false
+        input: [text]
+        contextWindow: 976000
+        maxTokens: 32000
       - id: minimax-m2.7:cloud
         name: MiniMax M2.7 Cloud
         reasoning: false

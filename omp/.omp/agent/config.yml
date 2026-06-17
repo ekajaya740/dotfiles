@@ -2,7 +2,7 @@ Models:
   - deepseek/*
   - ollama-cloud/*
 modelRoles: 
-  default: ollama-cloud/kimi-k2.7-code:cloud
+  default: ollama-cloud/glm-5.2:cloud
   smol: ollama-cloud/deepseek-v4-flash
   plan: ollama-cloud/kimi-k2.6:cloud
   commit: ollama-cloud/deepseek-v4-flash
