@@ -225,6 +225,48 @@ setup_fzf() {
     fi
 }
 
+# ── mise (runtime version manager) ──────────────────────────
+setup_mise() {
+    if ! has_cmd mise; then
+        info "installing mise"
+        curl -fsSL https://mise.run | MISE_QUIET=1 sh
+    else
+        ok "mise already installed"
+    fi
+
+    # Source mise for this script session so `mise use` works
+    local mise_bin
+    mise_bin="$(command -v mise 2>/dev/null || echo "$HOME/.local/bin/mise")"
+    if [[ -x "$mise_bin" ]]; then
+        eval "$("$mise_bin" activate bash --shims)"
+    fi
+
+    # Install dev tools via mise
+    info "installing node, yarn, make, neovim, vim, opencode, pi via mise"
+    mise use -g \
+        node@lts \
+        yarn@latest \
+        make@latest \
+        neovim@stable \
+        vim@latest \
+        opencode@latest \
+        pi@latest
+
+    ok "mise tools installed"
+
+    # omp (oh-my-pi) is not in the mise registry — install via bun
+    if ! has_cmd omp; then
+        info "installing oh-my-pi (omp) via bun"
+        if has_cmd bun; then
+            bun install -g @oh-my-pi/pi-coding-agent
+        else
+            curl -fsSL https://raw.githubusercontent.com/can1357/oh-my-pi/main/scripts/install.sh | sh
+        fi
+    else
+        ok "omp already installed"
+    fi
+}
+
 # ── neovim post-install ──────────────────────────────────────
 setup_neovim() {
     # lazy.nvim auto-installs plugins on first launch
@@ -280,11 +322,11 @@ main() {
     # 2. Install GNU Stow (prerequisite for everything else)
     install_packages stow
 
-    # 3. Install all dotfile tool dependencies
+    # 3. Install platform tool dependencies (neovim, vim managed by mise)
     case $PLATFORM in
         macos)
             install_packages \
-                neovim tmux zsh vim \
+                tmux zsh \
                 ripgrep fd shellcheck jq \
                 fzf lazygit
             # Bun (OpenCode dependency)
@@ -296,7 +338,7 @@ main() {
             ;;
         arch)
             install_packages \
-                neovim tmux zsh vim \
+                tmux zsh \
                 ripgrep fd shellcheck jq \
                 fzf lazygit
             # Bun from AUR
@@ -307,7 +349,7 @@ main() {
             ;;
         debian)
             install_packages \
-                neovim tmux zsh vim \
+                tmux zsh \
                 ripgrep fd-find shellcheck jq \
                 fzf lazygit
             if ! has_cmd bun; then
@@ -318,25 +360,28 @@ main() {
             ;;
     esac
 
-    # 4. Oh My Zsh
+    # 4. mise (node, yarn, make, neovim, vim, opencode, pi)
+    setup_mise
+
+    # 5. Oh My Zsh
     setup_ohmyzsh
 
-    # 5. Powerlevel10k
+    # 6. Powerlevel10k
     setup_powerlevel10k
 
-    # 6. fzf keybindings
+    # 7. fzf keybindings
     setup_fzf
 
-    # 7. Stow everything
+    # 8. Stow everything
     stow_packages
 
-    # 8. Neovim post-install
+    # 9. Neovim post-install
     setup_neovim
 
-    # 9. Validation
+    # 10. Validation
     post_install_checks
 
-    # 10. Summary
+    # 11. Summary
     cat <<-'EOF'
 
     ─────────────────────────────────────────────

@@ -31,13 +31,26 @@ Personal configuration for Neovim (LazyVim + coc.nvim), tmux, zsh, OpenCode, and
 
 ### Required
 
-- `git`, `stow`, `neovim`, `tmux`, `zsh`
-- `node` (`npm` is included with Node on both macOS and Arch)
-- `bun` (OpenCode MCP commands use `bunx`)
-- `make` and a C/C++ toolchain (`telescope-fzf-native` uses `run = "make"`)
+- `git`, `stow`, `tmux`, `zsh`
+- `mise` (runtime version manager — installs `node`, `yarn`, `make`, `neovim`, `vim`, `opencode`, `pi` automatically via `bootstrap.sh`)
+- `bun` (OpenCode MCP commands use `bunx`; ≥ 1.3.7 required by oh-my-pi)
 - `jq` and `tidy` (`rest.nvim` formatters)
-- `yarn` (used by some Node-based Neovim plugin installers)
-- `bun` ≥ 1.3.7 (required by oh-my-pi; also used by OpenCode MCP commands via `bunx`)
+
+### Managed by mise (installed by `bootstrap.sh`)
+
+These are installed automatically via `mise use -g`:
+
+- `node` (LTS) — includes `npm`
+- `yarn` — used by some Neovim plugin installers
+- `make` — required by `telescope-fzf-native`
+- `neovim` (stable) — editor
+- `vim` (latest) — editor
+- `opencode` (latest) — terminal coding agent
+- `pi` (latest) — Pi coding agent
+
+### Installed separately (not in mise registry)
+
+- **oh-my-pi (omp)** — installed via `bun install -g @oh-my-pi/pi-coding-agent` or the install script; not available in mise
 
 ### Recommended
 
@@ -76,19 +89,40 @@ Omarchy-specific behavior:
 
 ## Install Dependencies
 
-### macOS (Homebrew)
+### Quick install (recommended)
+
+The `bootstrap.sh` script handles everything including mise, node, yarn, make, neovim, vim, opencode, pi, and omp:
+
+```bash
+bash bootstrap.sh
+```
+
+### Manual install
+
+#### mise (runtime version manager)
+
+```bash
+curl https://mise.run | sh
+mise use -g node@lts yarn@latest make@latest neovim@stable vim@latest opencode@latest pi@latest
+```
+
+#### macOS (Homebrew)
 
 ```bash
 xcode-select --install
 brew tap oven-sh/bun
-brew install git stow neovim tmux zsh node yarn bun jq tidy-html5 ripgrep fd fzf tree-sitter lua-language-server stylua shellcheck shfmt graphviz chafa
+brew install git stow tmux zsh bun jq tidy-html5 ripgrep fd fzf tree-sitter lua-language-server stylua shellcheck shfmt graphviz chafa
 brew install powerlevel10k
+# If not using mise for neovim/vim/node/yarn/make/opencode:
+# brew install neovim vim node yarn make
 ```
 
-### Arch Linux (pacman)
+#### Arch Linux (pacman)
 
 ```bash
-sudo pacman -S --needed git stow neovim tmux zsh nodejs npm yarn bun base-devel jq tidy ripgrep fd fzf tree-sitter lua-language-server stylua shellcheck shfmt graphviz chafa xclip wl-clipboard
+sudo pacman -S --needed git stow tmux zsh bun base-devel jq tidy ripgrep fd fzf tree-sitter lua-language-server stylua shellcheck shfmt graphviz chafa xclip wl-clipboard
+# If not using mise for neovim/vim/node/yarn/make/opencode:
+# sudo pacman -S --needed neovim vim nodejs npm yarn make
 ```
 
 ### Arch Linux (yay)
@@ -96,9 +130,11 @@ sudo pacman -S --needed git stow neovim tmux zsh nodejs npm yarn bun base-devel 
 Use this if you prefer a single command through AUR helper flow, or if a package is temporarily missing in official repos.
 
 ```bash
-yay -S --needed git neovim tmux zsh nodejs npm yarn bun base-devel jq tidy ripgrep fd fzf tree-sitter lua-language-server stylua shellcheck shfmt graphviz chafa xclip wl-clipboard
+yay -S --needed git stow tmux zsh bun base-devel jq tidy ripgrep fd fzf tree-sitter lua-language-server stylua shellcheck shfmt graphviz chafa xclip wl-clipboard
 # fallback if bun is unavailable from current repos:
 # yay -S --needed bun-bin
+# If not using mise for neovim/vim/node/yarn/make/opencode:
+# yay -S --needed neovim vim nodejs npm yarn make
 # Powerlevel10k (AUR)
 yay -S --needed zsh-theme-powerlevel10k-git
 ```
@@ -152,15 +188,29 @@ cd ~/dotfiles
 stow nvim tmux zsh opencode claude omp pi
 ```
 
-### 4) First run
+### 4) Install mise and dev tools
+
+```bash
+curl https://mise.run | sh
+mise use -g node@lts yarn@latest make@latest neovim@stable vim@latest opencode@latest pi@latest
+```
+
+### 5) Install oh-my-pi (omp)
+
+```bash
+bun install -g @oh-my-pi/pi-coding-agent
+# or: curl -fsSL https://raw.githubusercontent.com/can1357/oh-my-pi/main/scripts/install.sh | sh
+```
+
+### 6) First run
 
 - Open `nvim` and let `lazy.nvim` install plugins.
 - Coc will auto-install configured extensions on first startup (Java support comes from `coc-java`).
 - Install TPM if needed: `git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm`, then press `prefix + I` in tmux.
 - Run `p10k configure` to set up your powerlevel10k prompt (installs Meslo Nerd Font for icons).
+- Restart your shell or run `exec zsh` to activate mise and all tools.
 - Restart OpenCode so provider/agent config reloads.
 - Run `omp` once before stowing to create `~/.omp/agent/` with local state, then `stow omp` to symlink config files.
-- Install oh-my-pi: `bun install -g @oh-my-pi/pi-coding-agent` or `curl -fsSL https://raw.githubusercontent.com/can1357/oh-my-pi/main/scripts/install.sh | sh`.
 
 ## Linting
 
