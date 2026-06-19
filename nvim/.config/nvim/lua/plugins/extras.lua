@@ -62,6 +62,8 @@ return {
 		"rest-nvim/rest.nvim",
 		dependencies = {
 			"nvim-treesitter/nvim-treesitter",
+			"j-hui/fidget.nvim",
+			"nvim-neotest/nvim-nio",
 		},
 	},
 	{

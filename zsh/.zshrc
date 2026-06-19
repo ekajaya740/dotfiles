@@ -163,3 +163,6 @@ source "/home/recreation/.openclaw/completions/openclaw.zsh"
 [ -s ~/.luaver/luaver ] && . ~/.luaver/luaver
 
 export PATH="$HOME/.local/bin:$PATH"
+
+# Added by codebase-memory-mcp install
+export PATH="/home/recreation/.local/bin:$PATH"
