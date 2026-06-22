@@ -9,14 +9,14 @@ This document provides guidelines for AI agents and automation tools working wit
 - **Validation**: Always run checks before and after changes
  **Keybindings**: See [KEYBINDINGS.md](./KEYBINDINGS.md) for custom shortcuts
 
-## Repository Structure
-
 ```
 ~/dotfiles/
 ├── nvim/.config/nvim/          → ~/.config/nvim
 ├── tmux/.tmux.conf             → ~/.tmux.conf
 ├── opencode/.config/opencode/  → ~/.config/opencode/
 ├── claude/.claude/             → ~/.claude
+├── codex/.codex/              → ~/.codex
+├── gemini/.gemini/            → ~/.gemini
 ├── omp/.omp/agent/            → ~/.omp/agent (config + models only)
 ├── pi/.pi/agent/extensions/   → ~/.pi/agent/extensions (pi-notify-pp)
 └── agent/.agent/commands/     → ~/.agent/commands (custom omp commands)
@@ -50,8 +50,8 @@ If symlinks break or need refresh:
 
 ```bash
 cd ~/dotfiles
-stow -D nvim tmux opencode claude omp agent pi  # Unstow
-stow nvim tmux opencode claude omp agent pi     # Restow
+stow -D nvim tmux opencode claude codex gemini omp agent pi  # Unstow
+stow nvim tmux opencode claude codex gemini omp agent pi     # Restow
 ```
 
 ## Safety Rules
@@ -130,7 +130,6 @@ Models use the `ollama-cloud` provider (matching the OpenCode `oh-my-openagent.j
 | default | `ollama-cloud/kimi-k2.7-code:cloud` | Primary agent |
 | smol | `ollama-cloud/deepseek-v4-flash` | Quick/light tasks |
 | plan | `ollama-cloud/kimi-k2.6:cloud` | Planning & architecture |
-| teacher | `ollama-cloud/kimi-k2.6:cloud` | Concept explanation & learning |
 | commit | `ollama-cloud/deepseek-v4-flash` | Commit generation |
 
 ### Update OMP config
@@ -159,20 +158,16 @@ stow omp agent
 
 ### MCP Servers
 
-Configured in `omp/.omp/agent/mcp.json` (oMP) and `opencode/.config/opencode/opencode.json` (OpenCode):
+Configured in `omp/.omp/agent/mcp.json` (oMP), `opencode/.config/opencode/opencode.json` (OpenCode), `claude/.claude/.mcp.json` (Claude Code), `codex/.codex/config.toml` (Codex CLI), and `gemini/.gemini/settings.json` (Gemini CLI):
 
 | Server | Type | Command | Purpose |
 |--------|------|---------|---------|
 | lightpanda | stdio | `lightpanda mcp` | Native headless browser MCP — markdown, semantic tree, structured data, JS eval |
 | grep_app | stdio | `bunx -y @modelcontextprotocol/server-github` | GitHub API access |
+| codebase-memory-mcp | stdio | `codebase-memory-mcp` | Code intelligence knowledge graph — search, trace, architecture, impact analysis |
 
-**[Lightpanda](https://lightpanda.io)** must be installed separately. The binary at `~/.local/bin/lightpanda` exposes a native MCP server:
+**codebase-memory-mcp** is a high-performance code intelligence MCP server. It indexes codebases into a persistent knowledge graph for fast structural queries. Installed at `~/.local/bin/codebase-memory-mcp`. Auto-configured for all detected agents via `codebase-memory-mcp install`.
 
-```bash
-# Install (see https://lightpanda.io/docs/quickstart/installation-and-setup)
-# Then verify:
-lightpanda --version
-```
 
 ### Custom Commands (`.agent/commands/`)
 
@@ -181,10 +176,8 @@ User-level custom omp commands that dispatch directly to a specific agent, bypas
 | Command | File | Effect |
 |---------|------|--------|
 | `/designer` | `~/.agent/commands/designer.md` | Forwards your prompt to the `designer` agent with zero deviation |
-| `/learn` | `~/.agent/commands/learn.md` | Forwards your prompt to the `teacher` agent for explanations and learning |
 
 Usage: `/designer <your design prompt>` — the designer agent runs on `ollama-cloud/glm-5.1:cloud` (configured via `modelRoles.designer`).
-Usage: `/learn <your question>` — the teacher agent runs on `deepseek/deepseek-v4-pro` (configured via `modelRoles.teacher`).
 
 The `$@` placeholder in the command body passes your inline arguments straight to the agent assignment. The body is rigid — the main model has no room to paraphrase or re-route.
 
@@ -211,7 +204,6 @@ The default omp agent is configured as an **orchestrator** — it routes special
 | Route | Agent | Enables |
 |-------|-------|---------|
 | UI/UX design | `designer` | Re-enabled from `task.disabledAgents` |
-| Concept explanation, learning | `teacher` | Routes via `model: "teacher"` on task agent |
 | Codebase exploration | `explore` | Re-enabled from `task.disabledAgents` |
 | Code review | `reviewer` | Always available (`/review` or task) |
 | Commit/push | CLI `omp commit` | CLI tool, not a task agent |
@@ -220,7 +212,6 @@ The default omp agent is configured as an **orchestrator** — it routes special
 Instructions are in `~/.claude/CLAUDE.md` (`## Orchestrator Mode`). The default agent reads these and delegates:
 - Design/UI work → spawn `designer` agent
 - Exploration → spawn `explore` agent
-- Learning/understanding concepts → spawn `teacher` agent (auto-detected or via `/learn`)
 - Simple ops → do directly (reading files, running commands)
 
 To add an agent to the routing table, remove it from `task.disabledAgents` in `config.yml` and add a row to the routing table in `~/.claude/CLAUDE.md`.

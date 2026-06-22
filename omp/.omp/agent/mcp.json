@@ -1,11 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/can1357/oh-my-pi/main/packages/coding-agent/src/config/mcp-schema.json",
   "mcpServers": {
-    "lightpanda": {
-      "command": "/Users/ekajaya740/.local/bin/lightpanda",
-      "args": ["mcp"],
-      "enabled": true
-    },
     "figma": {
       "type": "http",
       "url": "https://mcp.figma.com/mcp",
@@ -19,6 +14,10 @@
     "exa": {
       "type": "http",
       "url": "https://mcp.exa.ai/mcp",
+      "enabled": true
+    },
+    "codebase-memory-mcp": {
+      "command": "/home/recreation/.local/bin/codebase-memory-mcp",
       "enabled": true
     }
   }

@@ -1,33 +1,21 @@
-model = "gpt-5.3-codex"
+model = "gpt-5.2-codex"
+model_reasoning_effort = "medium"
 personality = "pragmatic"
-model_reasoning_effort = "xhigh"
 
-[projects."/Users/ekajaya740/Documents/00-Inbox/LINKFOLIO/linkfolio-project"]
+[projects."/home/recreation/Documents/01-Projects/MIPS/work_assignments"]
 trust_level = "trusted"
 
-[projects."/Users/ekajaya740/Documents/01-Project/dotfiles"]
+[projects."/home/recreation/dotfiles"]
 trust_level = "trusted"
 
-[projects."/Users/ekajaya740/Documents/00-Inbox/MIPS/work_assignments"]
+[projects."/home/recreation/Documents/01-Projects/MIPS/ry-psiam"]
 trust_level = "trusted"
 
-[projects."/Users/ekajaya740/Documents/00-Inbox/Dicoding/MBEDEJS/forum-api-starter-project"]
+[projects."/home/recreation/Documents/01-Projects/MIPS/ry-merged"]
 trust_level = "trusted"
 
-[projects."/Users/ekajaya740/Documents/00-Inbox/lbms"]
-trust_level = "trusted"
-
-[projects."/Users/ekajaya740/Documents/00-Inbox/LINKFOLIO"]
-trust_level = "trusted"
-
-[projects."/Users/ekajaya740/Documents/00-Inbox/LINKFOLIO/apps/profill-fe"]
-trust_level = "trusted"
-
-[projects."/Users/ekajaya740/Downloads/kuis_pengolahan_data_230030556"]
-trust_level = "trusted"
-
-[projects."/Users/ekajaya740/.config/opencode"]
-trust_level = "trusted"
+[projects."/home/recreation/Documents/01-Projects/MIPS"]
+trust_level = "untrusted"
 
 [notice]
 hide_gpt5_1_migration_prompt = true
@@ -36,6 +24,15 @@ hide_gpt5_1_migration_prompt = true
 [notice.model_migrations]
 "gpt-5.1-codex-max" = "gpt-5.2-codex"
 
-[mcp_servers.shadcn]
-command = "bunx"
-args = [ "shadcn@latest", "mcp" ]
+[plugins."github@openai-curated"]
+enabled = true
+
+[mcp_servers.codebase-memory-mcp]
+command = "/home/recreation/.local/bin/codebase-memory-mcp"
+
+[[hooks.SessionStart]]
+matcher = "startup|resume|clear|compact"
+
+[[hooks.SessionStart.hooks]]
+type = "command"
+command = 'echo "Code discovery: prefer codebase-memory-mcp (search_graph, trace_path, get_code_snippet, query_graph, search_code) over grep/file-read; run index_repository first if the project is not indexed."'

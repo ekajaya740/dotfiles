@@ -360,6 +360,12 @@ main() {
             ;;
     esac
 
+    # Lightpanda headless browser (MCP server for browser automation)
+    if ! has_cmd lightpanda; then
+        info "installing Lightpanda"
+        curl -fsSL https://pkg.lightpanda.io/install.sh | bash
+    fi
+
     # 4. mise (node, yarn, make, neovim, vim, opencode, pi)
     setup_mise
 

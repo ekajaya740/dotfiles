@@ -18,3 +18,13 @@ dist/
 
 # Understand-Anything generated files
 .understand-anything/
+
+# Machine-local state (not tracked in dotfiles)
+omp/.omp/agent/*.db
+omp/.omp/agent/*.db-shm
+omp/.omp/agent/*.db-wal
+omp/.omp/agent/sessions/
+omp/.omp/agent/terminal-sessions/
+omp/.omp/gpu_cache.json
+omp/.omp/logs/
+omp/.omp/natives/
