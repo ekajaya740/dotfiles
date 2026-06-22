@@ -114,7 +114,44 @@ vim.api.nvim_create_autocmd("FileType", {
 	group = vim.api.nvim_create_augroup("JavaKeymaps", {}),
 	callback = function(ev)
 		local opts = { buffer = ev.buf, silent = true }
-		keymap.set("n", "<leader>co", "<cmd>JavaBuildBuildWorkspace<cr>", vim.tbl_extend("force", opts, { desc = "Organize Imports" }))
+		keymap.set("n", "<leader>co", function()
+			local clients = vim.lsp.get_clients({ bufnr = ev.buf, name = "jdtls" })
+			if #clients == 0 then
+				vim.notify("jdtls not attached", vim.log.levels.WARN)
+				return
+			end
+			local client = clients[1]
+			local bufs = vim.api.nvim_list_bufs()
+			local java_bufs = {}
+			for _, bufnr in ipairs(bufs) do
+				if vim.bo[bufnr].filetype == "java" and vim.api.nvim_buf_is_loaded(bufnr) then
+					table.insert(java_bufs, bufnr)
+				end
+			end
+			if #java_bufs == 0 then
+				vim.notify("No open Java buffers", vim.log.levels.INFO)
+				return
+			end
+			vim.notify("Organizing imports in " .. #java_bufs .. " files...", vim.log.levels.INFO)
+			local pending = #java_bufs
+			for _, bufnr in ipairs(java_bufs) do
+				client:request("workspace/executeCommand", {
+					command = "java.edit.organizeImports",
+					arguments = { vim.uri_from_bufnr(bufnr) },
+				}, function(err, result, ctx)
+					if err then
+						vim.notify("Organize imports failed: " .. vim.inspect(err), vim.log.levels.ERROR)
+					elseif result then
+						vim.lsp.util.apply_workspace_edit(result, "utf-8")
+					end
+					pending = pending - 1
+					if pending == 0 then
+						vim.cmd("silent! wall")
+						vim.notify("Organize imports done", vim.log.levels.INFO)
+					end
+				end)
+			end
+		end, vim.tbl_extend("force", opts, { desc = "Organize Imports (workspace)" }))
 		keymap.set("n", "<leader>cj", vim.lsp.buf.code_action, vim.tbl_extend("force", opts, { desc = "Java Code Action" }))
 		keymap.set("n", "<leader>cem", "<cmd>JavaRefactorExtractMethod<cr>", vim.tbl_extend("force", opts, { desc = "Extract Method" }))
 		keymap.set("n", "<leader>cev", "<cmd>JavaRefactorExtractVariable<cr>", vim.tbl_extend("force", opts, { desc = "Extract Variable" }))
