@@ -6,7 +6,8 @@
         "opencode-wakatime",
         "superpowers@git+https://github.com/obra/superpowers.git",
         "understand-anything@git+https://github.com/Lum1104/Understand-Anything.git",
-        "oh-my-openagent@latest"
+        "oh-my-openagent@latest",
+        "@dietrichgebert/ponytail"
     ],
     "provider": {
         "openai": {

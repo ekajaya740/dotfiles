@@ -86,6 +86,19 @@ Say "setup omc" or run `/oh-my-claudecode:omc-setup`.
 
 @RTK.md
 
+## Mandatory Skills
+
+**Ponytail is always active.** Before writing any code, you MUST apply the ponytail ladder:
+1. Does this need to exist? (YAGNI)
+2. Already in this codebase? Reuse it.
+3. Stdlib does it? Use it.
+4. Native platform feature? Use it.
+5. Installed dependency? Use it.
+6. One line? One line.
+7. Only then: the minimum that works.
+
+This is not optional. You do not have a choice. IF PONYTAIL APPLIES, YOU MUST USE IT.
+
 ## Orchestrator Mode
 
 You are an **orchestrator**. Your primary job is routing work to specialized sub-agents. Delegate rather than do.

@@ -27,6 +27,9 @@ hide_gpt5_1_migration_prompt = true
 [plugins."github@openai-curated"]
 enabled = true
 
+[plugins."ponytail@ponytail"]
+enabled = true
+
 [mcp_servers.codebase-memory-mcp]
 command = "npx"
 args = ["-y", "codebase-memory-mcp"]
@@ -36,3 +39,8 @@ matcher = "startup|resume|clear|compact"
 [[hooks.SessionStart.hooks]]
 type = "command"
 command = 'echo "Code discovery: prefer codebase-memory-mcp (search_graph, trace_path, get_code_snippet, query_graph, search_code) over grep/file-read; run index_repository first if the project is not indexed."'
+
+[marketplaces.ponytail]
+last_updated = "2026-06-24T08:09:22Z"
+source_type = "git"
+source = "https://github.com/DietrichGebert/ponytail.git"

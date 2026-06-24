@@ -35,3 +35,5 @@ inspect_image:
 providers: 
   webSearch: auto
 setupVersion: 1
+extensions: 
+  - /home/recreation/dotfiles/pi/.pi/agent/extensions/pi-notify-pp/index.ts
