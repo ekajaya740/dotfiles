@@ -35,6 +35,14 @@ keymap.set("n", "<leader>tp", ":tabp<CR>") --  go to previous tab
 -- vim-maximizer
 keymap.set("n", "<leader>sm", ":MaximizerToggle<CR>") -- toggle split window maximization
 
+-- mini.map toggle
+keymap.set("n", "<leader>mm", function()
+	local ok, mini_map = pcall(require, "mini.map")
+	if ok then
+		mini_map.toggle()
+	end
+end, { desc = "Toggle minimap" })
+
 -- nvim-tree
 local function set_file_picker_keymaps()
 	for _, lhs in ipairs({ "<leader>e", "<leader>E", "<leader>fe", "<leader>fE", "<leader><space>", "<leader>/", "<leader>ff", "<leader>fs", "<leader>fc" }) do
@@ -162,5 +170,49 @@ vim.api.nvim_create_autocmd("FileType", {
 		keymap.set("n", "<leader>ds", "<cmd>JavaRunnerStopMain<cr>", vim.tbl_extend("force", opts, { desc = "Stop Main" }))
 		keymap.set("n", "<leader>dt", "<cmd>JavaTestRunCurrentClass<cr>", vim.tbl_extend("force", opts, { desc = "Test Current Class" }))
 		keymap.set("n", "<leader>dT", "<cmd>JavaTestDebugCurrentClass<cr>", vim.tbl_extend("force", opts, { desc = "Debug Current Class" }))
+		keymap.set("n", "<leader>cu", function()
+			local diags = vim.diagnostic.get(ev.buf)
+			local unused = vim.tbl_filter(function(d)
+				return d.message:lower():match("unused")
+					or d.message:lower():match("dead code")
+					or d.message:lower():match("never used")
+					or d.message:lower():match("not used")
+			end, diags)
+			if #unused == 0 then
+				vim.notify("No unused diagnostics in this buffer", vim.log.levels.INFO)
+				return
+			end
+			table.sort(unused, function(a, b) return a.lnum > b.lnum end)
+			local fixed = 0
+			for _, d in ipairs(unused) do
+				local results = vim.lsp.buf_request_sync(ev.buf, "textDocument/codeAction", {
+					textDocument = { uri = vim.uri_from_bufnr(ev.buf) },
+					context = { diagnostics = { d } },
+					range = {
+						start = { line = d.lnum, character = 0 },
+						["end"] = { line = d.lnum, character = 0 },
+					},
+				}, 3000)
+				if results then
+					for _, res in pairs(results) do
+						if res.result then
+							for _, action in ipairs(res.result) do
+								if action.edit then
+									vim.lsp.util.apply_workspace_edit(action.edit, "utf-8")
+									fixed = fixed + 1
+								elseif action.command then
+									local client = vim.lsp.get_clients({ bufnr = ev.buf, name = "jdtls" })[1]
+									if client then
+										client.request("workspace/executeCommand", action.command, function() end)
+										fixed = fixed + 1
+									end
+								end
+							end
+						end
+					end
+				end
+			end
+			vim.notify(string.format("Fixed %d/%d unused", fixed, #unused), vim.log.levels.INFO)
+		end, vim.tbl_extend("force", opts, { desc = "Remove unused in current buffer" }))
 	end,
 })

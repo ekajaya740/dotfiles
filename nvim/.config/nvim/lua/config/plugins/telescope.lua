@@ -128,3 +128,24 @@ telescope.setup({
 telescope.load_extension("fzf")
 telescope.load_extension("media_files")
 pcall(telescope.load_extension, "rest")
+
+-- Guard Telescope's treesitter highlighter against nil parser (race condition)
+local function patch_ts_highlighter()
+	local ok, utils = pcall(require, "telescope.previewers.utils")
+	if not ok then
+		return
+	end
+	local orig = utils.ts_highlighter
+	utils.ts_highlighter = function(bufnr, ft)
+		local parsers_ok, ts_parsers = pcall(require, "nvim-treesitter.parsers")
+		if not parsers_ok then
+			return false
+		end
+		local parser_ok, parser = pcall(ts_parsers.get_parser, bufnr, ft)
+		if not parser_ok or not parser then
+			return false
+		end
+		return orig(bufnr, ft)
+	end
+end
+vim.schedule(patch_ts_highlighter)

@@ -1,5 +1,6 @@
 return {
 	{ "catppuccin/nvim", name = "catppuccin" },
+	{ "nvim-mini/mini.map", version = false, config = function() require("config.plugins.mini-map") end },
 	{ "nvim-neo-tree/neo-tree.nvim", enabled = false },
 	{ "christoomey/vim-tmux-navigator" },
 	{ "szw/vim-maximizer" },

@@ -34,6 +34,10 @@ return {
 								variableTypes = { enabled = true },
 							},
 						},
+						["js/ts.implicitProjectConfig.strict"] = true,
+						["js/ts.implicitProjectConfig.strictNullChecks"] = true,
+						["js/ts.implicitProjectConfig.strictFunctionTypes"] = true,
+						["js/ts.implicitProjectConfig.checkJs"] = true,
 					},
 				},
 				tailwindcss = {
@@ -209,6 +213,26 @@ return {
 					lspconfig[server].setup(server_opts)
 				end
 			end
+
+			-- diagnostic display: virtual_text, signs, severity_sort, underline
+			vim.diagnostic.config({
+				underline = true,
+				update_in_insert = false,
+				virtual_text = {
+					spacing = 4,
+					source = "if_many",
+					prefix = "●",
+				},
+				severity_sort = true,
+				signs = {
+					text = {
+						[vim.diagnostic.severity.ERROR] = "",
+						[vim.diagnostic.severity.WARN] = "",
+						[vim.diagnostic.severity.HINT] = "",
+						[vim.diagnostic.severity.INFO] = "",
+					},
+				},
+			})
 
 			vim.api.nvim_create_autocmd("FileType", {
 				group = vim.api.nvim_create_augroup("DisableHtmlAutoformat", {}),
