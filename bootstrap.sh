@@ -273,6 +273,37 @@ setup_neovim() {
     info "neovim config ready — plugins will auto-install on first :Lazy sync or launch"
 }
 
+
+# ── machine-specific agent config ──────────────────────────
+setup_machine_specific() {
+    info "Applying machine-specific agent config..."
+
+    # OMP: pi-notify-pp extension
+    if has_cmd omp; then
+        local ext_path="${DOTFILES_REPO}/pi/.pi/agent/extensions/pi-notify-pp/index.ts"
+        if [[ -f "$ext_path" ]]; then
+            omp config set extensions "[\"$ext_path\"]" 2>/dev/null || \
+                warn "omp config set extensions failed — set manually: omp config set extensions '[\"$ext_path\"]'"
+        fi
+    fi
+
+    # Gemini: RTK hook
+    if has_cmd rtk; then
+        rtk init -g --gemini --auto-patch 2>/dev/null || \
+            warn "rtk gemini init failed — run: rtk init -g --gemini --auto-patch"
+    fi
+
+    # Codex: project trust (user must run manually)
+    if has_cmd codex; then
+        warn "Codex project trust is machine-specific. Add projects to ~/.codex/config.toml:"
+        warn "  [projects.\"${HOME}/dotfiles\"]"
+        warn "  trust_level = \"trusted\""
+    fi
+
+    ok "Machine-specific config applied"
+
+}
+
 # ── post-stow checks ────────────────────────────────────────
 post_install_checks() {
     info "running post-install checks"
@@ -351,6 +382,7 @@ main() {
             install_packages \
                 tmux zsh \
                 ripgrep fd-find shellcheck jq \
+
                 fzf lazygit
             if ! has_cmd bun; then
                 info "installing Bun"
@@ -381,7 +413,9 @@ main() {
     # 8. Stow everything
     stow_packages
 
-    # 9. Neovim post-install
+    # 9. Machine-specific agent config (extensions, hooks, trust)
+    setup_machine_specific
+
     setup_neovim
 
     # 10. Validation

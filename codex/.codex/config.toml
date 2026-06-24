@@ -2,20 +2,6 @@ model = "gpt-5.2-codex"
 model_reasoning_effort = "medium"
 personality = "pragmatic"
 
-[projects."/home/recreation/Documents/01-Projects/MIPS/work_assignments"]
-trust_level = "trusted"
-
-[projects."/home/recreation/dotfiles"]
-trust_level = "trusted"
-
-[projects."/home/recreation/Documents/01-Projects/MIPS/ry-psiam"]
-trust_level = "trusted"
-
-[projects."/home/recreation/Documents/01-Projects/MIPS/ry-merged"]
-trust_level = "trusted"
-
-[projects."/home/recreation/Documents/01-Projects/MIPS"]
-trust_level = "untrusted"
 
 [notice]
 hide_gpt5_1_migration_prompt = true
@@ -48,3 +34,18 @@ command = 'echo "Code discovery: prefer codebase-memory-mcp (search_graph, trace
 last_updated = "2026-06-24T08:09:22Z"
 source_type = "git"
 source = "https://github.com/DietrichGebert/ponytail.git"
+
+[projects."/home/recreation/Documents/01-Projects/MIPS/work_assignments"]
+trust_level = "trusted"
+
+[projects."/home/recreation/dotfiles"]
+trust_level = "trusted"
+
+[projects."/home/recreation/Documents/01-Projects/MIPS/ry-psiam"]
+trust_level = "trusted"
+
+[projects."/home/recreation/Documents/01-Projects/MIPS/ry-merged"]
+trust_level = "trusted"
+
+[projects."/home/recreation/Documents/01-Projects/MIPS"]
+trust_level = "untrusted"

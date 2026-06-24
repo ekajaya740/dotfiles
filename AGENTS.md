@@ -374,3 +374,21 @@ Rules:
 - Shortest working diff wins, but only once you understand the problem.
 - Mark intentional simplifications with a `ponytail:` comment.
 - Not lazy about: understanding the problem, input validation, error handling, security, accessibility.
+
+
+## Machine-Specific Setup
+
+After stowing, run these on each new machine:
+
+```bash
+# OMP: enable pi-notify-pp extension
+omp config set extensions '["$HOME/dotfiles/pi/.pi/agent/extensions/pi-notify-pp/index.ts"]'
+
+# Gemini: install RTK hook
+rtk init -g --gemini --auto-patch
+
+# Codex: trust this project
+codex --config 'projects."$HOME/dotfiles".trust_level="trusted"'
+```
+
+Or run `bootstrap.sh` which handles all of the above automatically.
