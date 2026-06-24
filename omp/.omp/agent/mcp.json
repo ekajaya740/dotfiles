@@ -6,9 +6,9 @@
       "args": ["-y", "@upstash/context7-mcp"],
       "enabled": true
     },
-    "exa": {
+    "firecrawl": {
       "type": "http",
-      "url": "https://mcp.exa.ai/mcp",
+      "url": "https://mcp.firecrawl.dev/v2/mcp",
       "enabled": true
     },
     "codebase-memory-mcp": {

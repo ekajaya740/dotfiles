@@ -33,6 +33,10 @@ enabled = true
 [mcp_servers.codebase-memory-mcp]
 command = "npx"
 args = ["-y", "codebase-memory-mcp"]
+
+[mcp_servers.firecrawl]
+type = "remote"
+url = "https://mcp.firecrawl.dev/v2/mcp"
 [[hooks.SessionStart]]
 matcher = "startup|resume|clear|compact"
 
