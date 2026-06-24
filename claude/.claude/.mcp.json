@@ -1,9 +1,5 @@
 {
     "mcpServers": {
-        "firecrawl": {
-            "type": "http",
-            "url": "https://mcp.firecrawl.dev/v2/mcp"
-        },
         "codebase-memory-mcp": {
             "command": "npx",
             "args": ["-y", "codebase-memory-mcp"]

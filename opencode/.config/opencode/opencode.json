@@ -377,7 +377,7 @@
         "firecrawl": {
             "type": "remote",
             "url": "https://mcp.firecrawl.dev/v2/mcp",
-            "enabled": true
+            "enabled": false
         },
         "codebase-memory-mcp": {
             "enabled": true,

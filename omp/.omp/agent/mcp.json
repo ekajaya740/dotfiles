@@ -9,7 +9,7 @@
     "firecrawl": {
       "type": "http",
       "url": "https://mcp.firecrawl.dev/v2/mcp",
-      "enabled": true
+      "enabled": false
     },
     "codebase-memory-mcp": {
       "command": "npx",
