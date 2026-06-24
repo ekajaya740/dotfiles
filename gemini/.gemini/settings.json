@@ -4,7 +4,8 @@
     "preferredEditor": "vscode",
     "mcpServers": {
         "codebase-memory-mcp": {
-            "command": "/home/recreation/.local/bin/codebase-memory-mcp"
+            "command": "npx",
+            "args": ["-y", "codebase-memory-mcp"]
         }
     },
     "hooks": {

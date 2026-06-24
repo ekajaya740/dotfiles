@@ -28,8 +28,8 @@ hide_gpt5_1_migration_prompt = true
 enabled = true
 
 [mcp_servers.codebase-memory-mcp]
-command = "/home/recreation/.local/bin/codebase-memory-mcp"
-
+command = "npx"
+args = ["-y", "codebase-memory-mcp"]
 [[hooks.SessionStart]]
 matcher = "startup|resume|clear|compact"
 

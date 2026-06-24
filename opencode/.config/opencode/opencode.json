@@ -383,7 +383,9 @@
             "enabled": true,
             "type": "local",
             "command": [
-                "/home/recreation/.local/bin/codebase-memory-mcp"
+                "npx",
+                "-y",
+                "codebase-memory-mcp"
             ]
         }
     }
