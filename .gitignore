@@ -16,9 +16,6 @@ vim/.vim/plugged/
 dist/
 .vite/
 
-# Understand-Anything generated files
-.understand-anything/
-
 # Machine-local state (not tracked in dotfiles)
 omp/.omp/agent/*.db
 omp/.omp/agent/*.db-shm
