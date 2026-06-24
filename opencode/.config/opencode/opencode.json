@@ -365,11 +365,6 @@
             "enabled": true,
             "timeout": 20000
         },
-        "figma": {
-            "type": "remote",
-            "url": "https://mcp.figma.com/mcp",
-            "enabled": true
-        },
         "context7": {
             "type": "local",
             "command": [
