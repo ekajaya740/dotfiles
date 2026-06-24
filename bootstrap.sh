@@ -123,7 +123,16 @@ install_packages() {
 STOW_PACKAGES=(nvim tmux zsh vim opencode claude omp pi agent codex)
 
 stow_packages() {
+    local adopt=false
+    local args=()
+    for arg in "$@"; do
+        case "$arg" in
+            -f|--adopt|--force) adopt=true ;;
+        esac
+    done
+
     info "stowing packages: ${STOW_PACKAGES[*]}"
+    $adopt && info "  --adopt mode: existing files will be replaced"
 
     # un-stow everything first to avoid conflicts
     for pkg in "${STOW_PACKAGES[@]}"; do
@@ -132,13 +141,21 @@ stow_packages() {
         fi
     done
 
-    # stow each package
+    # stow each package — skip on conflict unless --adopt
     for pkg in "${STOW_PACKAGES[@]}"; do
-        if [[ -d "$DOTFILES_REPO/$pkg" ]]; then
-            stow "$pkg"
-            ok "stowed $pkg"
-        else
+        if [[ ! -d "$DOTFILES_REPO/$pkg" ]]; then
             warn "skipping $pkg — directory not found"
+            continue
+        fi
+
+        if $adopt; then
+            stow --adopt "$pkg" 2>&1 || warn "failed to stow $pkg"
+        else
+            local out
+            out=$(stow "$pkg" 2>&1) && ok "stowed $pkg" || {
+                warn "skipping $pkg — existing files conflict (use --adopt to replace)"
+                warn "  $out"
+            }
         fi
     done
 }
@@ -195,8 +212,15 @@ setup_ohmyzsh() {
     fi
 }
 
-# ── powerlevel10k ───────────────────────────────────────────
 setup_powerlevel10k() {
+    # Check if p10k is already available (repo or -git variant)
+    if [[ -d "$HOME/.oh-my-zsh/custom/themes/powerlevel10k" ]] || \
+       [[ -f /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme ]] || \
+       pacman -Q zsh-theme-powerlevel10k-git 2>/dev/null; then
+        ok "powerlevel10k already installed"
+        return
+    fi
+
     case $PLATFORM in
         macos)
             install_packages powerlevel10k
@@ -205,7 +229,6 @@ setup_powerlevel10k() {
             install_packages zsh-theme-powerlevel10k
             ;;
         debian)
-            # git clone into oh-my-zsh custom
             local ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
             if [[ ! -d "$ZSH_CUSTOM/themes/powerlevel10k" ]]; then
                 info "installing powerlevel10k from git"
