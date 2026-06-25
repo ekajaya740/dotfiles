@@ -9,6 +9,23 @@ IFS=$'\n\t'
 DOTFILES_REPO="${DOTFILES_REPO:-${HOME}/dotfiles}"
 DOTFILES_URL="${DOTFILES_URL:-https://github.com/ekajaya740/dotfiles.git}"
 
+# ── flags ─────────────────────────────────────────────────────
+SKIP_DEPS=false
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --skip-deps) SKIP_DEPS=true ;;
+        --help|-h)
+            echo "Usage: bootstrap.sh [--skip-deps]"
+            echo ""
+            echo "  --skip-deps    Skip installing system packages and tools (stow only)"
+            exit 0
+            ;;
+        *) err "unknown flag: $1"; exit 1 ;;
+    esac
+    shift
+done
+
 # ── utilities ────────────────────────────────────────────────
 info()  { printf "\033[1;34m[INFO]\033[0m  %s\n" "$*"; }
 ok()    { printf "\033[1;32m[ OK ]\033[0m  %s\n" "$*"; }
@@ -373,52 +390,56 @@ main() {
     # 1. Clone / pull repo
     ensure_repo
 
-    # 2. Install GNU Stow (prerequisite for everything else)
-    install_packages stow
+    if ! $SKIP_DEPS; then
+        # 2. Install GNU Stow (prerequisite for everything else)
+        install_packages stow
 
-    # 3. Install platform tool dependencies (neovim, vim managed by mise)
-    case $PLATFORM in
-        macos)
-            install_packages \
-                tmux zsh \
-                ripgrep fd shellcheck jq \
-                fzf lazygit
-            # Bun (OpenCode dependency)
-            if ! has_cmd bun; then
-                info "installing Bun"
-                curl -fsSL https://bun.sh/install | bash
-            fi
-            setup_macos_extras
-            ;;
-        arch)
-            install_packages \
-                tmux zsh \
-                ripgrep fd shellcheck jq \
-                fzf lazygit
-            # Bun from AUR
-            if ! has_cmd bun; then
-                install_packages bun-bin 2>/dev/null || warn "bun-bin not found in AUR; install manually"
-            fi
-            setup_arch_extras
-            ;;
-        debian)
-            install_packages \
-                tmux zsh \
-                ripgrep fd-find shellcheck jq \
+        # 3. Install platform tool dependencies (neovim, vim managed by mise)
+        case $PLATFORM in
+            macos)
+                install_packages \
+                    tmux zsh \
+                    ripgrep fd shellcheck jq \
+                    fzf lazygit
+                # Bun (OpenCode dependency)
+                if ! has_cmd bun; then
+                    info "installing Bun"
+                    curl -fsSL https://bun.sh/install | bash
+                fi
+                setup_macos_extras
+                ;;
+            arch)
+                install_packages \
+                    tmux zsh \
+                    ripgrep fd shellcheck jq \
+                    fzf lazygit
+                # Bun from AUR
+                if ! has_cmd bun; then
+                    install_packages bun-bin 2>/dev/null || warn "bun-bin not found in AUR; install manually"
+                fi
+                setup_arch_extras
+                ;;
+            debian)
+                install_packages \
+                    tmux zsh \
+                    ripgrep fd-find shellcheck jq \
 
-                fzf lazygit
-            if ! has_cmd bun; then
-                info "installing Bun"
-                curl -fsSL https://bun.sh/install | bash
-            fi
-            setup_debian_extras
-            ;;
-    esac
+                    fzf lazygit
+                if ! has_cmd bun; then
+                    info "installing Bun"
+                    curl -fsSL https://bun.sh/install | bash
+                fi
+                setup_debian_extras
+                ;;
+        esac
 
-    # Lightpanda headless browser (MCP server for browser automation)
-    if ! has_cmd lightpanda; then
-        info "installing Lightpanda"
-        curl -fsSL https://pkg.lightpanda.io/install.sh | bash
+        # Lightpanda headless browser (MCP server for browser automation)
+        if ! has_cmd lightpanda; then
+            info "installing Lightpanda"
+            curl -fsSL https://pkg.lightpanda.io/install.sh | bash
+        fi
+    else
+        info "skipping system package and tool installation (--skip-deps)"
     fi
 
     # 4. mise (node, yarn, make, neovim, vim, opencode, pi)
