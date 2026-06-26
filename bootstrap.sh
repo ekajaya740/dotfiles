@@ -9,16 +9,18 @@ IFS=$'\n\t'
 DOTFILES_REPO="${DOTFILES_REPO:-${HOME}/dotfiles}"
 DOTFILES_URL="${DOTFILES_URL:-https://github.com/ekajaya740/dotfiles.git}"
 
-# ── flags ─────────────────────────────────────────────────────
 SKIP_DEPS=false
+SYNC_ONLY=false
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --skip-deps) SKIP_DEPS=true ;;
+        --skip-deps) SKIP_DEPS=true; shift ;;
+        --sync-only) SYNC_ONLY=true; shift ;;
         --help|-h)
-            echo "Usage: bootstrap.sh [--skip-deps]"
+            echo "Usage: bootstrap.sh [--skip-deps] [--sync-only]"
             echo ""
             echo "  --skip-deps    Skip installing system packages and tools (stow only)"
+            echo "  --sync-only    Only restow symlinks, skip everything else"
             exit 0
             ;;
         *) err "unknown flag: $1"; exit 1 ;;
@@ -456,6 +458,12 @@ main() {
 
     # 8. Stow everything
     stow_packages
+
+    # --sync-only: restow done, skip everything else
+    if $SYNC_ONLY; then
+        ok "symlinks synced"
+        return 0
+    fi
 
     # 9. Machine-specific agent config (extensions, hooks, trust)
     setup_machine_specific
