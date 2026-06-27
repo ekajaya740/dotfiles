@@ -164,11 +164,17 @@ eval "$(mise activate zsh)" 2>/dev/null || true
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 # OpenClaw Completion
-source "/home/recreation/.openclaw/completions/openclaw.zsh"
+[[ -f "$HOME/.openclaw/completions/openclaw.zsh" ]] && source "$HOME/.openclaw/completions/openclaw.zsh"
 
 [ -s ~/.luaver/luaver ] && . ~/.luaver/luaver
 
 export PATH="$HOME/.local/bin:$PATH"
 
+# Bun
+export PATH="$HOME/.bun/bin:$PATH"
+
 # Added by codebase-memory-mcp install
-export PATH="/home/recreation/.local/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
+
+# Vite+ bin (https://viteplus.dev)
+. "$HOME/.vite-plus/env"
