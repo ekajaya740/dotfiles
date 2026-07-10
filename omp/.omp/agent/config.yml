@@ -1,16 +1,18 @@
 Models: 
   - deepseek/*
   - ollama-cloud/*
+  - jatevo/*
 modelRoles: 
-  default: ollama-cloud/deepseek-v4-flash
+  default: jatevo/gpt-5.6-sol:high
   smol: ollama-cloud/deepseek-v4-flash
-  plan: ollama-cloud/kimi-k2.6:cloud
+  plan: ollama-cloud/glm-5.2:cloud
   commit: ollama-cloud/deepseek-v4-flash
-  slow: ollama-cloud/deepseek-v4-pro
-  designer: ollama-cloud/minimax-m3:cloud
+  slow: ollama-cloud/glm-5.2:cloud
+  designer: ollama-cloud/glm-5.2:cloud
   vision: ollama-cloud/gemma4:31b-cloud
   task: ollama-cloud/deepseek-v4-flash
-defaultThinkingLevel: medium
+  advisor: jatevo/gpt-5.5:high
+defaultThinkingLevel: auto
 steeringMode: one-at-a-time
 followUpMode: auto
 interruptMode: immediate
@@ -26,6 +28,10 @@ retry:
   networkOnly: true
   maxRetries: 3
   baseDelayMs: 2000
+  fallbackChains: 
+    default: 
+      - ollama-cloud/deepseek-v4-flash
+      - jatevo/gpt-5.5
 async: 
   enabled: false
 skills: 

@@ -173,6 +173,9 @@ export PATH="$HOME/.local/bin:$PATH"
 # Bun
 export PATH="$HOME/.bun/bin:$PATH"
 
+# Docker alias (Apple container)
+! command -v docker &>/dev/null && alias docker="container"
+
 # Added by codebase-memory-mcp install
 export PATH="$HOME/.local/bin:$PATH"
 

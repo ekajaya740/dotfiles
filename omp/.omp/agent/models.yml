@@ -51,6 +51,58 @@ providers:
           extraBody:
             thinking:
               type: enabled
+  unimodel:
+    baseUrl: https://unimodel.ai/v1/
+    api: openai-completions
+    apiKey: UNIMODEL_API_KEY
+    authHeader: true
+    models:
+      - id: deepseek-v4-pro
+        name: DeepSeek V4 Pro
+        reasoning: true
+        thinking:
+          minLevel: high
+          maxLevel: xhigh
+          mode: effort
+        input: [text]
+        contextWindow: 1000000
+        maxTokens: 65536
+        compat:
+          supportsDeveloperRole: false
+          supportsReasoningEffort: true
+          maxTokensField: max_tokens
+          reasoningEffortMap:
+            high: high
+            xhigh: max
+          supportsToolChoice: false
+          requiresReasoningContentForToolCalls: true
+          requiresAssistantContentForToolCalls: true
+          extraBody:
+            thinking:
+              type: enabled
+      - id: deepseek-v4-flash
+        name: DeepSeek V4 Flash
+        reasoning: true
+        thinking:
+          minLevel: high
+          maxLevel: xhigh
+          mode: effort
+        input: [text]
+        contextWindow: 1000000
+        maxTokens: 65536
+        compat:
+          supportsDeveloperRole: false
+          supportsReasoningEffort: true
+          maxTokensField: max_tokens
+          reasoningEffortMap:
+            high: high
+            xhigh: max
+          supportsToolChoice: false
+          requiresReasoningContentForToolCalls: true
+          requiresAssistantContentForToolCalls: true
+          extraBody:
+            thinking:
+              type: enabled
   ollama:
     baseUrl: http://localhost:11434/v1
     api: openai-completions
@@ -175,7 +227,7 @@ providers:
       - id: gemma4:31b-cloud
         name: Gemma 4 31B Cloud
         reasoning: false
-        input: [text]
+        input: [text, image]
         cost:
           input: 0
           output: 0
@@ -197,6 +249,10 @@ providers:
       - id: deepseek-v4-pro
         name: DeepSeek V4 Pro
         reasoning: true
+        thinking:
+          minLevel: minimal
+          maxLevel: xhigh
+          mode: effort
         input: [text]
         cost:
           input: 0
@@ -208,6 +264,10 @@ providers:
       - id: deepseek-v4-flash
         name: DeepSeek V4 Flash
         reasoning: true
+        thinking:
+          minLevel: high
+          maxLevel: xhigh
+          mode: effort
         input: [text]
         cost:
           input: 0
@@ -216,3 +276,37 @@ providers:
           cacheWrite: 0
         contextWindow: 1000000
         maxTokens: 65536
+  jatevo:
+    baseUrl: https://2.jatevo.ai/v1
+    api: openai-completions
+    apiKey: JATEVO_API_KEY
+    authHeader: true
+    models:
+      - id: gpt-5.5
+        name: GPT 5.5
+        input: [text]
+        contextWindow: 128000
+        maxTokens: 16384
+      - id: gpt-5.6-sol
+        name: GPT 5.6 Sol
+        reasoning: true
+        thinking:
+          minLevel: high
+          maxLevel: xhigh
+          mode: effort
+        input: [text]
+        contextWindow: 1000000
+        maxTokens: 16384
+        compat:
+          supportsDeveloperRole: false
+          supportsReasoningEffort: true
+          maxTokensField: max_tokens
+          reasoningEffortMap:
+            high: high
+            xhigh: max
+          supportsToolChoice: false
+          requiresReasoningContentForToolCalls: true
+          requiresAssistantContentForToolCalls: true
+          extraBody:
+            thinking:
+              type: enabled

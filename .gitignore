@@ -19,6 +19,9 @@ dist/
 
 # Understand-Anything generated files
 .understand-anything/
+# macOS metadata files
+.DS_Store
+
 # Machine-local state (not tracked in dotfiles)
 omp/.omp/agent/*.db
 omp/.omp/agent/*.db-shm

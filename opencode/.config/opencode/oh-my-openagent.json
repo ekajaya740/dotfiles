@@ -60,6 +60,15 @@
     "glm-5.2": {
       "model": "ollama-cloud/glm-5.2:cloud",
       "temperature": 0.3
+    },
+    "unimodel-v4-pro": {
+      "model": "unimodel/deepseek-v4-pro",
+      "variant": "high",
+      "temperature": 0.2
+    },
+    "unimodel-v4-flash": {
+      "model": "unimodel/deepseek-v4-flash",
+      "temperature": 0.3
     }
   },
   "categories": {
@@ -67,20 +76,20 @@
       "model": "ollama-cloud/minimax-m3:cloud"
     },
     "ultrabrain": {
-      "model": "ollama-cloud/deepseek-v4-pro",
+      "model": "unimodel/deepseek-v4-pro",
       "variant": "high"
     },
     "deep": {
-      "model": "ollama-cloud/deepseek-v4-pro"
+      "model": "unimodel/deepseek-v4-pro"
     },
     "artistry": {
       "model": "ollama-cloud/minimax-m3:cloud"
     },
     "quick": {
-      "model": "ollama-cloud/deepseek-v4-flash"
+      "model": "unimodel/deepseek-v4-flash"
     },
     "unspecified-low": {
-      "model": "ollama-cloud/deepseek-v4-flash"
+      "model": "unimodel/deepseek-v4-flash"
     },
     "unspecified-high": {
       "model": "ollama-cloud/kimi-k2.7-code:cloud"
