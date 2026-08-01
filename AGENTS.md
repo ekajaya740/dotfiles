@@ -128,9 +128,9 @@ Models use the `ollama-cloud` provider (matching the OpenCode `oh-my-openagent.j
 | Role | Model | Purpose |
 |------|-------|---------|
 | default | `ollama-cloud/kimi-k2.7-code:cloud` | Primary agent |
-| smol | `ollama-cloud/deepseek-v4-flash` | Quick/light tasks |
+| smol | `ollama-cloud/deepseek-v4-flash:0731-cloud` | Quick/light tasks |
 | plan | `ollama-cloud/kimi-k2.6:cloud` | Planning & architecture |
-| commit | `ollama-cloud/deepseek-v4-flash` | Commit generation |
+| commit | `ollama-cloud/deepseek-v4-flash:0731-cloud` | Commit generation |
 
 ### Update OMP config
 

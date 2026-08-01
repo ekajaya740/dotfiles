@@ -352,12 +352,12 @@
                 "cliPath": "claude"
             }
         },
-        "jatevo": {
+        "jatevo-gpt": {
             "npm": "@ai-sdk/openai-compatible",
-            "name": "Jatevo",
+            "name": "Jatevo GPT",
             "options": {
                 "baseURL": "https://2.jatevo.ai/v1",
-                "apiKey": "{env:JATEVO_API_KEY}"
+                "apiKey": "{env:JATEVO_GPT_API_KEY}"
             },
             "models": {
                 "gpt-5.6-sol": {
@@ -365,6 +365,30 @@
                     "limit": {
                         "context": 1000000,
                         "output": 16384
+                    }
+                }
+            }
+        },
+        "jatevo": {
+            "npm": "@ai-sdk/openai-compatible",
+            "name": "Jatevo",
+            "options": {
+                "baseURL": "https://api.jatevo.ai/v1",
+                "apiKey": "{env:JATEVO_API_KEY}"
+            },
+            "models": {
+                "cerebras/gemma-4-31b": {
+                    "name": "Cerebras Gemma 4 31B",
+                    "limit": {
+                        "context": 128000,
+                        "output": 16384
+                    }
+                },
+                "kimi/kimi-k2.7-code": {
+                    "name": "Kimi K2.7 Code",
+                    "limit": {
+                        "context": 1000000,
+                        "output": 65536
                     }
                 }
             }
@@ -404,6 +428,16 @@
                 "-y",
                 "codebase-memory-mcp"
             ]
+        },
+        "expect": {
+            "type": "local",
+            "command": [
+                "npx",
+                "-y",
+                "expect-cli@latest",
+                "mcp"
+            ],
+            "enabled": true
         }
     }
 }

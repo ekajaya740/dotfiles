@@ -11,6 +11,11 @@
       "url": "https://mcp.firecrawl.dev/v2/mcp",
       "enabled": false
     },
+    "Figma": {
+      "type": "http",
+      "url": "https://mcp.figma.com/mcp",
+      "enabled": true
+    },
     "codebase-memory-mcp": {
       "command": "npx",
       "args": ["-y", "codebase-memory-mcp"],

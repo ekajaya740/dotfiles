@@ -1,23 +1,24 @@
 Models: 
   - deepseek/*
   - ollama-cloud/*
+  - jatevo-gpt/*
   - jatevo/*
 modelRoles: 
-  default: jatevo/gpt-5.6-sol:high
-  smol: ollama-cloud/deepseek-v4-flash
-  plan: ollama-cloud/glm-5.2:cloud
-  commit: ollama-cloud/deepseek-v4-flash
+  smol: ollama-cloud/deepseek-v4-flash:0731-cloud
+  plan: ollama-cloud/deepseek-v4-flash:high
+  commit: ollama-cloud/deepseek-v4-flash:0731-cloud
   slow: ollama-cloud/glm-5.2:cloud
   designer: ollama-cloud/glm-5.2:cloud
-  vision: ollama-cloud/gemma4:31b-cloud
-  task: ollama-cloud/deepseek-v4-flash
-  advisor: jatevo/gpt-5.5:high
+  vision: jatevo/cerebras/gemma-4-31b
+  task: jatevo/kimi/kimi-k2.7-code:high
+  advisor: jatevo/kimi/kimi-k2.7-code:high
+  tiny: ollama-cloud/deepseek-v4-flash:0731-cloud
+  default: jatevo-gpt/gpt-5.6-sol:high
 defaultThinkingLevel: auto
 steeringMode: one-at-a-time
 followUpMode: auto
 interruptMode: immediate
 hideThinkingBlock: false
-collapseChangelog: true
 display: 
   tabWidth: 4
 compaction: 
@@ -30,16 +31,34 @@ retry:
   baseDelayMs: 2000
   fallbackChains: 
     default: 
-      - ollama-cloud/deepseek-v4-flash
-      - jatevo/gpt-5.5
+      - jatevo/gpt-5.6-sol
+      - ollama-cloud/deepseek-v4-flash:0731-cloud
+    designer: 
+      - ollama-cloud/glm-5.2:cloud
+    vision: 
+      - ollama-cloud/gemma4:31b-cloud
+    task: 
+      - ollama-cloud/deepseek-v4-flash:0731-cloud
+    advisor: 
+      - ollama-cloud/glm-5.2:cloud
+    plan: 
+      - jatevo/kimi/kimi-k2.7-code
 async: 
   enabled: false
 skills: 
   showImages: true
 inspect_image: 
-  enabled: true
+  mode: "on"
 providers: 
-  webSearch: auto
+  {}
 setupVersion: 1
 extensions: 
   - /home/recreation/dotfiles/pi/.pi/agent/extensions/pi-notify-pp/index.ts
+cycleOrder: 
+  - default
+  - smol
+  - slow
+dev: 
+  autoqaConsent: denied
+startup: 
+  changelogMode: summary
