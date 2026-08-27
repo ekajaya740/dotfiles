@@ -95,4 +95,6 @@ export DOTFILES_IS_OMARCHY="$DOTFILES_OMARCHY_FLAG"
 unset DOTFILES_OMARCHY_FLAG
 
 # Vite+ bin (https://viteplus.dev)
-. "$HOME/.vite-plus/env"
+if [[ -f "$HOME/.vite-plus/env" ]]; then
+    . "$HOME/.vite-plus/env"
+fi
