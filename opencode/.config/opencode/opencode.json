@@ -1,4 +1,5 @@
 {
+    "model": "9router/ollama-cloud/glm-5.3-flash",
     "plugin": [
         "opencode-openai-codex-auth",
         "opencode-rate-limit-fallback",

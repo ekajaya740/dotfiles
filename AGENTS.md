@@ -47,8 +47,8 @@ If symlinks break or need refresh:
 
 ```bash
 cd ~/dotfiles
-stow -D nvim tmux opencode omp agent pi  # Unstow
-stow nvim tmux opencode omp agent pi     # Restow
+stow -D nvim tmux opencode omp agent pi hermes  # Unstow
+stow nvim tmux opencode omp agent pi hermes     # Restow
 ```
 
 ## Safety Rules

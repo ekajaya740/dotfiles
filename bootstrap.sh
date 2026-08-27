@@ -139,7 +139,7 @@ install_packages() {
 }
 
 # ── stow packages ────────────────────────────────────────────
-STOW_PACKAGES=(nvim tmux zsh vim opencode omp pi agent)
+STOW_PACKAGES=(nvim tmux zsh vim opencode omp pi agent hermes)
 
 stow_packages() {
     local adopt=false
