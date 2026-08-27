@@ -6,7 +6,7 @@ Personal configuration for Neovim (LazyVim + coc.nvim), tmux, zsh, OpenCode, and
 - [rest.nvim](https://github.com/rest-nvim/rest.nvim) - HTTP client for testing APIs directly from `.http` files (see [AGENTS.md](./AGENTS.md) for usage)
 
 **oh-my-pi (OMP)** includes:
-- [oh-my-pi](https://github.com/can1357/oh-my-pi) - AI coding agent for the terminal (`omp` CLI), configured with ollama-cloud models (see [AGENTS.md](./AGENTS.md) for details)
+- [oh-my-pi](https://github.com/can1357/oh-my-pi) - AI coding agent for the terminal (`omp` CLI), configured with 9router models (see [AGENTS.md](./AGENTS.md) for details)
 
 **Pi agent extensions:**
 - [pi-notify-pp](https://github.com/kim0/pi-notify-pp) - Native terminal notifications for Pi agent turns (OSC 777, works with Ghostty/iTerm2)
@@ -21,8 +21,6 @@ Personal configuration for Neovim (LazyVim + coc.nvim), tmux, zsh, OpenCode, and
 - `zsh/.p10k.zsh` -> `~/.p10k.zsh` (placeholder, run `p10k configure` to generate)
 - `opencode/.config/opencode/opencode.json` -> `~/.config/opencode/opencode.json`
 - `opencode/.config/opencode/oh-my-openagent.json` -> `~/.config/opencode/oh-my-openagent.json`
-- `claude/.claude/CLAUDE.md` -> `~/.claude/CLAUDE.md`
-- `claude/.claude/.omc-config.json` -> `~/.claude/.omc-config.json`
 - `omp/.omp/agent/config.yml` -> `~/.omp/agent/config.yml` (settings, model roles)
 - `omp/.omp/agent/models.yml` -> `~/.omp/agent/models.yml` (custom providers & models)
 - `pi/.pi/agent/extensions/pi-notify-pp/` -> `~/.pi/agent/extensions/pi-notify-pp/` (Pi Notify++ extension)
@@ -175,8 +173,6 @@ mkdir -p ~/.config/opencode
 [ -e ~/.p10k.zsh ] && mv ~/.p10k.zsh ~/.p10k.zsh.bak.$(date +%Y%m%d-%H%M%S)
 [ -e ~/.config/opencode/opencode.json ] && mv ~/.config/opencode/opencode.json ~/.config/opencode/opencode.json.bak.$(date +%Y%m%d-%H%M%S)
 [ -e ~/.config/opencode/oh-my-openagent.json ] && mv ~/.config/opencode/oh-my-openagent.json ~/.config/opencode/oh-my-openagent.json.bak.$(date +%Y%m%d-%H%M%S)
-[ -e ~/.claude/CLAUDE.md ] && mv ~/.claude/CLAUDE.md ~/.claude/CLAUDE.md.bak.$(date +%Y%m%d-%H%M%S)
-[ -e ~/.claude/.omc-config.json ] && mv ~/.claude/.omc-config.json ~/.claude/.omc-config.json.bak.$(date +%Y%m%d-%H%M%S)
 [ -e ~/.omp/agent/config.yml ] && mv ~/.omp/agent/config.yml ~/.omp/agent/config.yml.bak.$(date +%Y%m%d-%H%M%S)
 [ -e ~/.omp/agent/models.yml ] && mv ~/.omp/agent/models.yml ~/.omp/agent/models.yml.bak.$(date +%Y%m%d-%H%M%S)
 ```
@@ -185,7 +181,7 @@ mkdir -p ~/.config/opencode
 
 ```bash
 cd ~/dotfiles
-stow nvim tmux zsh opencode claude omp pi
+stow nvim tmux zsh opencode omp pi
 ```
 
 ### 4) Install mise and dev tools

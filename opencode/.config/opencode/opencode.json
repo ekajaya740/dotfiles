@@ -9,383 +9,149 @@
         "@dietrichgebert/ponytail"
     ],
     "provider": {
-        "openai": {
-            "name": "OpenAI",
-            "options": {
-                "reasoningEffort": "medium",
-                "reasoningSummary": "auto",
-                "textVerbosity": "medium",
-                "include": [
-                    "reasoning.encrypted_content"
-                ],
-                "store": false
-            },
-            "models": {
-                "gpt-5.2": {
-                    "name": "GPT 5.2 (OAuth)",
-                    "limit": {
-                        "context": 272000,
-                        "output": 128000
-                    },
-                    "modalities": {
-                        "input": [
-                            "text",
-                            "image"
-                        ],
-                        "output": [
-                            "text"
-                        ]
-                    },
-                    "variants": {
-                        "none": {
-                            "reasoningEffort": "none",
-                            "reasoningSummary": "auto",
-                            "textVerbosity": "medium"
-                        },
-                        "low": {
-                            "reasoningEffort": "low",
-                            "reasoningSummary": "auto",
-                            "textVerbosity": "medium"
-                        },
-                        "medium": {
-                            "reasoningEffort": "medium",
-                            "reasoningSummary": "auto",
-                            "textVerbosity": "medium"
-                        },
-                        "high": {
-                            "reasoningEffort": "high",
-                            "reasoningSummary": "detailed",
-                            "textVerbosity": "medium"
-                        },
-                        "xhigh": {
-                            "reasoningEffort": "xhigh",
-                            "reasoningSummary": "detailed",
-                            "textVerbosity": "medium"
-                        }
-                    }
-                },
-                "gpt-5.4": {
-                    "name": "GPT 5.4 (OAuth)",
-                    "limit": {
-                        "context": 1050000,
-                        "output": 128000
-                    },
-                    "modalities": {
-                        "input": [
-                            "text",
-                            "image"
-                        ],
-                        "output": [
-                            "text"
-                        ]
-                    },
-                    "variants": {
-                        "low": {
-                            "reasoningEffort": "low",
-                            "reasoningSummary": "auto",
-                            "textVerbosity": "medium"
-                        },
-                        "medium": {
-                            "reasoningEffort": "medium",
-                            "reasoningSummary": "auto",
-                            "textVerbosity": "medium"
-                        },
-                        "high": {
-                            "reasoningEffort": "high",
-                            "reasoningSummary": "detailed",
-                            "textVerbosity": "medium"
-                        },
-                        "xhigh": {
-                            "reasoningEffort": "xhigh",
-                            "reasoningSummary": "detailed",
-                            "textVerbosity": "medium"
-                        }
-                    }
-                },
-                "gpt-5.2-codex": {
-                    "name": "GPT 5.2 Codex (OAuth)",
-                    "limit": {
-                        "context": 272000,
-                        "output": 128000
-                    },
-                    "modalities": {
-                        "input": [
-                            "text",
-                            "image"
-                        ],
-                        "output": [
-                            "text"
-                        ]
-                    },
-                    "variants": {
-                        "low": {
-                            "reasoningEffort": "low",
-                            "reasoningSummary": "auto",
-                            "textVerbosity": "medium"
-                        },
-                        "medium": {
-                            "reasoningEffort": "medium",
-                            "reasoningSummary": "auto",
-                            "textVerbosity": "medium"
-                        },
-                        "high": {
-                            "reasoningEffort": "high",
-                            "reasoningSummary": "detailed",
-                            "textVerbosity": "medium"
-                        },
-                        "xhigh": {
-                            "reasoningEffort": "xhigh",
-                            "reasoningSummary": "detailed",
-                            "textVerbosity": "medium"
-                        }
-                    }
-                },
-                "gpt-5.3-codex": {
-                    "name": "GPT 5.3 Codex (OAuth)",
-                    "limit": {
-                        "context": 272000,
-                        "output": 128000
-                    },
-                    "modalities": {
-                        "input": [
-                            "text",
-                            "image"
-                        ],
-                        "output": [
-                            "text"
-                        ]
-                    },
-                    "variants": {
-                        "low": {
-                            "reasoningEffort": "low",
-                            "reasoningSummary": "auto",
-                            "textVerbosity": "medium"
-                        },
-                        "medium": {
-                            "reasoningEffort": "medium",
-                            "reasoningSummary": "auto",
-                            "textVerbosity": "medium"
-                        },
-                        "high": {
-                            "reasoningEffort": "high",
-                            "reasoningSummary": "detailed",
-                            "textVerbosity": "medium"
-                        },
-                        "xhigh": {
-                            "reasoningEffort": "xhigh",
-                            "reasoningSummary": "detailed",
-                            "textVerbosity": "medium"
-                        }
-                    }
-                },
-                "gpt-5.1-codex-max": {
-                    "name": "GPT 5.1 Codex Max (OAuth)",
-                    "limit": {
-                        "context": 272000,
-                        "output": 128000
-                    },
-                    "modalities": {
-                        "input": [
-                            "text",
-                            "image"
-                        ],
-                        "output": [
-                            "text"
-                        ]
-                    },
-                    "variants": {
-                        "low": {
-                            "reasoningEffort": "low",
-                            "reasoningSummary": "detailed",
-                            "textVerbosity": "medium"
-                        },
-                        "medium": {
-                            "reasoningEffort": "medium",
-                            "reasoningSummary": "detailed",
-                            "textVerbosity": "medium"
-                        },
-                        "high": {
-                            "reasoningEffort": "high",
-                            "reasoningSummary": "detailed",
-                            "textVerbosity": "medium"
-                        },
-                        "xhigh": {
-                            "reasoningEffort": "xhigh",
-                            "reasoningSummary": "detailed",
-                            "textVerbosity": "medium"
-                        }
-                    }
-                }
-            }
-        },
-        "ollama": {
+        "9router": {
             "npm": "@ai-sdk/openai-compatible",
-            "name": "Ollama",
+            "name": "9Router",
             "options": {
-                "baseURL": "http://localhost:11434/v1"
+                "baseURL": "https://ai.workofekajaya.com/v1",
+                "apiKey": "{env:9ROUTER_API_KEY}"
             },
             "models": {
-                "lfm2.5-thinking:1.2b": {
-                    "name": "lfm2.5-thinking:1.2b"
-                },
-                "qwen3.5:2b": {
-                    "name": "qwen3.5:2b"
-                },
-                "kimi-k2.6": {
-                    "name": "kimi-k2.6"
-                }
-            }
-        },
-        "ollama-cloud": {
-            "npm": "@ai-sdk/openai-compatible",
-            "name": "Ollama Cloud",
-            "options": {
-                "baseURL": "https://ollama.com/v1"
-            },
-            "models": {
-                "kimi-k2.6:cloud": {
-                    "name": "kimi-k2.6:cloud",
+                "glm-5.3-flash": {
+                    "name": "GLM 5.3 Flash",
                     "limit": {
-                        "context": 200000,
+                        "context": 1310720,
                         "output": 32000
                     }
                 },
-                "kimi-k2.7-code:cloud": {
-                    "name": "kimi-k2.7-code:cloud",
-                    "limit": {
-                        "context": 200000,
-                        "output": 32000
-                    }
-                },
-                "glm-5.1:cloud": {
-                    "name": "glm-5.1:cloud",
+                "glm-5.1": {
+                    "name": "GLM 5.1 Cloud",
                     "limit": {
                         "context": 198000,
                         "output": 32000
                     }
                 },
-                "minimax-m2.7:cloud": {
-                    "name": "minimax-m2.7:cloud",
+                "glm-5.2": {
+                    "name": "GLM 5.2 Cloud",
+                    "limit": {
+                        "context": 1048576,
+                        "output": 32000
+                    }
+                },
+                "kimi-k2.6": {
+                    "name": "Kimi K2.6 Cloud",
                     "limit": {
                         "context": 200000,
                         "output": 32000
                     }
                 },
-                "minimax-m3:cloud": {
-                    "name": "minimax-m3:cloud",
+                "kimi-k2.7-code": {
+                    "name": "Kimi K2.7 Code Cloud",
+                    "limit": {
+                        "context": 200000,
+                        "output": 32000
+                    }
+                },
+                "kimi-k3": {
+                    "name": "Kimi K3 Cloud",
+                    "limit": {
+                        "context": 1000000,
+                        "output": 65536
+                    }
+                },
+                "minimax-m2.7": {
+                    "name": "MiniMax M2.7 Cloud",
+                    "limit": {
+                        "context": 200000,
+                        "output": 32000
+                    }
+                },
+                "minimax-m3": {
+                    "name": "MiniMax M3 Cloud",
                     "limit": {
                         "context": 512000,
                         "output": 32000
                     }
                 },
-                "gemma4:31b-cloud": {
-                    "name": "gemma4:31b-cloud",
+                "gemma4:31b": {
+                    "name": "Gemma 4 31B Cloud",
                     "limit": {
                         "context": 200000,
                         "output": 32000
                     }
                 },
-                "qwen3.5:cloud": {
-                    "name": "qwen3.5:cloud",
+                "qwen3.5:397b": {
+                    "name": "Qwen 3.5 397B Cloud",
                     "limit": {
                         "context": 200000,
                         "output": 32000
                     }
                 },
-                "deepseek-v4-pro": {
-                    "name": "deepseek-v4-pro",
+                "gpt-oss:120b": {
+                    "name": "GPT-OSS 120B",
                     "limit": {
-                        "context": 1000000,
-                        "output": 65536
+                        "context": 131072,
+                        "output": 32768
                     }
                 },
-                "deepseek-v4-flash": {
-                    "name": "deepseek-v4-flash",
+                "gpt-oss:20b": {
+                    "name": "GPT-OSS 20B",
                     "limit": {
-                        "context": 1000000,
-                        "output": 65536
+                        "context": 131072,
+                        "output": 32768
                     }
-                }
-            }
-        },
-        "claude-code": {
-            "npm": "file:///Users/ekajaya740/opencode-claude-code-plugin",
-            "models": {
-                "haiku": {
-                    "name": "Claude Code Haiku",
-                    "attachment": false,
+                },
+                "nemotron-3-ultra": {
+                    "name": "Nemotron 3 Ultra",
                     "limit": {
                         "context": 200000,
-                        "output": 8192
-                    },
-                    "capabilities": {
-                        "reasoning": false,
-                        "toolcall": true
+                        "output": 32000
                     }
                 },
-                "sonnet": {
-                    "name": "Claude Code Sonnet",
-                    "attachment": false,
+                "nemotron-3-super": {
+                    "name": "Nemotron 3 Super",
                     "limit": {
-                        "context": 1000000,
-                        "output": 16384
-                    },
-                    "capabilities": {
-                        "reasoning": true,
-                        "toolcall": true
+                        "context": 200000,
+                        "output": 32000
                     }
                 },
-                "opus": {
-                    "name": "Claude Code Opus",
-                    "attachment": false,
+                "nemotron-3-nano:30b": {
+                    "name": "Nemotron 3 Nano 30B",
                     "limit": {
-                        "context": 1000000,
-                        "output": 16384
-                    },
-                    "capabilities": {
-                        "reasoning": true,
-                        "toolcall": true
-                    }
-                }
-            },
-            "options": {
-                "cliPath": "claude"
-            }
-        },
-        "jatevo-gpt": {
-            "npm": "@ai-sdk/openai-compatible",
-            "name": "Jatevo GPT",
-            "options": {
-                "baseURL": "https://2.jatevo.ai/v1",
-                "apiKey": "{env:JATEVO_GPT_API_KEY}"
-            },
-            "models": {
-                "gpt-5.6-sol": {
-                    "name": "GPT 5.6 Sol",
-                    "limit": {
-                        "context": 1000000,
-                        "output": 16384
-                    }
-                }
-            }
-        },
-        "jatevo": {
-            "npm": "@ai-sdk/openai-compatible",
-            "name": "Jatevo",
-            "options": {
-                "baseURL": "https://api.jatevo.ai/v1",
-                "apiKey": "{env:JATEVO_API_KEY}"
-            },
-            "models": {
-                "cerebras/gemma-4-31b": {
-                    "name": "Cerebras Gemma 4 31B",
-                    "limit": {
-                        "context": 128000,
-                        "output": 16384
+                        "context": 200000,
+                        "output": 32000
                     }
                 },
-                "kimi/kimi-k2.7-code": {
-                    "name": "Kimi K2.7 Code",
+                "mistral-large-3:675b": {
+                    "name": "Mistral Large 3 675B",
+                    "limit": {
+                        "context": 200000,
+                        "output": 32000
+                    }
+                },
+                "deepseek-v4-pro:0813": {
+                    "name": "DeepSeek V4 Pro 0813",
+                    "limit": {
+                        "context": 1000000,
+                        "output": 65536
+                    }
+                },
+                "deepseek-v4-pro:preview": {
+                    "name": "DeepSeek V4 Pro Preview",
+                    "limit": {
+                        "context": 1000000,
+                        "output": 65536
+                    }
+                },
+                "deepseek-v4-flash:0731": {
+                    "name": "DeepSeek V4 Flash 0731",
+                    "limit": {
+                        "context": 1000000,
+                        "output": 65536
+                    }
+                },
+                "deepseek-v4-flash:preview": {
+                    "name": "DeepSeek V4 Flash Preview",
                     "limit": {
                         "context": 1000000,
                         "output": 65536

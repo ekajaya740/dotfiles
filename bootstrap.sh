@@ -139,7 +139,7 @@ install_packages() {
 }
 
 # ── stow packages ────────────────────────────────────────────
-STOW_PACKAGES=(nvim tmux zsh vim opencode claude omp pi agent codex)
+STOW_PACKAGES=(nvim tmux zsh vim opencode omp pi agent)
 
 stow_packages() {
     local adopt=false
@@ -329,19 +329,6 @@ setup_machine_specific() {
         fi
     fi
 
-    # Gemini: RTK hook
-    if has_cmd rtk; then
-        rtk init -g --gemini --auto-patch 2>/dev/null || \
-            warn "rtk gemini init failed — run: rtk init -g --gemini --auto-patch"
-    fi
-
-    # Codex: project trust (user must run manually)
-    if has_cmd codex; then
-        warn "Codex project trust is machine-specific. Add projects to ~/.codex/config.toml:"
-        warn "  [projects.\"${HOME}/dotfiles\"]"
-        warn "  trust_level = \"trusted\""
-    fi
-
     ok "Machine-specific config applied"
 
 }
@@ -490,13 +477,13 @@ main() {
           chsh -s "$(which zsh)"
 
       • Install platform-specific agents:
-          macOS:  brew install omp opencode claude-codex
-          Arch:   yay -S omp-bin opencode-cli-bin claude-code-cli
+          macOS:  brew install omp opencode
+          Arch:   yay -S omp-bin opencode-cli-bin
           Debian: install from respective package managers
 
-      • For OMP/OpenCode, the config assumes ollama-cloud models.
-        Make sure OLLAMA_API_KEY is set in your environment:
-          export OLLAMA_API_KEY="your-key"
+      • For OMP/OpenCode, the config assumes the 9router gateway models.
+        Make sure 9ROUTER_API_KEY is set in your environment:
+          export 9ROUTER_API_KEY="your-key"
 
       • For pi-notify-pp, bun is required to run index.ts.
 

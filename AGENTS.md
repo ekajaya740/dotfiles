@@ -14,9 +14,6 @@ This document provides guidelines for AI agents and automation tools working wit
 ├── nvim/.config/nvim/          → ~/.config/nvim
 ├── tmux/.tmux.conf             → ~/.tmux.conf
 ├── opencode/.config/opencode/  → ~/.config/opencode/
-├── claude/.claude/             → ~/.claude
-├── codex/.codex/              → ~/.codex
-├── gemini/.gemini/            → ~/.gemini
 ├── omp/.omp/agent/            → ~/.omp/agent (config + models only)
 ├── pi/.pi/agent/extensions/   → ~/.pi/agent/extensions (pi-notify-pp)
 └── agent/.agent/commands/     → ~/.agent/commands (custom omp commands)
@@ -37,7 +34,7 @@ This document provides guidelines for AI agents and automation tools working wit
 jq empty opencode/.config/opencode/*.json
 
 # Verify symlinks
-ls -l ~/.config/nvim ~/.tmux.conf ~/.config/opencode/ ~/.claude/
+ls -l ~/.config/nvim ~/.tmux.conf ~/.config/opencode/ ~/.omp/agent/
 
 # Test configs
 nvim --headless -c 'quit' 2>/dev/null && echo "nvim OK"
@@ -50,8 +47,8 @@ If symlinks break or need refresh:
 
 ```bash
 cd ~/dotfiles
-stow -D nvim tmux opencode claude codex gemini omp agent pi  # Unstow
-stow nvim tmux opencode claude codex gemini omp agent pi     # Restow
+stow -D nvim tmux opencode omp agent pi  # Unstow
+stow nvim tmux opencode omp agent pi     # Restow
 ```
 
 ## Safety Rules
@@ -72,15 +69,6 @@ vim ~/dotfiles/opencode/.config/opencode/oh-my-opencode.json
 
 # Validate
 jq empty ~/dotfiles/opencode/.config/opencode/oh-my-opencode.json
-
-# Changes apply immediately (symlinked)
-```
-
-### Update Claude config
-
-```bash
-# Edit in repo
-vim ~/dotfiles/claude/.claude/CLAUDE.md
 
 # Changes apply immediately (symlinked)
 ```
@@ -123,14 +111,16 @@ cd ~/dotfiles && stow <package>
 
 ### Model Configuration
 
-Models use the `ollama-cloud` provider (matching the OpenCode `oh-my-openagent.json` pattern):
+All AI model traffic goes through the **9router** gateway (`https://ai.workofekajaya.com/v1`, an OpenAI-compatible proxy). Models are declared in `omp/.omp/agent/models.yml` and referenced as `9router/<model-id>`.
 
 | Role | Model | Purpose |
 |------|-------|---------|
-| default | `ollama-cloud/kimi-k2.7-code:cloud` | Primary agent |
-| smol | `ollama-cloud/deepseek-v4-flash:0731-cloud` | Quick/light tasks |
-| plan | `ollama-cloud/kimi-k2.6:cloud` | Planning & architecture |
-| commit | `ollama-cloud/deepseek-v4-flash:0731-cloud` | Commit generation |
+| default | `9router/deepseek-v4-flash:0731` | Primary agent |
+| smol | `9router/deepseek-v4-flash:0731` | Quick/light tasks |
+| plan | `9router/deepseek-v4-flash:0731` | Planning & architecture |
+| commit | `9router/deepseek-v4-flash:0731` | Commit generation |
+
+Set `9ROUTER_API_KEY` in your shell environment (`~/.zshenv.local`) to authenticate against the gateway.
 
 ### Update OMP config
 
@@ -158,7 +148,7 @@ stow omp agent
 
 ### MCP Servers
 
-Configured in `omp/.omp/agent/mcp.json` (oMP), `opencode/.config/opencode/opencode.json` (OpenCode), `claude/.claude/.mcp.json` (Claude Code), `codex/.codex/config.toml` (Codex CLI), and `gemini/.gemini/settings.json` (Gemini CLI):
+Configured in `omp/.omp/agent/mcp.json` (oMP) and `opencode/.config/opencode/opencode.json` (OpenCode):
 
 | Server | Type | Command | Purpose |
 |--------|------|---------|---------|
@@ -177,7 +167,7 @@ User-level custom omp commands that dispatch directly to a specific agent, bypas
 |---------|------|--------|
 | `/designer` | `~/.agent/commands/designer.md` | Forwards your prompt to the `designer` agent with zero deviation |
 
-Usage: `/designer <your design prompt>` — the designer agent runs on `ollama-cloud/glm-5.1:cloud` (configured via `modelRoles.designer`).
+Usage: `/designer <your design prompt>` — the designer agent runs on `9router/glm-5.2` (configured via `modelRoles.designer`).
 
 The `$@` placeholder in the command body passes your inline arguments straight to the agent assignment. The body is rigid — the main model has no room to paraphrase or re-route.
 
@@ -209,12 +199,12 @@ The default omp agent is configured as an **orchestrator** — it routes special
 | Commit/push | CLI `omp commit` | CLI tool, not a task agent |
 | Vision analysis | `inspect_image` tool | Routes to `modelRoles.vision` automatically |
 
-Instructions are in `~/.claude/CLAUDE.md` (`## Orchestrator Mode`). The default agent reads these and delegates:
+The default omp agent reads the orchestrator instructions and delegates:
 - Design/UI work → spawn `designer` agent
 - Exploration → spawn `explore` agent
 - Simple ops → do directly (reading files, running commands)
 
-To add an agent to the routing table, remove it from `task.disabledAgents` in `config.yml` and add a row to the routing table in `~/.claude/CLAUDE.md`.
+To add an agent to the routing table, remove it from `task.disabledAgents` in `config.yml` and add a row to the routing table.
 
 ## Pi Coding Agent Extensions
 
@@ -384,11 +374,8 @@ After stowing, run these on each new machine:
 # OMP: enable pi-notify-pp extension
 omp config set extensions '["$HOME/dotfiles/pi/.pi/agent/extensions/pi-notify-pp/index.ts"]'
 
-# Gemini: install RTK hook
-rtk init -g --gemini --auto-patch
-
-# Codex: trust this project
-codex --config 'projects."$HOME/dotfiles".trust_level="trusted"'
+# Set the 9router gateway key (all AI model traffic)
+export 9ROUTER_API_KEY="your-key"   # add to ~/.zshenv.local
 ```
 
 Or run `bootstrap.sh` which handles all of the above automatically.
