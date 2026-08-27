@@ -16,9 +16,9 @@ vim/.vim/plugged/
 dist/
 .vite/
 
-
 # Understand-Anything generated files
 .understand-anything/
+
 # macOS metadata files
 .DS_Store
 
@@ -28,6 +28,16 @@ omp/.omp/agent/*.db-shm
 omp/.omp/agent/*.db-wal
 omp/.omp/agent/sessions/
 omp/.omp/agent/terminal-sessions/
+omp/.omp/agent/blobs/
+omp/.omp/agent/cache/
+omp/.omp/agent/memories/
+omp/.omp/agent/last-changelog-version
+omp/.omp/cache/
+omp/.omp/puppeteer/
+omp/.omp/run/
 omp/.omp/gpu_cache.json
 omp/.omp/logs/
 omp/.omp/natives/
+
+# Nested clone of the rtk-extension repo (own git history)
+omp/omp-rtk-extension/
