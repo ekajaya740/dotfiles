@@ -115,11 +115,11 @@ All AI model traffic goes through the **9router** gateway (`https://ai.workofeka
 
 | Role | Model | Purpose |
 |------|-------|---------|
-| default | `9router/glm-5.3-flash` | Primary agent |
-| smol | `9router/glm-5.3-flash` | Quick/light tasks |
-| plan | `9router/glm-5.3-flash` | Planning & architecture |
-| commit | `9router/glm-5.3-flash` | Commit generation |
-| vision | `9router/gemma4:31b` | Image-capable fallback |
+| default | `9router/ollama-cloud/glm-5.3-flash` | Primary agent |
+| smol | `9router/ollama-cloud/glm-5.3-flash` | Quick/light tasks |
+| plan | `9router/ollama-cloud/glm-5.3-flash` | Planning & architecture |
+| commit | `9router/ollama-cloud/glm-5.3-flash` | Commit generation |
+| vision | `9router/ollama-cloud/gemma4:31b` | Image-capable fallback |
 
 Set `NINEROUTER_API_KEY` in your shell environment (`~/.zshenv.local`) to authenticate against the gateway.
 
