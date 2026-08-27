@@ -115,12 +115,13 @@ All AI model traffic goes through the **9router** gateway (`https://ai.workofeka
 
 | Role | Model | Purpose |
 |------|-------|---------|
-| default | `9router/deepseek-v4-flash:0731` | Primary agent |
-| smol | `9router/deepseek-v4-flash:0731` | Quick/light tasks |
-| plan | `9router/deepseek-v4-flash:0731` | Planning & architecture |
-| commit | `9router/deepseek-v4-flash:0731` | Commit generation |
+| default | `9router/glm-5.3-flash` | Primary agent |
+| smol | `9router/glm-5.3-flash` | Quick/light tasks |
+| plan | `9router/glm-5.3-flash` | Planning & architecture |
+| commit | `9router/glm-5.3-flash` | Commit generation |
+| vision | `9router/gemma4:31b` | Image-capable fallback |
 
-Set `9ROUTER_API_KEY` in your shell environment (`~/.zshenv.local`) to authenticate against the gateway.
+Set `NINEROUTER_API_KEY` in your shell environment (`~/.zshenv.local`) to authenticate against the gateway.
 
 ### Update OMP config
 
@@ -375,7 +376,7 @@ After stowing, run these on each new machine:
 omp config set extensions '["$HOME/dotfiles/pi/.pi/agent/extensions/pi-notify-pp/index.ts"]'
 
 # Set the 9router gateway key (all AI model traffic)
-export 9ROUTER_API_KEY="your-key"   # add to ~/.zshenv.local
+export NINEROUTER_API_KEY="your-key"   # add to ~/.zshenv.local
 ```
 
 Or run `bootstrap.sh` which handles all of the above automatically.

@@ -1,16 +1,16 @@
 Models: 
   - 9router/*
 modelRoles: 
-  smol: 9router/deepseek-v4-flash:0731
-  plan: 9router/deepseek-v4-flash:0731
-  commit: 9router/deepseek-v4-flash:0731
-  slow: 9router/deepseek-v4-flash:0731
-  designer: 9router/glm-5.2
+  smol: 9router/glm-5.3-flash
+  plan: 9router/glm-5.3-flash
+  commit: 9router/glm-5.3-flash
+  slow: 9router/glm-5.3-flash
+  designer: 9router/glm-5.3-flash
   vision: 9router/gemma4:31b
-  task: 9router/deepseek-v4-flash:0731
-  advisor: 9router/glm-5.2
-  tiny: 9router/deepseek-v4-flash:0731
-  default: 9router/deepseek-v4-flash:0731:high
+  task: 9router/glm-5.3-flash
+  advisor: 9router/glm-5.3-flash
+  tiny: 9router/glm-5.3-flash
+  default: 9router/glm-5.3-flash
 defaultThinkingLevel: auto
 steeringMode: one-at-a-time
 followUpMode: auto
@@ -28,15 +28,15 @@ retry:
   baseDelayMs: 2000
   fallbackChains: 
     default: 
-      - 9router/deepseek-v4-flash:0731
+      - 9router/glm-5.3-flash
     designer: 
-      - 9router/glm-5.2
+      - 9router/glm-5.3-flash
     vision: 
       - 9router/gemma4:31b
     task: 
-      - 9router/deepseek-v4-flash:0731
+      - 9router/glm-5.3-flash
     advisor: 
-      - 9router/glm-5.2
+      - 9router/glm-5.3-flash
 async: 
   enabled: false
 skills: 

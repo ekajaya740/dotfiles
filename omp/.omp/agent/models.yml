@@ -2,20 +2,20 @@ providers:
   9router:
     baseUrl: https://ai.workofekajaya.com/v1
     api: openai-completions
-    apiKey: 9ROUTER_API_KEY
+    apiKey: NINEROUTER_API_KEY
     authHeader: true
     models:
       - id: glm-5.3-flash
         name: GLM 5.3 Flash
-        reasoning: false
+        reasoning: true
         input: [text]
         cost:
           input: 0
           output: 0
           cacheRead: 0
           cacheWrite: 0
-        contextWindow: 1310720
-        maxTokens: 32000
+        contextWindow: 200000
+        maxTokens: 128000
       - id: glm-5.1
         name: GLM 5.1 Cloud
         reasoning: false

@@ -1,7 +1,7 @@
 {
   "enabled": true,
   "fallbackModels": [
-    "9router/glm-5.1",
+    "9router/glm-5.3-flash",
     "9router/kimi-k2.6"
   ],
   "cooldownMs": 300000,

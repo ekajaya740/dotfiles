@@ -482,8 +482,8 @@ main() {
           Debian: install from respective package managers
 
       • For OMP/OpenCode, the config assumes the 9router gateway models.
-        Make sure 9ROUTER_API_KEY is set in your environment:
-          export 9ROUTER_API_KEY="your-key"
+        Make sure NINEROUTER_API_KEY is set in your environment:
+          export NINEROUTER_API_KEY="your-key"
 
       • For pi-notify-pp, bun is required to run index.ts.
 
