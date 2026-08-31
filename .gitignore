@@ -41,3 +41,9 @@ omp/.omp/natives/
 
 # Nested clone of the rtk-extension repo (own git history)
 omp/omp-rtk-extension/
+
+# Claude agent state (untracked local state)
+claude/
+
+# omp lock files
+*.lock

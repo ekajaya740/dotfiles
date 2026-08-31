@@ -1,6 +1,6 @@
-Models: 
+Models:
   - 9router/*
-modelRoles: 
+modelRoles:
   smol: 9router/ollama-cloud/glm-5.3-flash
   plan: 9router/ollama-cloud/kimi-k3
   commit: 9router/ollama-cloud/deepseek-v4-flash:0731
@@ -16,45 +16,38 @@ steeringMode: one-at-a-time
 followUpMode: auto
 interruptMode: immediate
 hideThinkingBlock: false
-display: 
+display:
   tabWidth: 4
-compaction: 
+compaction:
   enabled: true
   reserveTokens: 16384
   keepRecentTokens: 20000
-retry: 
+retry:
   networkOnly: true
   maxRetries: 3
   baseDelayMs: 2000
-  fallbackChains: 
-    default: 
-      - 9router/ollama-cloud/glm-5.3-flash
-    designer: 
-      - 9router/ollama-cloud/glm-5.3-flash
-    vision: 
-      - 9router/ollama-cloud/gemma4:31b
-    task: 
-      - 9router/ollama-cloud/glm-5.3-flash
-    advisor: 
-      - 9router/ollama-cloud/glm-5.3-flash
-async: 
+  fallbackChains:
+    {}
+async:
   enabled: false
-skills: 
+skills:
   showImages: true
-inspect_image: 
+inspect_image:
   mode: "on"
-providers: 
+providers:
   {}
 setupVersion: 2
-extensions: 
+extensions:
   - /home/recreation/dotfiles/pi/.pi/agent/extensions/pi-notify-pp/index.ts
-cycleOrder: 
+cycleOrder:
   - default
   - smol
   - slow
-dev: 
+dev:
   autoqaConsent: denied
-startup: 
+startup:
   changelogMode: summary
-composer: 
+composer:
   shape: box
+advisor:
+  enabled: true

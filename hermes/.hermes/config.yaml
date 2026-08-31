@@ -58,7 +58,6 @@ compression:
 prompt_caching:
   cache_ttl: 5m
 memory:
-  provider: omh
   memory_enabled: true
   user_profile_enabled: true
   memory_char_limit: 2200
@@ -72,8 +71,6 @@ group_sessions_per_user: true
 streaming:
   enabled: false
 skills:
-  external_dirs:
-    - /home/recreation/.omh/skills
   creation_nudge_interval: 15
 agent:
   max_turns: 500
@@ -137,9 +134,8 @@ updates:
   backup_keep: 5
   non_interactive_local_changes: stash
 plugins:
-  enabled:
-    - omh
-_config_version: 39
+  enabled: []
+_config_version: 38
 onboarding:
   seen:
     openclaw_residue_cleanup: true
