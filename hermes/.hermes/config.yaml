@@ -3,7 +3,7 @@ database:
 runtime:
   nofile_soft_limit: 4096
 model:
-  default: ollama-cloud/glm-5.3-flash
+  default: cost-efficient
   provider: 9router
 providers:
   9router:

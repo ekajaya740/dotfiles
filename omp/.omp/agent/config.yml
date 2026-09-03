@@ -1,16 +1,16 @@
 Models:
   - 9router/*
 modelRoles:
-  smol: 9router/ollama-cloud/glm-5.3-flash
-  plan: 9router/ollama-cloud/kimi-k3
-  commit: 9router/ollama-cloud/deepseek-v4-flash:0731
-  slow: 9router/ollama-cloud/glm-5.3-flash
-  designer: 9router/ollama-cloud/glm-5.3-flash
-  vision: 9router/ollama-cloud/gemma4:31b
-  task: 9router/ollama-cloud/glm-5.3-flash
-  advisor: 9router/ollama-cloud/kimi-k3
-  tiny: 9router/ollama-cloud/glm-5.3-flash
-  default: 9router/ollama-cloud/glm-5.3-flash
+  smol: 9router/cost-efficient
+  plan: 9router/cost-efficient
+  commit: 9router/cost-efficient
+  slow: 9router/cost-efficient
+  designer: 9router/designer:auto
+  vision: 9router/ollama-cloud/gemma4:31b:auto
+  task: 9router/cost-efficient
+  advisor: 9router/advisor:high
+  tiny: 9router/cost-efficient
+  default: 9router/cost-efficient
 defaultThinkingLevel: auto
 steeringMode: one-at-a-time
 followUpMode: auto
@@ -38,7 +38,7 @@ providers:
   {}
 setupVersion: 2
 extensions:
-  - /home/recreation/dotfiles/pi/.pi/agent/extensions/pi-notify-pp/index.ts
+  - /Users/ekajaya740/dotfiles/pi/.pi/agent/extensions/pi-notify-pp/index.ts
 cycleOrder:
   - default
   - smol

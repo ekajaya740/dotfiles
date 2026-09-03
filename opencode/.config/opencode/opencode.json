@@ -1,5 +1,5 @@
 {
-    "model": "9router/ollama-cloud/glm-5.3-flash",
+    "model": "9router/cost-efficient",
     "plugin": [
         "opencode-openai-codex-auth",
         "opencode-rate-limit-fallback",
@@ -18,10 +18,59 @@
                 "apiKey": "{env:NINEROUTER_API_KEY}"
             },
             "models": {
+                "designer": {
+                    "name": "Designer (combo)",
+                    "limit": {
+                        "context": 1000000,
+                        "output": 32000
+                    }
+                },
+                "personal-chat": {
+                    "name": "Personal Chat (combo)",
+                    "limit": {
+                        "context": 1000000,
+                        "output": 32000
+                    }
+                },
+                "cost-efficient": {
+                    "name": "Cost Efficient (combo)",
+                    "limit": {
+                        "context": 1000000,
+                        "output": 32000
+                    }
+                },
+                "advisor": {
+                    "name": "Advisor (combo)",
+                    "limit": {
+                        "context": 1000000,
+                        "output": 32000
+                    }
+                },
+                "coder": {
+                    "name": "Coder (combo)",
+                    "limit": {
+                        "context": 1000000,
+                        "output": 32000
+                    }
+                },
+                "combo-profill-fast": {
+                    "name": "Profill Fast (combo)",
+                    "limit": {
+                        "context": 1000000,
+                        "output": 32000
+                    }
+                },
+                "combo-profill-smart": {
+                    "name": "Profill Smart (combo)",
+                    "limit": {
+                        "context": 1000000,
+                        "output": 32000
+                    }
+                },
                 "ollama-cloud/glm-5.3-flash": {
                     "name": "GLM 5.3 Flash",
                     "limit": {
-                        "context": 200000,
+                        "context": 1048576,
                         "output": 128000
                     }
                 },
@@ -156,6 +205,30 @@
                     "limit": {
                         "context": 1000000,
                         "output": 65536
+                    }
+                }
+            }
+        },
+        "shiteru": {
+            "npm": "@ai-sdk/openai-compatible",
+            "name": "Shiteru",
+            "options": {
+                "baseURL": "https://ai.shiteru.id/v1",
+                "apiKey": "{env:SHITERU_API_KEY}"
+            },
+            "models": {
+                "qwen-3.8-flash": {
+                    "name": "Qwen 3.8 Flash",
+                    "limit": {
+                        "context": 1000000,
+                        "output": 128000
+                    }
+                },
+                "kimi-k3": {
+                    "name": "Kimi K3",
+                    "limit": {
+                        "context": 1000000,
+                        "output": 128000
                     }
                 }
             }

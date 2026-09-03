@@ -115,11 +115,13 @@ All AI model traffic goes through the **9router** gateway (`https://ai.workofeka
 
 | Role | Model | Purpose |
 |------|-------|---------|
-| default | `9router/ollama-cloud/glm-5.3-flash` | Primary agent |
-| smol | `9router/ollama-cloud/glm-5.3-flash` | Quick/light tasks |
-| plan | `9router/ollama-cloud/glm-5.3-flash` | Planning & architecture |
-| commit | `9router/ollama-cloud/glm-5.3-flash` | Commit generation |
-| vision | `9router/ollama-cloud/gemma4:31b` | Image-capable fallback |
+| default | `9router/cost-efficient` | Primary agent |
+| smol | `9router/cost-efficient` | Quick/light tasks |
+| plan | `9router/cost-efficient` | Planning & architecture |
+| commit | `9router/cost-efficient` | Commit generation |
+| designer | `9router/designer:auto` | Design / UI work |
+| advisor | `9router/advisor:high` | Advice / review |
+| vision | `9router/ollama-cloud/gemma4:31b:auto` | Image-capable fallback |
 
 Set `NINEROUTER_API_KEY` in your shell environment (`~/.zshenv.local`) to authenticate against the gateway.
 
@@ -168,7 +170,7 @@ User-level custom omp commands that dispatch directly to a specific agent, bypas
 |---------|------|--------|
 | `/designer` | `~/.agent/commands/designer.md` | Forwards your prompt to the `designer` agent with zero deviation |
 
-Usage: `/designer <your design prompt>` — the designer agent runs on `9router/glm-5.2` (configured via `modelRoles.designer`).
+Usage: `/designer <your design prompt>` — the designer agent runs on `9router/designer:auto` (configured via `modelRoles.designer`).
 
 The `$@` placeholder in the command body passes your inline arguments straight to the agent assignment. The body is rigid — the main model has no room to paraphrase or re-route.
 

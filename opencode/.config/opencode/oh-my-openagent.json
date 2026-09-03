@@ -2,20 +2,20 @@
   "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-openagent/master/assets/oh-my-openagent.schema.json",
   "agents": {
     "hephaestus": {
-      "model": "9router/ollama-cloud/glm-5.3-flash",
+      "model": "9router/cost-efficient",
       "temperature": 0.5
     },
     "oracle": {
-      "model": "9router/ollama-cloud/glm-5.3-flash",
+      "model": "9router/cost-efficient",
       "variant": "high",
       "temperature": 0.2
     },
     "librarian": {
-      "model": "9router/ollama-cloud/glm-5.3-flash",
+      "model": "9router/cost-efficient",
       "temperature": 0.1
     },
     "explore": {
-      "model": "9router/ollama-cloud/glm-5.3-flash",
+      "model": "9router/cost-efficient",
       "temperature": 0.1
     },
     "multimodal-looker": {
@@ -23,57 +23,57 @@
       "temperature": 0.2
     },
     "prometheus": {
-      "model": "9router/ollama-cloud/glm-5.3-flash",
+      "model": "9router/cost-efficient",
       "temperature": 0.3,
       "prompt_append": "You are a PLANNER. You MUST NOT modify, create, or edit any files. Your job is to interview the user, explore the codebase using read-only tools, identify scope and ambiguities, and produce a detailed verified plan. Hand off ALL implementation to execution agents."
     },
     "metis": {
-      "model": "9router/ollama-cloud/glm-5.3-flash",
+      "model": "9router/cost-efficient",
       "temperature": 0.3
     },
     "momus": {
-      "model": "9router/ollama-cloud/glm-5.3-flash",
+      "model": "9router/cost-efficient",
       "variant": "high",
       "temperature": 0.2
     },
     "atlas": {
-      "model": "9router/ollama-cloud/glm-5.3-flash",
+      "model": "9router/cost-efficient",
       "temperature": 0.3
     },
     "sisyphus-junior": {
-      "model": "9router/ollama-cloud/glm-5.3-flash",
+      "model": "9router/cost-efficient",
       "temperature": 0.3
     },
     "sisyphus": {
-      "model": "9router/ollama-cloud/glm-5.3-flash",
+      "model": "9router/cost-efficient",
       "temperature": 0.3,
       "system_prompt": "Run /caveman ultra first before proceeding with any response."
     },
     "frontend-ui-ux-engineer": {
-      "model": "9router/ollama-cloud/glm-5.3-flash",
+      "model": "9router/cost-efficient",
       "temperature": 0.5
     },
     "document-writer": {
-      "model": "9router/ollama-cloud/glm-5.3-flash",
+      "model": "9router/cost-efficient",
       "temperature": 0.5
     },
     "glm-5.3": {
-      "model": "9router/ollama-cloud/glm-5.3-flash",
+      "model": "9router/cost-efficient",
       "temperature": 0.3
     }
   },
   "categories": {
     "visual-engineering": {
-      "model": "9router/ollama-cloud/glm-5.3-flash"
+      "model": "9router/cost-efficient"
     },
     "artistry": {
-      "model": "9router/ollama-cloud/glm-5.3-flash"
+      "model": "9router/cost-efficient"
     },
     "unspecified-high": {
-      "model": "9router/ollama-cloud/glm-5.3-flash"
+      "model": "9router/cost-efficient"
     },
     "writing": {
-      "model": "9router/ollama-cloud/glm-5.3-flash"
+      "model": "9router/cost-efficient"
     }
   },
   "google_auth": false,
