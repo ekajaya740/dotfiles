@@ -374,11 +374,11 @@ Rules:
 After stowing, run these on each new machine:
 
 ```bash
-# OMP: enable pi-notify-pp extension
-omp config set extensions '["$HOME/dotfiles/pi/.pi/agent/extensions/pi-notify-pp/index.ts"]'
-
 # Set the 9router gateway key (all AI model traffic)
 export NINEROUTER_API_KEY="your-key"   # add to ~/.zshenv.local
 ```
+
+The pi-notify-pp extension path is already in `omp/.omp/agent/config.yml` as `~/dotfiles/...`
+(portable — omp expands `~`, but NOT `$HOME`; do not rewrite it with `omp config set`).
 
 Or run `bootstrap.sh` which handles all of the above automatically.

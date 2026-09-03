@@ -38,7 +38,7 @@ providers:
   {}
 setupVersion: 2
 extensions:
-  - /Users/ekajaya740/dotfiles/pi/.pi/agent/extensions/pi-notify-pp/index.ts
+  - ~/dotfiles/pi/.pi/agent/extensions/pi-notify-pp/index.ts
 cycleOrder:
   - default
   - smol

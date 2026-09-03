@@ -320,14 +320,10 @@ setup_neovim() {
 setup_machine_specific() {
     info "Applying machine-specific agent config..."
 
-    # OMP: pi-notify-pp extension
-    if has_cmd omp; then
-        local ext_path="${DOTFILES_REPO}/pi/.pi/agent/extensions/pi-notify-pp/index.ts"
-        if [[ -f "$ext_path" ]]; then
-            omp config set extensions "[\"$ext_path\"]" 2>/dev/null || \
-                warn "omp config set extensions failed — set manually: omp config set extensions '[\"$ext_path\"]'"
-        fi
-    fi
+    # OMP: pi-notify-pp extension path is already portable (~/dotfiles/...) in the
+    # tracked omp/.omp/agent/config.yml — omp expands ~, so no per-machine rewrite
+    # is needed. Running `omp config set extensions` here would clobber it with a
+    # machine-absolute path (writes through the stow symlink into the repo file).
 
     ok "Machine-specific config applied"
 
