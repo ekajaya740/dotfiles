@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "fallbackModels": [
+    "9router/ollama-cloud/glm-5.3-flash",
+    "9router/ollama-cloud/kimi-k2.6"
+  ],
+  "cooldownMs": 300000,
+  "patterns": [
+    "429",
+    "rate limit",
+    "usage limit",
+    "quota exceeded",
+    "too many requests",
+    "rate_limit_exceeded"
+  ]
+}

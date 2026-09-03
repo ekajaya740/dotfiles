@@ -1,0 +1,162 @@
+return {
+	{ "catppuccin/nvim", name = "catppuccin" },
+	{ "nvim-mini/mini.map", version = false, config = function() require("config.plugins.mini-map") end },
+	{ "nvim-neo-tree/neo-tree.nvim", enabled = false },
+	{ "christoomey/vim-tmux-navigator" },
+	{ "szw/vim-maximizer" },
+	{ "tpope/vim-surround" },
+	{ "inkarkat/vim-ReplaceWithRegister" },
+	{ "mg979/vim-visual-multi", branch = "master" },
+	{ "wakatime/vim-wakatime" },
+	{ "f-person/git-blame.nvim", config = function() require("config.plugins.git-blame") end },
+	{ "nvim-tree/nvim-tree.lua", config = function() require("config.plugins.nvim-tree") end },
+	{ "nvim-tree/nvim-web-devicons" },
+	{ "nvim-lualine/lualine.nvim", config = function() require("config.plugins.lualine") end },
+	{ "nvim-telescope/telescope.nvim", branch = "0.1.x", config = function() require("config.plugins.telescope") end },
+	{ "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
+	{ "kiyoon/telescope-insert-path.nvim" },
+	{ "dimaportenko/telescope-simulators.nvim", config = function() require("config.plugins.telescope-simulators") end },
+	{ "nvim-telescope/telescope-media-files.nvim" },
+	{ "numToStr/Comment.nvim", config = function() require("config.plugins.comment") end },
+	{ "JoosepAlviste/nvim-ts-context-commentstring" },
+	{ "windwp/nvim-autopairs", config = function() require("config.plugins.autopairs") end },
+	{ "windwp/nvim-ts-autotag", dependencies = { "nvim-treesitter/nvim-treesitter" } },
+	{ "nvim-treesitter/nvim-treesitter", build = ":TSUpdate", config = function() require("config.plugins.treesitter") end },
+	{
+		"laytan/tailwind-sorter.nvim",
+		dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-lua/plenary.nvim" },
+		build = "cd formatter && npm i && npm run build",
+		config = function()
+			require("config.plugins.tailwind-sorter")
+		end,
+	},
+	{ "lewis6991/gitsigns.nvim", config = function() require("config.plugins.gitsigns") end },
+	{
+		"folke/todo-comments.nvim",
+		dependencies = { "nvim-lua/plenary.nvim" },
+		config = function()
+			require("config.plugins.todo")
+		end,
+	},
+	{
+		"lukas-reineke/indent-blankline.nvim",
+		dependencies = { "TheGLander/indent-rainbowline.nvim" },
+		config = function()
+			require("config.plugins.indent-blankline")
+		end,
+	},
+	{ "liuchengxu/graphviz.vim" },
+	{
+		"iamcco/markdown-preview.nvim",
+		build = function()
+			vim.fn["mkdp#util#install"]()
+		end,
+	},
+	{
+		"aurum77/live-server.nvim",
+		build = function()
+			require("live_server.util").install()
+		end,
+		cmd = { "LiveServer", "LiveServerStart", "LiveServerStop" },
+	},
+	{
+		"rest-nvim/rest.nvim",
+		dependencies = {
+			"nvim-treesitter/nvim-treesitter",
+			"j-hui/fidget.nvim",
+			"nvim-neotest/nvim-nio",
+		},
+	},
+	{
+		"erichlf/devcontainer-cli.nvim",
+		dependencies = { "akinsho/toggleterm.nvim" },
+		config = function()
+			require("config.plugins.devcontainer-cli")
+		end,
+	},
+	{
+		"esensar/nvim-dev-container",
+		dependencies = { "nvim-treesitter/nvim-treesitter" },
+		cmd = {
+			"DevcontainerStart",
+			"DevcontainerAttach",
+			"DevcontainerExec",
+			"DevcontainerStop",
+			"DevcontainerStopAll",
+			"DevcontainerRemoveAll",
+			"DevcontainerLogs",
+			"DevcontainerEditNearestConfig",
+		},
+		config = function()
+			require("config.plugins.nvim-dev-container")
+		end,
+	},
+	{
+		"nvim-java/nvim-java",
+		ft = "java",
+		dependencies = {
+			"MunifTanjim/nui.nvim",
+			"mfussenegger/nvim-dap",
+			"JavaHello/spring-boot.nvim",
+		},
+		config = function()
+			require("java").setup({
+				jdk = {
+					auto_install = false,
+				},
+				spring_boot_tools = {
+					enable = true,
+				},
+				java_test = {
+					enable = true,
+				},
+				java_debug_adapter = {
+					enable = true,
+				},
+			})
+
+			vim.lsp.config("jdtls", {
+				cmd_env = {
+					_JAVA_OPTIONS = "-Xmx2g -XX:+UseG1GC -XX:+UseStringDeduplication",
+				},
+				settings = {
+					java = {
+						autobuild = { enabled = false },
+						format = {
+							enabled = true,
+							settings = {
+								url = vim.fn.stdpath("config") .. "/java/eclipse-formatter.xml",
+								profile = "KandR",
+							},
+						},
+						codeGeneration = {
+							useBlocks = true,
+							toString = {
+								template = "${class.name}(${field.name}=${field.value}, ${otherFields})",
+							},
+							hashCodeEquals = {
+								useJava7Objects = true,
+							},
+							insertLocation = "after",
+						},
+						completion = {
+							favoriteStaticMembers = {
+								"org.junit.jupiter.api.Assertions.*",
+								"org.mockito.Mockito.*",
+								"java.util.Collections.*",
+							},
+						},
+						sources = {
+							organizeImports = {
+								starThreshold = 5,
+								staticStarThreshold = 3,
+							},
+						},
+					},
+				},
+			})
+
+			vim.lsp.enable("jdtls")
+		end,
+	},
+}

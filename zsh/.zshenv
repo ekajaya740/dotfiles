@@ -1,0 +1,100 @@
+# Zsh environment - sourced by all zsh sessions
+# Safe, portable exports only - no secrets, no host-specific values
+
+source "$HOME/.zshenv.local"
+# XDG Base Directory Specification
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+
+# Editor
+export EDITOR="${EDITOR:-vim}"
+export VISUAL="${VISUAL:-vim}"
+
+# Language and locale
+export LANG="${LANG:-en_US.UTF-8}"
+export LC_ALL="${LC_ALL:-en_US.UTF-8}"
+
+# History
+export HISTSIZE=10000
+export SAVEHIST=10000
+export HISTFILE="$HOME/.zsh_history"
+
+# Less
+export LESS='-R -i -w -M -z-4'
+
+# Color support
+export CLICOLOR=1
+export COLORTERM="${COLOR}"
+
+# Enable color supportTERM:-truecolor for various tools
+if command -v dircolors >/dev/null 2>&1; then
+    export LS_COLORS='di=34:ln=35:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43'
+fi
+
+# Homebrew (macOS)
+if [[ -x /opt/homebrew/bin/brew ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [[ -x /usr/local/bin/brew ]]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+fi
+
+# Cargo/Rust
+if [[ -f "$HOME/.cargo/env" ]]; then
+    source "$HOME/.cargo/env"
+fi
+
+
+## Platform detection
+if [[ -r /etc/os-release ]]; then
+    # shellcheck disable=SC1091
+    . /etc/os-release
+    export DOTFILES_OS_ID="${ID:-}"
+    export DOTFILES_OS_ID_LIKE="${ID_LIKE:-}"
+else
+    export DOTFILES_OS_ID=""
+    export DOTFILES_OS_ID_LIKE=""
+fi
+
+case "$DOTFILES_OS_ID" in
+    arch|archlinux|omarchy)
+        export DOTFILES_IS_ARCH="1"
+        ;;
+    *)
+        export DOTFILES_IS_ARCH="0"
+        ;;
+esac
+
+if [[ "$DOTFILES_OS_ID" == "manjaro" ]]; then
+    export DOTFILES_IS_MANJARO="1"
+else
+    export DOTFILES_IS_MANJARO="0"
+fi
+
+DOTFILES_OMARCHY_FLAG="0"
+if [[ "$DOTFILES_OS_ID" == "omarchy" ]]; then
+    DOTFILES_OMARCHY_FLAG="1"
+elif [[ -d "$HOME/.local/share/omarchy" ]]; then
+    DOTFILES_OMARCHY_FLAG="1"
+    export DOTFILES_OMARCHY_HOME="$HOME/.local/share/omarchy"
+elif [[ -d "$HOME/.config/omarchy" ]]; then
+    DOTFILES_OMARCHY_FLAG="1"
+    export DOTFILES_OMARCHY_HOME="$HOME/.config/omarchy"
+elif [[ "$XDG_CURRENT_DESKTOP" == "Hyprland" && -d "$HOME/.config/omarchy" ]]; then
+    DOTFILES_OMARCHY_FLAG="1"
+    export DOTFILES_OMARCHY_HOME="$HOME/.config/omarchy"
+else
+    unset DOTFILES_OMARCHY_HOME
+fi
+
+if [[ "$DOTFILES_OMARCHY_FLAG" == "1" ]]; then
+    export DOTFILES_IS_ARCH="1"
+fi
+
+export DOTFILES_IS_OMARCHY="$DOTFILES_OMARCHY_FLAG"
+unset DOTFILES_OMARCHY_FLAG
+
+# Vite+ bin (https://viteplus.dev)
+if [[ -f "$HOME/.vite-plus/env" ]]; then
+    . "$HOME/.vite-plus/env"
+fi

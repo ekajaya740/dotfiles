@@ -1,0 +1,282 @@
+return {
+	{
+		"neovim/nvim-lspconfig",
+		event = { "BufReadPre", "BufNewFile" },
+		dependencies = {
+			"mason-org/mason.nvim",
+			"mason-org/mason-lspconfig.nvim",
+			"saghen/blink.cmp",
+			{ "j-hui/fidget.nvim", opts = {} },
+			"b0o/schemastore.nvim",
+		},
+		init = function()
+			-- Prevent nvim-lspconfig's lsp/jdtls.lua from overriding nvim-java's config
+			-- by pre-registering an empty jdtls config that nvim-java will fill later
+			if vim.lsp.config and vim.lsp.config._configs then
+				vim.lsp.config._configs["jdtls"] = {}
+			end
+		end,
+		opts = {
+			servers = {
+				vtsls = {
+					settings = {
+						typescript = {
+							inlayHints = {
+								parameterNames = { enabled = "all" },
+								functionLikeReturnTypes = { enabled = true },
+								variableTypes = { enabled = true },
+							},
+						},
+						javascript = {
+							inlayHints = {
+								parameterNames = { enabled = "all" },
+								functionLikeReturnTypes = { enabled = true },
+								variableTypes = { enabled = true },
+							},
+						},
+						["js/ts.implicitProjectConfig.strict"] = true,
+						["js/ts.implicitProjectConfig.strictNullChecks"] = true,
+						["js/ts.implicitProjectConfig.strictFunctionTypes"] = true,
+						["js/ts.implicitProjectConfig.checkJs"] = true,
+					},
+				},
+				tailwindcss = {
+					settings = {
+						tailwindCSS = {
+							classAttributes = { "class", "className", "class:list", "classList", "ngClass" },
+							includeLanguages = {
+								templ = "html",
+								astro = "html",
+								svelte = "html",
+								vue = "html",
+								jsx = "html",
+								tsx = "html",
+								solid = "html",
+							},
+						},
+					},
+				},
+				volar = { filetypes = { "vue" } },
+				svelte = {},
+				astro = {},
+				solidity = {},
+				pyright = {
+					settings = {
+						python = {
+							venvPath = ".",
+							pythonPath = ".venv/bin/python",
+							analysis = {
+								typeCheckingMode = "basic",
+								autoImportCompletions = true,
+								diagnosticMode = "workspace",
+								useLibraryCodeForTypes = true,
+							},
+						},
+					},
+					before_init = function(_, config)
+						local root = config.root_dir or vim.fn.getcwd()
+						local venv = root .. "/.venv/bin/python"
+						if vim.fn.filereadable(venv) == 1 then
+							config.settings.python.pythonPath = venv
+							config.settings.python.venvPath = root
+						else
+							config.settings.python.pythonPath = "python3"
+						end
+					end,
+				},
+				gopls = {
+					settings = {
+						gopls = {
+							analyses = {
+								unusedparams = true,
+								shadow = true,
+							},
+							staticcheck = true,
+							gofumpt = true,
+						},
+					},
+				},
+				rust_analyzer = {
+					settings = {
+						["rust-analyzer"] = {
+							cargo = { allFeatures = true },
+							checkOnSave = { command = "clippy" },
+							procMacro = { enable = true },
+						},
+					},
+				},
+				clangd = {
+					settings = {
+						clangd = {
+							fallbackFlags = { "-std=c++20" },
+						},
+					},
+				},
+				omnisharp = {
+					settings = {
+						FormattingOptions = {
+							EnableEditorConfigSupport = true,
+							OrganizeImports = true,
+						},
+					},
+				},
+				intelephense = {
+					settings = {
+						intelephense = {
+							environment = { phpVersion = "8.2" },
+							files = { associations = { "*.php", "*.blade.php" } },
+							diagnostics = { enable = true, builtins = true },
+							indexes = { builtins = true, workspaces = true },
+						},
+					},
+				},
+				ruby_lsp = { settings = {} },
+				dartls = {
+					settings = {
+						dart = {
+							completeFunctionCalls = true,
+							showTodos = true,
+						},
+					},
+				},
+				zls = {},
+				lua_ls = {
+					settings = {
+						Lua = {
+							workspace = { checkThirdParty = false },
+							telemetry = { enable = false },
+						},
+					},
+				},
+				bashls = {},
+				jsonls = {
+					before_init = function(_, new_config)
+						new_config.settings.json.schemas = new_config.settings.json.schemas or {}
+						vim.list_extend(new_config.settings.json.schemas, require("schemastore").json.schemas())
+					end,
+					settings = {
+						json = {
+							format = { enable = true },
+							validate = { enable = true },
+						},
+					},
+				},
+				yamlls = {
+					before_init = function(_, new_config)
+						new_config.settings.yaml.schemas = vim.tbl_deep_extend(
+							"force",
+							new_config.settings.yaml.schemas or {},
+							require("schemastore").yaml.schemas()
+						)
+					end,
+					settings = {
+						redhat = { telemetry = { enabled = false } },
+						yaml = {
+							keyOrdering = false,
+							format = { enable = true },
+							validate = true,
+							schemaStore = {
+								enable = false,
+								url = "",
+							},
+						},
+					},
+				},
+				html = {},
+				cssls = {},
+				dockerls = {},
+				docker_compose_language_service = {},
+				prismals = {},
+			},
+		},
+		config = function(_, opts)
+			local lspconfig = require("lspconfig")
+			local capabilities = vim.lsp.protocol.make_client_capabilities()
+			local function is_autoformat_enabled(bufnr)
+				if vim.bo[bufnr].filetype == "html" then
+					return false
+				end
+
+				local global_autoformat = vim.g.autoformat
+				local buffer_autoformat = vim.b[bufnr].autoformat
+				local global_enabled = global_autoformat == nil or global_autoformat
+				local buffer_enabled = buffer_autoformat == nil or buffer_autoformat
+
+				return global_enabled and buffer_enabled
+			end
+
+			capabilities = vim.tbl_deep_extend("force", capabilities, require("blink.cmp").get_lsp_capabilities())
+
+			for server, server_opts in pairs(opts.servers) do
+				if server ~= "*" and type(server_opts) == "table" and server_opts.enabled ~= false then
+					server_opts.capabilities = capabilities
+					lspconfig[server].setup(server_opts)
+				end
+			end
+
+			-- diagnostic display: virtual_text, signs, severity_sort, underline
+			vim.diagnostic.config({
+				underline = true,
+				update_in_insert = false,
+				virtual_text = {
+					spacing = 4,
+					source = "if_many",
+					prefix = "●",
+				},
+				severity_sort = true,
+				signs = {
+					text = {
+						[vim.diagnostic.severity.ERROR] = "",
+						[vim.diagnostic.severity.WARN] = "",
+						[vim.diagnostic.severity.HINT] = "",
+						[vim.diagnostic.severity.INFO] = "",
+					},
+				},
+			})
+
+			vim.api.nvim_create_autocmd("FileType", {
+				group = vim.api.nvim_create_augroup("DisableHtmlAutoformat", {}),
+				pattern = { "html" },
+				callback = function(args)
+					vim.b[args.buf].autoformat = false
+				end,
+			})
+
+			vim.api.nvim_create_autocmd("BufWritePre", {
+				group = vim.api.nvim_create_augroup("GoOrganizeImports", {}),
+				pattern = "*.go",
+				callback = function()
+					local params = vim.lsp.util.make_range_params()
+					params.context = { only = { "source.organizeImports" } }
+					local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 1000)
+					for _, res in pairs(result or {}) do
+						for _, action in pairs(res.result or {}) do
+							if action.edit then
+								vim.lsp.util.apply_action(action)
+							end
+						end
+					end
+					vim.lsp.buf.format({ async = false })
+				end,
+			})
+
+			vim.api.nvim_create_autocmd("BufWritePre", {
+				group = vim.api.nvim_create_augroup("LspFormatting", {}),
+				callback = function(args)
+					if vim.bo[args.buf].filetype == "go" then
+						return
+					end
+					if not is_autoformat_enabled(args.buf) then
+						return
+					end
+
+					if vim.b[args.buf].editorconfig then
+						return
+					end
+
+					vim.lsp.buf.format({ bufnr = args.buf, timeout_ms = 2000 })
+				end,
+			})
+		end,
+	},
+}

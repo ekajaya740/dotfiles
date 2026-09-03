@@ -1,0 +1,25 @@
+vim.api.nvim_create_autocmd("ColorScheme", {
+	pattern = "*",
+	callback = function()
+		vim.api.nvim_set_hl(0, "@lsp.type.class", { link = "Type" })
+		vim.api.nvim_set_hl(0, "@lsp.type.interface", { link = "Type" })
+		vim.api.nvim_set_hl(0, "@lsp.type.enum", { link = "Type" })
+		vim.api.nvim_set_hl(0, "@lsp.type.struct", { link = "Type" })
+		vim.api.nvim_set_hl(0, "@lsp.type.parameter", { link = "Identifier" })
+		vim.api.nvim_set_hl(0, "@lsp.type.variable", { link = "Identifier" })
+		vim.api.nvim_set_hl(0, "@lsp.type.property", { link = "Identifier" })
+		vim.api.nvim_set_hl(0, "@lsp.type.method", { link = "Function" })
+		vim.api.nvim_set_hl(0, "@lsp.type.function", { link = "Function" })
+		vim.api.nvim_set_hl(0, "@lsp.type.macro", { link = "Macro" })
+		vim.api.nvim_set_hl(0, "@lsp.type.keyword", { link = "Keyword" })
+		vim.api.nvim_set_hl(0, "@lsp.type.comment", { link = "Comment" })
+		vim.api.nvim_set_hl(0, "@lsp.type.string", { link = "String" })
+		vim.api.nvim_set_hl(0, "@lsp.type.number", { link = "Number" })
+		vim.api.nvim_set_hl(0, "@lsp.type.boolean", { link = "Boolean" })
+		vim.api.nvim_set_hl(0, "@lsp.type.regexp", { link = "String" })
+		vim.api.nvim_set_hl(0, "@lsp.type.operator", { link = "Operator" })
+		vim.api.nvim_set_hl(0, "@lsp.type.namespace", { link = "Include" })
+	end,
+})
+
+vim.api.nvim_exec_autocmds("ColorScheme", { pattern = vim.g.colors_name or "default" })
