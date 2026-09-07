@@ -1,16 +1,16 @@
 Models:
   - 9router/*
 modelRoles:
-  smol: 9router/cost-efficient
-  plan: 9router/cost-efficient
-  commit: 9router/cost-efficient
-  slow: 9router/cost-efficient
+  smol: 9router/coder
+  plan: 9router/coder
+  commit: 9router/coder
+  slow: 9router/coder
   designer: 9router/designer:auto
-  vision: 9router/ollama-cloud/gemma4:31b:auto
-  task: 9router/cost-efficient
+  vision: 9router/coder:auto
+  task: 9router/coder
   advisor: 9router/advisor:high
-  tiny: 9router/cost-efficient
-  default: 9router/cost-efficient
+  tiny: 9router/coder
+  default: 9router/coder
 defaultThinkingLevel: auto
 steeringMode: one-at-a-time
 followUpMode: auto
