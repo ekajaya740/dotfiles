@@ -16,6 +16,7 @@ This document provides guidelines for AI agents and automation tools working wit
 ├── opencode/.config/opencode/  → ~/.config/opencode/
 ├── omp/.omp/agent/            → ~/.omp/agent (config + models only)
 ├── pi/.pi/agent/extensions/   → ~/.pi/agent/extensions (pi-notify-pp)
+├── omarchy/.config/hypr/       → ~/.config/hypr (hyprland + related configs)
 └── agent/.agent/commands/     → ~/.agent/commands (custom omp commands)
 ```
 
@@ -47,8 +48,8 @@ If symlinks break or need refresh:
 
 ```bash
 cd ~/dotfiles
-stow -D nvim tmux opencode omp agent pi hermes  # Unstow
-stow nvim tmux opencode omp agent pi hermes     # Restow
+stow -D nvim tmux opencode omp agent pi hermes omarchy  # Unstow
+stow nvim tmux opencode omp agent pi hermes omarchy     # Restow
 ```
 
 ## Safety Rules
@@ -58,6 +59,7 @@ stow nvim tmux opencode omp agent pi hermes     # Restow
 - Preserve existing user model/provider configurations unless explicitly asked
 - Keep changes minimal and consistent with existing style
 - Test changes in headless mode when possible
+
 
 ## Common Tasks
 
