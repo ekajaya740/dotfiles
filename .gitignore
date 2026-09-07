@@ -47,3 +47,4 @@ claude/
 
 # omp lock files
 *.lock
+omarchy-legacy-backup/
