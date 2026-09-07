@@ -63,6 +63,18 @@ providers:
         input: [text]
         contextWindow: 1000000
         maxTokens: 32000
+      - id: sfw-coder
+        name: Safe Coder (combo)
+        reasoning: true
+        input: [text]
+        contextWindow: 1000000
+        maxTokens: 32000
+      - id: sfw-advisor
+        name: Safe Advisor (combo)
+        reasoning: true
+        input: [text]
+        contextWindow: 1000000
+        maxTokens: 32000
       - id: combo-profill-fast
         name: Profill Fast (combo)
         reasoning: true
