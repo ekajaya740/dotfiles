@@ -153,15 +153,16 @@ stow omp agent
 
 ### MCP Servers
 
-Configured in `omp/.omp/agent/mcp.json` (oMP) and `opencode/.config/opencode/opencode.json` (OpenCode):
+Configured in `omp/.omp/agent/mcp.json` (oMP), `opencode/.config/opencode/opencode.json` (OpenCode), and `hermes/.hermes/config.yaml` (`mcp_servers:`); Claude Code reads `~/.claude.json` (machine-local, `claude/` is gitignored).
 
 | Server | Type | Command | Purpose |
 |--------|------|---------|---------|
 | lightpanda | stdio | `lightpanda mcp` | Native headless browser MCP — markdown, semantic tree, structured data, JS eval |
 | grep_app | stdio | `bunx -y @modelcontextprotocol/server-github` | GitHub API access |
-| codebase-memory-mcp | stdio | `codebase-memory-mcp` | Code intelligence knowledge graph — search, trace, architecture, impact analysis |
+| pencil | stdio | `/Applications/Pen.app/Contents/Resources/app.asar.unpacked/out/mcp-server-darwin-arm64 --app desktop --agent <name>` | pen.dev design files — read/modify `.pen` via MCP |
+| codebase-memory-mcp | stdio | `~/.local/bin/codebase-memory-mcp` | Code intelligence knowledge graph — search, trace, architecture, impact analysis |
 
-**codebase-memory-mcp** is a high-performance code intelligence MCP server. It indexes codebases into a persistent knowledge graph for fast structural queries. Installed at `~/.local/bin/codebase-memory-mcp`. Auto-configured for all detected agents via `codebase-memory-mcp install`.
+**codebase-memory-mcp** is a high-performance code intelligence MCP server. It indexes codebases into a persistent knowledge graph for fast structural queries. Installed at `~/.local/bin/codebase-memory-mcp`. Configured with the native binary path (not `npx -y`) in omp/opencode/hermes MCP configs and `~/.claude.json`. The `npx -y codebase-memory-mcp` fallback is intentionally replaced because the native binary must match the shared coordination daemon version.
 
 
 ### Custom Commands (`.agent/commands/`)
