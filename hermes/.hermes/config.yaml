@@ -565,6 +565,14 @@ mcp_servers:
   investment_vault:
     url: http://127.0.0.1:8790/mcp
     timeout: 120
+  pencil:
+    command: /Applications/Pen.app/Contents/Resources/app.asar.unpacked/out/mcp-server-darwin-arm64
+    args:
+      - --app
+      - desktop
+      - --agent
+      - hermesCLI
+    enabled: true
 platforms:
   discord:
     enabled: true

@@ -20,6 +20,11 @@
       "command": "npx",
       "args": ["-y", "codebase-memory-mcp"],
       "enabled": true
+    },
+    "pencil": {
+      "command": "/Applications/Pen.app/Contents/Resources/app.asar.unpacked/out/mcp-server-darwin-arm64",
+      "args": ["--app", "desktop", "--agent", "omhCLI"],
+      "enabled": true
     }
   }
 }
