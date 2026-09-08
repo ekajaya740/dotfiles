@@ -6,7 +6,7 @@ modelRoles:
   commit: 9router/coder
   slow: 9router/coder
   designer: 9router/designer:auto
-  vision: 9router/coder:auto
+  vision: 9router/ollama-cloud/gemma4:31b:auto
   task: 9router/coder
   advisor: 9router/advisor:high
   tiny: 9router/coder
@@ -42,7 +42,6 @@ extensions:
 cycleOrder:
   - default
   - smol
-  - slow
 dev:
   autoqaConsent: denied
 startup:

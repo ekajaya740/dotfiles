@@ -1,283 +1,294 @@
 {
-    "model": "9router/cost-efficient",
-    "plugin": [
-        "opencode-openai-codex-auth",
-        "opencode-rate-limit-fallback",
-        "opencode-agent-skills",
-        "opencode-wakatime",
-        "superpowers@git+https://github.com/obra/superpowers.git",
-        "oh-my-openagent@latest",
-        "@dietrichgebert/ponytail"
-    ],
-    "provider": {
-        "9router": {
-            "npm": "@ai-sdk/openai-compatible",
-            "name": "9Router",
-            "options": {
-                "baseURL": "https://ai.workofekajaya.com/v1",
-                "apiKey": "{env:NINEROUTER_API_KEY}"
-            },
-            "models": {
-                "designer": {
-                    "name": "Designer (combo)",
-                    "limit": {
-                        "context": 1000000,
-                        "output": 32000
-                    }
-                },
-                "personal-chat": {
-                    "name": "Personal Chat (combo)",
-                    "limit": {
-                        "context": 1000000,
-                        "output": 32000
-                    }
-                },
-                "cost-efficient": {
-                    "name": "Cost Efficient (combo)",
-                    "limit": {
-                        "context": 1000000,
-                        "output": 32000
-                    }
-                },
-                "advisor": {
-                    "name": "Advisor (combo)",
-                    "limit": {
-                        "context": 1000000,
-                        "output": 32000
-                    }
-                },
-                "coder": {
-                    "name": "Coder (combo)",
-                    "limit": {
-                        "context": 1000000,
-                        "output": 32000
-                    }
-                },
-                "combo-profill-fast": {
-                    "name": "Profill Fast (combo)",
-                    "limit": {
-                        "context": 1000000,
-                        "output": 32000
-                    }
-                },
-                "combo-profill-smart": {
-                    "name": "Profill Smart (combo)",
-                    "limit": {
-                        "context": 1000000,
-                        "output": 32000
-                    }
-                },
-                "ollama-cloud/glm-5.3-flash": {
-                    "name": "GLM 5.3 Flash",
-                    "limit": {
-                        "context": 1048576,
-                        "output": 128000
-                    }
-                },
-                "ollama-cloud/glm-5.1": {
-                    "name": "GLM 5.1 Cloud",
-                    "limit": {
-                        "context": 198000,
-                        "output": 32000
-                    }
-                },
-                "ollama-cloud/glm-5.2": {
-                    "name": "GLM 5.2 Cloud",
-                    "limit": {
-                        "context": 1048576,
-                        "output": 32000
-                    }
-                },
-                "ollama-cloud/kimi-k2.6": {
-                    "name": "Kimi K2.6 Cloud",
-                    "limit": {
-                        "context": 200000,
-                        "output": 32000
-                    }
-                },
-                "ollama-cloud/kimi-k2.7-code": {
-                    "name": "Kimi K2.7 Code Cloud",
-                    "limit": {
-                        "context": 200000,
-                        "output": 32000
-                    }
-                },
-                "ollama-cloud/kimi-k3": {
-                    "name": "Kimi K3 Cloud",
-                    "limit": {
-                        "context": 1000000,
-                        "output": 65536
-                    }
-                },
-                "ollama-cloud/minimax-m2.7": {
-                    "name": "MiniMax M2.7 Cloud",
-                    "limit": {
-                        "context": 200000,
-                        "output": 32000
-                    }
-                },
-                "ollama-cloud/minimax-m3": {
-                    "name": "MiniMax M3 Cloud",
-                    "limit": {
-                        "context": 512000,
-                        "output": 32000
-                    }
-                },
-                "ollama-cloud/gemma4:31b": {
-                    "name": "Gemma 4 31B Cloud",
-                    "limit": {
-                        "context": 200000,
-                        "output": 32000
-                    }
-                },
-                "ollama-cloud/qwen3.5:397b": {
-                    "name": "Qwen 3.5 397B Cloud",
-                    "limit": {
-                        "context": 200000,
-                        "output": 32000
-                    }
-                },
-                "ollama-cloud/gpt-oss:120b": {
-                    "name": "GPT-OSS 120B",
-                    "limit": {
-                        "context": 131072,
-                        "output": 32768
-                    }
-                },
-                "ollama-cloud/gpt-oss:20b": {
-                    "name": "GPT-OSS 20B",
-                    "limit": {
-                        "context": 131072,
-                        "output": 32768
-                    }
-                },
-                "ollama-cloud/nemotron-3-ultra": {
-                    "name": "Nemotron 3 Ultra",
-                    "limit": {
-                        "context": 200000,
-                        "output": 32000
-                    }
-                },
-                "ollama-cloud/nemotron-3-super": {
-                    "name": "Nemotron 3 Super",
-                    "limit": {
-                        "context": 200000,
-                        "output": 32000
-                    }
-                },
-                "ollama-cloud/nemotron-3-nano:30b": {
-                    "name": "Nemotron 3 Nano 30B",
-                    "limit": {
-                        "context": 200000,
-                        "output": 32000
-                    }
-                },
-                "ollama-cloud/mistral-large-3:675b": {
-                    "name": "Mistral Large 3 675B",
-                    "limit": {
-                        "context": 200000,
-                        "output": 32000
-                    }
-                },
-                "ollama-cloud/deepseek-v4-pro:0813": {
-                    "name": "DeepSeek V4 Pro 0813",
-                    "limit": {
-                        "context": 1000000,
-                        "output": 65536
-                    }
-                },
-                "ollama-cloud/deepseek-v4-pro:preview": {
-                    "name": "DeepSeek V4 Pro Preview",
-                    "limit": {
-                        "context": 1000000,
-                        "output": 65536
-                    }
-                },
-                "ollama-cloud/deepseek-v4-flash:0731": {
-                    "name": "DeepSeek V4 Flash 0731",
-                    "limit": {
-                        "context": 1000000,
-                        "output": 65536
-                    }
-                },
-                "ollama-cloud/deepseek-v4-flash:preview": {
-                    "name": "DeepSeek V4 Flash Preview",
-                    "limit": {
-                        "context": 1000000,
-                        "output": 65536
-                    }
-                }
-            }
+  "model": "9router/cost-efficient",
+  "plugin": [
+    "opencode-openai-codex-auth",
+    "opencode-rate-limit-fallback",
+    "opencode-agent-skills",
+    "opencode-wakatime",
+    "superpowers@git+https://github.com/obra/superpowers.git",
+    "oh-my-openagent@latest",
+    "@dietrichgebert/ponytail"
+  ],
+  "provider": {
+    "9router": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "9Router",
+      "options": {
+        "baseURL": "https://ai.workofekajaya.com/v1",
+        "apiKey": "{env:NINEROUTER_API_KEY}"
+      },
+      "models": {
+        "designer": {
+          "name": "Designer (combo)",
+          "limit": {
+            "context": 1000000,
+            "output": 32000
+          }
         },
-        "shiteru": {
-            "npm": "@ai-sdk/openai-compatible",
-            "name": "Shiteru",
-            "options": {
-                "baseURL": "https://ai.shiteru.id/v1",
-                "apiKey": "{env:SHITERU_API_KEY}"
-            },
-            "models": {
-                "qwen-3.8-flash": {
-                    "name": "Qwen 3.8 Flash",
-                    "limit": {
-                        "context": 1000000,
-                        "output": 128000
-                    }
-                },
-                "kimi-k3": {
-                    "name": "Kimi K3",
-                    "limit": {
-                        "context": 1000000,
-                        "output": 128000
-                    }
-                }
-            }
+        "personal-chat": {
+          "name": "Personal Chat (combo)",
+          "limit": {
+            "context": 1000000,
+            "output": 32000
+          }
+        },
+        "cost-efficient": {
+          "name": "Cost Efficient (combo)",
+          "limit": {
+            "context": 1000000,
+            "output": 32000
+          }
+        },
+        "advisor": {
+          "name": "Advisor (combo)",
+          "limit": {
+            "context": 1000000,
+            "output": 32000
+          }
+        },
+        "coder": {
+          "name": "Coder (combo)",
+          "limit": {
+            "context": 1000000,
+            "output": 32000
+          }
+        },
+        "combo-profill-fast": {
+          "name": "Profill Fast (combo)",
+          "limit": {
+            "context": 1000000,
+            "output": 32000
+          }
+        },
+        "combo-profill-smart": {
+          "name": "Profill Smart (combo)",
+          "limit": {
+            "context": 1000000,
+            "output": 32000
+          }
+        },
+        "ollama-cloud/glm-5.3-flash": {
+          "name": "GLM 5.3 Flash",
+          "limit": {
+            "context": 1048576,
+            "output": 128000
+          }
+        },
+        "ollama-cloud/glm-5.1": {
+          "name": "GLM 5.1 Cloud",
+          "limit": {
+            "context": 198000,
+            "output": 32000
+          }
+        },
+        "ollama-cloud/glm-5.2": {
+          "name": "GLM 5.2 Cloud",
+          "limit": {
+            "context": 1048576,
+            "output": 32000
+          }
+        },
+        "ollama-cloud/kimi-k2.6": {
+          "name": "Kimi K2.6 Cloud",
+          "limit": {
+            "context": 200000,
+            "output": 32000
+          }
+        },
+        "ollama-cloud/kimi-k2.7-code": {
+          "name": "Kimi K2.7 Code Cloud",
+          "limit": {
+            "context": 200000,
+            "output": 32000
+          }
+        },
+        "ollama-cloud/kimi-k3": {
+          "name": "Kimi K3 Cloud",
+          "limit": {
+            "context": 1000000,
+            "output": 65536
+          }
+        },
+        "ollama-cloud/minimax-m2.7": {
+          "name": "MiniMax M2.7 Cloud",
+          "limit": {
+            "context": 200000,
+            "output": 32000
+          }
+        },
+        "ollama-cloud/minimax-m3": {
+          "name": "MiniMax M3 Cloud",
+          "limit": {
+            "context": 512000,
+            "output": 32000
+          }
+        },
+        "ollama-cloud/gemma4:31b": {
+          "name": "Gemma 4 31B Cloud",
+          "limit": {
+            "context": 200000,
+            "output": 32000
+          }
+        },
+        "ollama-cloud/qwen3.5:397b": {
+          "name": "Qwen 3.5 397B Cloud",
+          "limit": {
+            "context": 200000,
+            "output": 32000
+          }
+        },
+        "ollama-cloud/gpt-oss:120b": {
+          "name": "GPT-OSS 120B",
+          "limit": {
+            "context": 131072,
+            "output": 32768
+          }
+        },
+        "ollama-cloud/gpt-oss:20b": {
+          "name": "GPT-OSS 20B",
+          "limit": {
+            "context": 131072,
+            "output": 32768
+          }
+        },
+        "ollama-cloud/nemotron-3-ultra": {
+          "name": "Nemotron 3 Ultra",
+          "limit": {
+            "context": 200000,
+            "output": 32000
+          }
+        },
+        "ollama-cloud/nemotron-3-super": {
+          "name": "Nemotron 3 Super",
+          "limit": {
+            "context": 200000,
+            "output": 32000
+          }
+        },
+        "ollama-cloud/nemotron-3-nano:30b": {
+          "name": "Nemotron 3 Nano 30B",
+          "limit": {
+            "context": 200000,
+            "output": 32000
+          }
+        },
+        "ollama-cloud/mistral-large-3:675b": {
+          "name": "Mistral Large 3 675B",
+          "limit": {
+            "context": 200000,
+            "output": 32000
+          }
+        },
+        "ollama-cloud/deepseek-v4-pro:0813": {
+          "name": "DeepSeek V4 Pro 0813",
+          "limit": {
+            "context": 1000000,
+            "output": 65536
+          }
+        },
+        "ollama-cloud/deepseek-v4-pro:preview": {
+          "name": "DeepSeek V4 Pro Preview",
+          "limit": {
+            "context": 1000000,
+            "output": 65536
+          }
+        },
+        "ollama-cloud/deepseek-v4-flash:0731": {
+          "name": "DeepSeek V4 Flash 0731",
+          "limit": {
+            "context": 1000000,
+            "output": 65536
+          }
+        },
+        "ollama-cloud/deepseek-v4-flash:preview": {
+          "name": "DeepSeek V4 Flash Preview",
+          "limit": {
+            "context": 1000000,
+            "output": 65536
+          }
         }
+      }
     },
-    "$schema": "https://opencode.ai/config.json",
-    "mcp": {
-        "grep_app": {
-            "type": "local",
-            "command": [
-                "bunx",
-                "-y",
-                "@modelcontextprotocol/server-github"
-            ],
-            "enabled": true,
-            "timeout": 20000
+    "shiteru": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Shiteru",
+      "options": {
+        "baseURL": "https://ai.shiteru.id/v1",
+        "apiKey": "{env:SHITERU_API_KEY}"
+      },
+      "models": {
+        "qwen-3.8-flash": {
+          "name": "Qwen 3.8 Flash",
+          "limit": {
+            "context": 1000000,
+            "output": 128000
+          }
         },
-        "context7": {
-            "type": "local",
-            "command": [
-                "npx",
-                "-y",
-                "@upstash/context7-mcp"
-            ],
-            "enabled": true
-        },
-        "firecrawl": {
-            "type": "remote",
-            "url": "https://mcp.firecrawl.dev/v2/mcp",
-            "enabled": false
-        },
-        "codebase-memory-mcp": {
-            "enabled": true,
-            "type": "local",
-            "command": [
-                "npx",
-                "-y",
-                "codebase-memory-mcp"
-            ]
-        },
-        "expect": {
-            "type": "local",
-            "command": [
-                "npx",
-                "-y",
-                "expect-cli@latest",
-                "mcp"
-            ],
-            "enabled": true
+        "kimi-k3": {
+          "name": "Kimi K3",
+          "limit": {
+            "context": 1000000,
+            "output": 128000
+          }
         }
+      }
     }
+  },
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "grep_app": {
+      "type": "local",
+      "command": [
+        "bunx",
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "enabled": true,
+      "timeout": 20000
+    },
+    "context7": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@upstash/context7-mcp"
+      ],
+      "enabled": true
+    },
+    "firecrawl": {
+      "type": "remote",
+      "url": "https://mcp.firecrawl.dev/v2/mcp",
+      "enabled": false
+    },
+    "codebase-memory-mcp": {
+      "enabled": true,
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "codebase-memory-mcp"
+      ]
+    },
+    "expect": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "expect-cli@latest",
+        "mcp"
+      ],
+      "enabled": true
+    },
+    "pencil": {
+      "command": [
+        "/Applications/Pen.app/Contents/Resources/app.asar.unpacked/out/mcp-server-darwin-arm64",
+        "--app",
+        "desktop",
+        "--agent",
+        "openCodeCLI"
+      ],
+      "enabled": true,
+      "type": "local"
+    }
+  }
 }
