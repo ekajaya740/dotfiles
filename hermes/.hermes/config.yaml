@@ -573,6 +573,10 @@ mcp_servers:
       - --agent
       - hermesCLI
     enabled: true
+  codebase-memory-mcp:
+    command: /Users/ekajaya740/.local/bin/codebase-memory-mcp
+    args: []
+    enabled: true
 platforms:
   discord:
     enabled: true
