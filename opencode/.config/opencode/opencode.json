@@ -264,9 +264,7 @@
       "enabled": true,
       "type": "local",
       "command": [
-        "npx",
-        "-y",
-        "codebase-memory-mcp"
+        "/Users/ekajaya740/.local/bin/codebase-memory-mcp"
       ]
     },
     "expect": {
