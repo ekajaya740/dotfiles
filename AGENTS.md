@@ -17,7 +17,8 @@ This document provides guidelines for AI agents and automation tools working wit
 ├── omp/.omp/agent/            → ~/.omp/agent (config + models only)
 ├── pi/.pi/agent/extensions/   → ~/.pi/agent/extensions (pi-notify-pp)
 ├── omarchy/.config/hypr/       → ~/.config/hypr (hyprland + related configs)
-└── agent/.agent/commands/     → ~/.agent/commands (custom omp commands)
+├── agent/.agent/commands/     → ~/.agent/commands (custom omp commands)
+└── pen/.pencil/models.json    → ~/.pencil/models.json (9router custom provider)
 ```
 
 ## Workflow
@@ -48,8 +49,12 @@ If symlinks break or need refresh:
 
 ```bash
 cd ~/dotfiles
-stow -D nvim tmux opencode omp agent pi hermes omarchy  # Unstow
-stow nvim tmux opencode omp agent pi hermes omarchy     # Restow
+stow -D nvim tmux opencode omp agent pi hermes omarchy pen  # Unstow
+stow nvim tmux opencode omp agent pi hermes omarchy pen     # Restow
+
+# Pen keeps app state (sessions/, agent-auth) in ~/.pencil — stow it without
+# folding, or ~/.pencil would become a symlink into the repo.
+stow --no-folding pen
 ```
 
 ## Safety Rules
@@ -211,6 +216,70 @@ The default omp agent reads the orchestrator instructions and delegates:
 - Simple ops → do directly (reading files, running commands)
 
 To add an agent to the routing table, remove it from `task.disabledAgents` in `config.yml` and add a row to the routing table.
+
+## Pen (pen.dev)
+
+[Pen](https://pen.dev) is a design tool whose built-in agent runs on a bundled
+[pi](https://github.com/earendil-works/pi) runtime. Custom OpenAI-compatible
+providers are declared in `~/.pencil/models.json`, which is **stowed from this
+repo** so the 9router provider syncs across machines.
+
+### Config File Managed in This Repo
+
+- `pen/.pencil/models.json` → `~/.pencil/models.json` (9router custom provider)
+
+### Stowing
+
+`~/.pencil` also holds app state (`sessions/`, `agent-auth`, `config.json`), so
+the package **must** be stowed with `--no-folding`. Plain `stow pen` on a machine
+without an existing `~/.pencil` would replace the directory with a symlink into
+the repo, causing Pen to write its state there.
+
+```bash
+cd ~/dotfiles
+stow --no-folding pen
+```
+
+`bootstrap.sh` and `sync-dotfiles.sh` handle this automatically (`pen` is in
+`STOW_NO_FOLDING`).
+
+### Provider Configuration
+
+The provider is exposed to Pen as `9router`, over the same gateway omp and
+OpenCode use (`https://ai.workofekajaya.com/v1`). Combo models mirror the ones
+declared for the other harnesses:
+
+| Model ID | Purpose |
+|----------|---------|
+| `coder` | Primary coding work |
+| `designer` | Design / UI work |
+| `advisor` | Advice / review |
+| `personal-chat` | General conversation |
+| `sfw-coder` | Text-only safe coder |
+| `sfw-advisor` | Text-only safe advisor |
+
+Select them in Pen's agent model picker (they appear under the **9Router**
+provider).
+
+### API Key
+
+Pen launched from the Dock/Finder does **not** inherit shell environment
+variables, so a plain `$NINEROUTER_API_KEY` reference would fail there. The key
+is resolved through a shell command instead:
+
+```json
+"apiKey": "!zsh -lc 'printenv NINEROUTER_API_KEY'"
+```
+
+This reads `NINEROUTER_API_KEY` from `~/.zshenv.local` at request time, keeping
+the secret out of the repo. A key pasted through Pen's UI is instead stored in
+`~/.pencil/agent-auth` (mode `0600`, machine-local, not tracked).
+
+### Validation
+
+```bash
+jq empty pen/.pencil/models.json
+```
 
 ## Pi Coding Agent Extensions
 
