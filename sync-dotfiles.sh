@@ -5,7 +5,11 @@
 set -euo pipefail
 
 DOTFILES="${HOME}/dotfiles"
-STOW_PACKAGES=(nvim tmux zsh vim opencode claude omp pi agent codex)
+STOW_PACKAGES=(nvim tmux zsh vim opencode claude omp pi agent codex pen)
+
+# pen: ~/.pencil also holds app state (sessions/, agent-auth), so it must not be
+# folded into a single symlink pointing at the repo.
+STOW_NO_FOLDING=(pen)
 
 cd "$DOTFILES"
 
@@ -20,7 +24,11 @@ for pkg in "${STOW_PACKAGES[@]}"; do
 done
 for pkg in "${STOW_PACKAGES[@]}"; do
     if [[ -d "$DOTFILES/$pkg" ]]; then
-        stow "$pkg" 2>/dev/null && echo "OK: stowed $pkg" || echo "WARN: stow $pkg failed"
+        flags=()
+        for nf in "${STOW_NO_FOLDING[@]}"; do
+            [[ "$pkg" == "$nf" ]] && flags+=(--no-folding)
+        done
+        stow ${flags[@]+"${flags[@]}"} "$pkg" 2>/dev/null && echo "OK: stowed $pkg" || echo "WARN: stow $pkg failed"
     fi
 done
 

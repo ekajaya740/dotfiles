@@ -139,7 +139,12 @@ install_packages() {
 }
 
 # ── stow packages ────────────────────────────────────────────
-STOW_PACKAGES=(nvim tmux zsh vim opencode omp pi agent hermes)
+STOW_PACKAGES=(nvim tmux zsh vim opencode omp pi agent hermes pen)
+
+# Packages whose target dir also holds app-managed state must not be folded into
+# a single symlink, or the app would write its state into the repo. Pen keeps
+# sessions/ and agent-auth under ~/.pencil alongside models.json.
+STOW_NO_FOLDING=(pen)
 
 stow_packages() {
     local adopt=false
@@ -167,11 +172,16 @@ stow_packages() {
             continue
         fi
 
+        local flags=()
+        for nf in "${STOW_NO_FOLDING[@]}"; do
+            [[ "$pkg" == "$nf" ]] && flags+=(--no-folding)
+        done
+
         if $adopt; then
-            stow --adopt "$pkg" 2>&1 || warn "failed to stow $pkg"
+            stow ${flags[@]+"${flags[@]}"} --adopt "$pkg" 2>&1 || warn "failed to stow $pkg"
         else
             local out
-            out=$(stow "$pkg" 2>&1) && ok "stowed $pkg" || {
+            out=$(stow ${flags[@]+"${flags[@]}"} "$pkg" 2>&1) && ok "stowed $pkg" || {
                 warn "skipping $pkg — existing files conflict (use --adopt to replace)"
                 warn "  $out"
             }
@@ -346,6 +356,14 @@ post_install_checks() {
     if has_cmd jq && [[ -f "$DOTFILES_REPO/opencode/.config/opencode/oh-my-openagent.json" ]]; then
         jq empty "$DOTFILES_REPO/opencode/.config/opencode/oh-my-openagent.json" && \
             ok "oh-my-openagent.json valid"
+    fi
+
+    # Pen custom providers (9router). Pen creates this file on first launch; we
+    # stow it up front so the provider is available without a manual setup step.
+    if [[ -f "$HOME/.pencil/models.json" ]]; then
+        has_cmd jq && jq empty "$HOME/.pencil/models.json" && ok "pen models.json valid"
+    elif [[ -d "$HOME/.pencil" ]]; then
+        warn "~/.pencil/models.json missing — re-run: stow --no-folding pen"
     fi
 
     # Validate YAML
