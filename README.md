@@ -24,6 +24,7 @@ Personal configuration for Neovim (LazyVim + coc.nvim), tmux, zsh, OpenCode, and
 - `omp/.omp/agent/config.yml` -> `~/.omp/agent/config.yml` (settings, model roles)
 - `omp/.omp/agent/models.yml` -> `~/.omp/agent/models.yml` (custom providers & models)
 - `pi/.pi/agent/extensions/pi-notify-pp/` -> `~/.pi/agent/extensions/pi-notify-pp/` (Pi Notify++ extension)
+- `pen/.pencil/models.json` -> `~/.pencil/models.json` (9router provider for Pen; stow with `--no-folding`)
 
 ## Dependencies
 
