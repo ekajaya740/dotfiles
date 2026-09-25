@@ -224,16 +224,32 @@ To add an agent to the routing table, remove it from `task.disabledAgents` in `c
 providers are declared in `~/.pencil/models.json`, which is **stowed from this
 repo** so the 9router provider syncs across machines.
 
-### Config File Managed in This Repo
+### Config Files Managed in This Repo
 
 - `pen/.pencil/models.json` → `~/.pencil/models.json` (9router custom provider)
 
+### Not Synced (machine-local state and secrets)
+
+Only `models.json` is tracked. The rest of `~/.pencil` is deliberately excluded:
+
+| Path | Why it stays local |
+|------|--------------------|
+| `session-desktop.json` | **Live account bearer token** |
+| `agent-auth` | API keys pasted via Pen's UI (`0600`) |
+| `config.json`, `models-store.json` | Window bounds, workspace folders, login state |
+| `documents/`, `backup/`, `previews/`, `apps/`, `socket/`, `skills/` | Design documents and runtime state |
+
+`~/Library/Application Support/Pen/config.json` is electron-store `DesktopConfig`.
+It has no model/provider fields and its schema includes `claudeApiKey`,
+`codexApiKey`, `geminiApiKey`, and `cursorApiKey`, which Pen's UI writes there
+once entered — so it is **not** stowed either.
+
 ### Stowing
 
-`~/.pencil` also holds app state (`sessions/`, `agent-auth`, `config.json`), so
-the package **must** be stowed with `--no-folding`. Plain `stow pen` on a machine
-without an existing `~/.pencil` would replace the directory with a symlink into
-the repo, causing Pen to write its state there.
+`~/.pencil` also holds the state above, so the package **must** be stowed with
+`--no-folding`. Plain `stow pen` on a machine without an existing `~/.pencil`
+would replace the directory with a symlink into the repo, causing Pen to write
+its state there.
 
 ```bash
 cd ~/dotfiles
@@ -241,7 +257,8 @@ stow --no-folding pen
 ```
 
 `bootstrap.sh` and `sync-dotfiles.sh` handle this automatically (`pen` is in
-`STOW_NO_FOLDING`).
+`STOW_NO_FOLDING`). A `.stow-local-ignore` cannot guard this, because the fold
+happens at the directory level.
 
 ### Provider Configuration
 
@@ -259,21 +276,31 @@ declared for the other harnesses:
 | `sfw-advisor` | Text-only safe advisor |
 
 Select them in Pen's agent model picker (they appear under the **9Router**
-provider).
+provider). Pen's own `config.json` has no model fields — this provider is
+separate from Pen's CLI integrations (`claudeCodeCLI`, `openCodeCLI`, …), which
+read their own configs.
 
 ### API Key
 
 Pen launched from the Dock/Finder does **not** inherit shell environment
 variables, so a plain `$NINEROUTER_API_KEY` reference would fail there. The key
-is resolved through a shell command instead:
+is resolved through a shell command at request time instead:
 
 ```json
-"apiKey": "!zsh -lc 'printenv NINEROUTER_API_KEY'"
+"apiKey": "!zsh -c 'printenv NINEROUTER_API_KEY'"
 ```
 
-This reads `NINEROUTER_API_KEY` from `~/.zshenv.local` at request time, keeping
-the secret out of the repo. A key pasted through Pen's UI is instead stored in
-`~/.pencil/agent-auth` (mode `0600`, machine-local, not tracked).
+This keeps the secret in `~/.zshenv.local` and out of the repo.
+
+**Use `zsh -c`, not `zsh -lc` — the zsh config is shared across machines.**
+`.zshenv` is read for every zsh invocation and sources `.zshenv.local`, so `-c`
+resolves the key. `-lc` would additionally read `~/.zprofile`, which runs
+`exec startx` on Arch VT1 and spawns `ssh-agent`. A login shell inside a Pen
+request must not trigger those host-specific side effects.
+
+A key pasted through Pen's UI takes precedence and is stored in
+`~/.pencil/agent-auth`, not in `models.json`. Pen's Settings reads only
+`agent-auth`, so it can show the key as unset while the command form is working.
 
 ### Validation
 

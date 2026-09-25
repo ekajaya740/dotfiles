@@ -4,7 +4,7 @@
       "name": "9Router",
       "baseUrl": "https://ai.workofekajaya.com/v1",
       "api": "openai-completions",
-      "apiKey": "!zsh -lc 'printenv NINEROUTER_API_KEY'",
+      "apiKey": "!zsh -c 'printenv NINEROUTER_API_KEY'",
       "authHeader": true,
       "models": [
         {
