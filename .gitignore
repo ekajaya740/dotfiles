@@ -48,3 +48,9 @@ claude/
 # omp lock files
 *.lock
 omarchy-legacy-backup/
+
+# Pen (pen.dev) — only models.json is synced; everything else under the pen/
+# package is machine state or secrets. Guards against folding ~/.pencil into the
+# repo (which would drag live tokens in) and against a stray `git add`.
+pen/.pencil/*
+!pen/.pencil/models.json
