@@ -21,6 +21,25 @@ This document provides guidelines for AI agents and automation tools working wit
 └── pen/.pencil/models.json    → ~/.pencil/models.json (9router custom provider)
 ```
 
+### Config Categories
+
+Every package here is one of two kinds. Know which before editing — they have
+different sync rules and different failure modes.
+
+| Category | Packages | What it is | Sync rule |
+|----------|----------|------------|-----------|
+| **Agent harness** | `omp`, `opencode`, `hermes`, `pen`, `pi`, `agent` | Config for an AI coding/chat harness | Stow the *config only*. The harness's own state (sessions, DBs, plugins, caches) stays machine-local — see each section below. |
+| **Other** | `nvim`, `tmux`, `zsh`, `vim`, `omarchy` | Editor, multiplexer, shell, WM | Straight stow; these own their whole config dir. |
+
+Harness packages that share a directory with app state must be stowed with
+`--no-folding` (`omp`, `pen`), or the app writes its state into the repo — see
+**Safety Rules**.
+
+**Harness state is never synced.** Sessions, credentials, plugin installs and
+caches live in machine-local dirs (`~/.omp/plugins`, `~/.hermes/plugins`,
+`~/.pi/agent/npm`, …). Reproduce them with `bootstrap.sh`, which runs
+`jev/install.sh`; never commit them.
+
 ## Workflow
 
 ### Making Changes
@@ -61,8 +80,21 @@ stow --no-folding pen
 
 - **Never** commit secrets, tokens, or credentials
 - **Never** modify files directly in `~/.config/` or `~`
+- **This repo is shared across machines** — never put host-specific behaviour in
+  shared config. A command embedded in config (e.g. an `apiKey`) must work on
+  every host; prefer `zsh -c` over `zsh -lc`, because `-l` also reads
+  `~/.zprofile` (`exec startx` on Arch VT1, `ssh-agent`).
+- **API keys: never inline a literal.** Reference an env var (`$VAR` or a
+  `!command`) so the secret stays in `zsh/.zshenv.local` (gitignored) or the
+  app's own credential store. Bare names like `"VAR"` are literals, not
+  references, and fail with 401.
+- **Symlinks point one way: repo → `$HOME`.** Never make a tracked directory the
+  parent of machine state. If an app writes state into a stowed dir (see `pen`),
+  stow with `--no-folding` and add a `.gitignore` rule for the state files.
 - Preserve existing user model/provider configurations unless explicitly asked
 - Keep changes minimal and consistent with existing style
+- When editing `bootstrap.sh` or `sync-dotfiles.sh`, keep them consistent: any
+  package, `--no-folding` exception, or validation added to one belongs in both.
 - Test changes in headless mode when possible
 
 
@@ -266,19 +298,24 @@ The provider is exposed to Pen as `9router`, over the same gateway omp and
 OpenCode use (`https://ai.workofekajaya.com/v1`). Combo models mirror the ones
 declared for the other harnesses:
 
-| Model ID | Purpose |
-|----------|---------|
-| `coder` | Primary coding work |
-| `designer` | Design / UI work |
-| `advisor` | Advice / review |
-| `personal-chat` | General conversation |
-| `sfw-coder` | Text-only safe coder |
-| `sfw-advisor` | Text-only safe advisor |
+| # | Model ID | Purpose |
+|---|----------|---------|
+| 1 | `designer` | Design / UI work — **default** |
+| 2 | `coder` | Primary coding work |
+| 3 | `advisor` | Advice / review |
+| 4 | `personal-chat` | General conversation |
+| 5 | `sfw-coder` | Text-only safe coder |
+| 6 | `sfw-advisor` | Text-only safe advisor |
 
 Select them in Pen's agent model picker (they appear under the **9Router**
 provider). Pen's own `config.json` has no model fields — this provider is
 separate from Pen's CLI integrations (`claudeCodeCLI`, `openCodeCLI`, …), which
 read their own configs.
+
+**The default model is the first entry in `models`.** Pen derives it as
+`supportedModels[0].id`; there is no config field for it. Reorder the array to
+change the default — `designer` is listed first so Pen opens on it. Reordering
+does not affect the other harnesses, which select models independently.
 
 ### API Key
 
@@ -306,6 +343,60 @@ A key pasted through Pen's UI takes precedence and is stored in
 
 ```bash
 jq empty pen/.pencil/models.json
+```
+
+## Jev Toolchain
+
+[Jev](https://docs.typesafe.ai) is TypeSafe's **decision** model — it answers
+typed questions (pick one, score, yes/no) and never writes prose. Several tools
+use it to make cheap per-turn judgments: model routing, context compaction,
+guardrails. It is *not* a chat model, so nothing here goes in `models.yml`.
+
+**Backend: OpenRouter, not TypeSafe.** `TYPESAFE_API_KEY` is not set on this
+machine; every Jev tool is configured to use `OPENROUTER_API_KEY` instead
+(`typesafe/jev-1.13` via `openrouter.ai/api/alpha/decisions`). Set that key in
+`~/.zshenv.local`. A tool left on its default backend fails closed without a
+TypeSafe key.
+
+### What Is Synced vs Machine-Local
+
+| Part | Location | Synced? |
+|------|----------|---------|
+| MCP server entry (`jev-mcp`) | `omp/.omp/agent/mcp.json`, `opencode/.config/opencode/opencode.json`, `hermes/.hermes/config.yaml` | ✅ stowed |
+| Everything else — CLI, plugins, node_modules | `~/.omp/plugins`, `~/.hermes/plugins`, `~/.local/bin/jev`, `~/.pi/agent/npm` | ❌ machine-local |
+
+`bootstrap.sh` runs **`jev/install.sh`** (idempotent, `--check` for a dry run)
+to reproduce the machine-local half on a new device.
+
+### Components
+
+| Component | Harnesses | Notes |
+|-----------|-----------|-------|
+| `hermes-jev-skills` | hermes | Routing, memory, skill selection, browser/computer use. Installs a `jev` CLI + `~/.hermes/plugins/hermes-{jev,handoff}`. |
+| `omp-jev` | omp | Jev routing; config at `~/.config/omp-jev/config.json` (pointed at OpenRouter). |
+| `omp-jev-compaction` | omp | Jev-scored context reduction. Built from source into `~/.omp/plugins-local/`, linked with `omp plugin install <path>`. |
+| `pi-warden` | pi, omp | Guardrails. `typesafeBackend: openrouter` in `~/.pi/agent/pi-warden/config.json` — one file covers both, since pi-warden's `userConfigPath()` hardcodes `~/.pi/agent`. |
+
+### Pen Cannot Run jev-mcp
+
+Pen launches with `PATH=/usr/bin:/bin:/usr/sbin:/sbin`, so it cannot resolve
+`npx` (the same reason `spawn npm ENOENT` appears in `~/Library/Logs/Pen/main.log`).
+Jev MCP is registered in **omp, opencode and hermes only**. Pen gets Jev only if
+a compiled binary ships.
+
+### Consent and Defaults
+
+- `pi-warden`: judgments are **off** until `/warden enable` (it shows a
+  disclosure naming `openrouter.ai`). Offline guards work without any key.
+- `omp-jev`: dispatcher ships `enabled: true`.
+- `omp-jev-compaction`: continuous context reduction is **on** by default
+  (`context: true`) and sends conversation state to the decision endpoint.
+
+### Validation
+
+```bash
+~/.local/bin/jev doctor          # key present, endpoint reachable, routing config
+bash jev/install.sh --check      # what a fresh device would install
 ```
 
 ## Pi Coding Agent Extensions

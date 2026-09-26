@@ -72,7 +72,8 @@ require_sudo() {
 ensure_repo() {
     if [[ -d "$DOTFILES_REPO/.git" ]]; then
         info "dotfiles repo exists — pulling latest"
-        git -C "$DOTFILES_REPO" pull --ff-only
+        git -C "$DOTFILES_REPO" pull --ff-only 2>&1 || \
+            warn "pull failed (uncommitted or diverged) — continuing with local repo"
     else
         info "cloning dotfiles repo"
         if [[ -d "$DOTFILES_REPO" ]]; then
@@ -335,6 +336,14 @@ setup_machine_specific() {
     # is needed. Running `omp config set extensions` here would clobber it with a
     # machine-absolute path (writes through the stow symlink into the repo file).
 
+    # Jev toolchain (omp-jev, omp-jev-compaction, hermes-jev-skills, pi-warden).
+    # These install into app-owned dirs (~/.omp/plugins, ~/.hermes/plugins, …),
+    # so they cannot be stowed — this script reproduces them per machine.
+    if [[ -f "$DOTFILES_REPO/jev/install.sh" ]]; then
+        info "installing Jev toolchain"
+        bash "$DOTFILES_REPO/jev/install.sh" || warn "jev install had errors (non-fatal)"
+    fi
+
     ok "Machine-specific config applied"
 
 }
@@ -364,6 +373,18 @@ post_install_checks() {
         has_cmd jq && jq empty "$HOME/.pencil/models.json" && ok "pen models.json valid"
     elif [[ -d "$HOME/.pencil" ]]; then
         warn "~/.pencil/models.json missing — re-run: stow --no-folding pen"
+    fi
+
+    # Fold hazard: tracked stow packages whose target dir also holds app state
+    # must stay real directories, never symlinks into the repo — otherwise the
+    # app writes state (sessions, tokens) into git. Mirrors STOW_NO_FOLDING.
+    local folded=()
+    for d in "$HOME/.pencil"; do
+        [[ -L "$d" ]] && folded+=("$d")
+    done
+    if [[ ${#folded[@]} -gt 0 ]]; then
+        warn "state dir(s) folded into the repo: ${folded[*]}"
+        warn "  fix: rm the symlink, mkdir -p it, then stow --no-folding <pkg>"
     fi
 
     # Validate YAML
