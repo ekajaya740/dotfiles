@@ -149,10 +149,14 @@ bedrock:
     trace: disabled
 auxiliary:
   vision:
-    provider: 9router
-    model: shiteru/glm-5.3-flash
+    provider: auto
+    model: ''
     timeout: 120
     download_timeout: 30
+  web_extract:
+    provider: auto
+    model: ''
+    timeout: 360
   compression:
     provider: auto
     model: ''
@@ -213,10 +217,6 @@ auxiliary:
     base_url: ''
     api_key: ''
     timeout: 120
-  web_extract:
-    provider: auto
-    model: ''
-    timeout: 360
 display:
   compact: false
   personality: ''
@@ -278,7 +278,7 @@ dashboard:
     portal_url: ''
   basic_auth:
     username: ekajaya740
-    password_hash: ""
+    password_hash: ''
     password: ''
     secret: ''
     session_ttl_seconds: 0
@@ -379,8 +379,8 @@ curator:
   enabled: true
   interval_hours: 168
   min_idle_hours: 2
-  stale_after_days: 30
-  archive_after_days: 90
+  stale_after_days: 14
+  archive_after_days: 30
   consolidate: false
   prune_builtins: true
   backup:
@@ -439,10 +439,6 @@ approvals:
   destructive_slash_confirm: false
 command_allowlist:
   - script execution via heredoc
-plugins:
-  enabled:
-    - omh
-    - rtk-rewrite
 hooks_auto_accept: false
 security:
   allow_private_urls: false
@@ -547,7 +543,13 @@ paste_collapse_threshold_fallback: 5
 paste_collapse_char_threshold: 2000
 computer_use:
   cua_telemetry: false
-_config_version: 40
+_config_version: 46
+plugins:
+  enabled:
+  - omh
+  - rtk-rewrite
+  - hermes-handoff
+  - hermes-jev
 mcp_servers:
   hevy:
     command: npx
@@ -576,6 +578,15 @@ mcp_servers:
   codebase-memory-mcp:
     command: /Users/ekajaya740/.local/bin/codebase-memory-mcp
     args: []
+    enabled: true
+  jev:
+    command: npx
+    args:
+      - "-y"
+      - "@jkudish/jev-mcp"
+    env:
+      JEV_PROVIDER: openrouter
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
     enabled: true
 platforms:
   discord:
@@ -608,3 +619,5 @@ platforms:
 # fallback_model:
 #   provider: openrouter
 #   model: anthropic/claude-sonnet-4
+desktop:
+  repo_scan_enabled: false
