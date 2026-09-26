@@ -54,3 +54,15 @@ omarchy-legacy-backup/
 # repo (which would drag live tokens in) and against a stray `git add`.
 pen/.pencil/*
 !pen/.pencil/models.json
+
+# Hermes (hermes/.hermes is stowed to ~/.hermes) — the app writes runtime state
+# and a .env next to the tracked config. Keep those out of the repo in case the
+# dir is ever folded into a symlink.
+hermes/.hermes/.env
+hermes/.hermes/*.lock
+hermes/.hermes/*.db
+hermes/.hermes/*.db-*
+hermes/.hermes/.skills_prompt_snapshot.json
+hermes/.hermes/.hermes-update-*
+hermes/.hermes/.mcp-discovery.lock
+hermes/.hermes/.npm_lock_hash_*

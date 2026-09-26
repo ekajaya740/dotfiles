@@ -20,6 +20,15 @@
       "command": "/Applications/Pen.app/Contents/Resources/app.asar.unpacked/out/mcp-server-darwin-arm64",
       "args": ["--app", "desktop", "--agent", "omhCLI"],
       "enabled": true
+    },
+    "jev": {
+      "command": "npx",
+      "args": ["-y", "@jkudish/jev-mcp"],
+      "env": {
+        "JEV_PROVIDER": "openrouter",
+        "OPENROUTER_API_KEY": "${OPENROUTER_API_KEY}"
+      },
+      "enabled": true
     }
   }
 }

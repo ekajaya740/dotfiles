@@ -8,16 +8,16 @@
       "authHeader": true,
       "models": [
         {
-          "id": "coder",
-          "name": "Coder (combo)",
+          "id": "designer",
+          "name": "Designer (combo)",
           "reasoning": true,
           "input": ["text", "image"],
           "contextWindow": 1000000,
           "maxTokens": 32000
         },
         {
-          "id": "designer",
-          "name": "Designer (combo)",
+          "id": "coder",
+          "name": "Coder (combo)",
           "reasoning": true,
           "input": ["text", "image"],
           "contextWindow": 1000000,
