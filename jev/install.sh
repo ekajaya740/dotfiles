@@ -167,27 +167,29 @@ install_pi_warden() {
 
     # Judgments use OpenRouter (not TypeSafe), matching the other Jev tools.
     # Without this the plugin defaults to the typesafe backend and fails closed.
-    # pi-warden's userConfigPath() hardcodes ~/.pi/agent (it ignores
-    # PI_CODING_AGENT_DIR for the omp case), so this one file covers both the
-    # pi and omp instances — verified: omp never creates ~/.omp/agent/pi-warden.
-    local cfg="$HOME/.pi/agent/pi-warden/config.json"
+    # pi-warden resolves its config via PI_CODING_AGENT_DIR, falling back to
+    # ~/.pi/agent. omp sets that variable to its own agent dir
+    # (PI_CODING_AGENT_DIR=<omp agentDir>), so write BOTH locations rather than
+    # assuming which one a given host picks up.
+    local cfg_dirs=("$HOME/.pi/agent/pi-warden" "$HOME/.omp/agent/pi-warden")
     if $CHECK; then
-        echo "  [dry-run] set typesafeBackend=openrouter in $cfg"
+        echo "  [dry-run] set typesafeBackend=openrouter in: ${cfg_dirs[*]}"
     else
-        mkdir -p "$(dirname "$cfg")"
-        python3 - "$cfg" <<'PY'
+        python3 - "${cfg_dirs[@]}" <<'PY'
 import json, sys, pathlib
-p = pathlib.Path(sys.argv[1])
-d = {}
-if p.exists():
-    try:
-        d = json.loads(p.read_text())
-    except Exception:
-        d = {}
-d["typesafeBackend"] = "openrouter"
-p.write_text(json.dumps(d, indent=2) + "\n")
+for raw in sys.argv[1:]:
+    p = pathlib.Path(raw) / "config.json"
+    p.parent.mkdir(parents=True, exist_ok=True)
+    cfg = {}
+    if p.exists():
+        try:
+            cfg = json.loads(p.read_text())
+        except Exception:
+            cfg = {}
+    cfg["typesafeBackend"] = "openrouter"
+    p.write_text(json.dumps(cfg, indent=2) + "\n")
+    print("    wrote", p)
 PY
-        ok "  backend: openrouter ($cfg)"
     fi
     info "  enable in-session with /warden enable (judgments are off until then)"
 }
