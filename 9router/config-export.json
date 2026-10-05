@@ -337,39 +337,6 @@
       "updatedAt": "2026-09-03T08:52:33.690Z"
     },
     {
-      "id": "0c85797e-21ee-44c1-98ab-771d503d310b",
-      "name": "shiteru-gpt-5.6-luna",
-      "kind": "llm",
-      "models": [
-        "shiteru/gpt-5.6-luna",
-        "shiteru-zs/gpt-5.6-luna"
-      ],
-      "createdAt": "2026-09-03T08:45:21.544Z",
-      "updatedAt": "2026-09-03T08:52:33.698Z"
-    },
-    {
-      "id": "3c2d6daa-2b6c-40e1-9374-95e689551081",
-      "name": "shiteru-gpt-5.6-sol",
-      "kind": "llm",
-      "models": [
-        "shiteru/gpt-5.6-sol",
-        "shiteru-zs/gpt-5.6-sol"
-      ],
-      "createdAt": "2026-09-03T08:45:21.551Z",
-      "updatedAt": "2026-09-03T08:52:33.707Z"
-    },
-    {
-      "id": "ac867e15-4aa6-4a31-91e0-b8b9915329ca",
-      "name": "shiteru-gpt-5.6-terra",
-      "kind": "llm",
-      "models": [
-        "shiteru/gpt-5.6-terra",
-        "shiteru-zs/gpt-5.6-terra"
-      ],
-      "createdAt": "2026-09-03T08:45:21.594Z",
-      "updatedAt": "2026-09-03T08:52:33.712Z"
-    },
-    {
       "id": "51cd6214-a32c-4c74-8fb1-81a3e4133196",
       "name": "shiteru-grok-4.6",
       "kind": "llm",
@@ -1079,24 +1046,6 @@
     },
     {
       "providerAlias": "shiteru",
-      "id": "gpt-5.6-sol",
-      "type": "llm",
-      "name": "gpt-5.6-sol"
-    },
-    {
-      "providerAlias": "shiteru",
-      "id": "gpt-5.6-terra",
-      "type": "llm",
-      "name": "gpt-5.6-terra"
-    },
-    {
-      "providerAlias": "shiteru",
-      "id": "gpt-5.6-luna",
-      "type": "llm",
-      "name": "gpt-5.6-luna"
-    },
-    {
-      "providerAlias": "shiteru",
       "id": "kimi-k3",
       "type": "llm",
       "name": "kimi-k3"
@@ -1567,24 +1516,6 @@
     },
     {
       "providerAlias": "openai-compatible-chat-ce0002fb-6c70-4ef5-99e2-1f7f4db0ad89",
-      "id": "gpt-5.6-sol",
-      "type": "llm",
-      "name": "gpt-5.6-sol"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-ce0002fb-6c70-4ef5-99e2-1f7f4db0ad89",
-      "id": "gpt-5.6-terra",
-      "type": "llm",
-      "name": "gpt-5.6-terra"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-ce0002fb-6c70-4ef5-99e2-1f7f4db0ad89",
-      "id": "gpt-5.6-luna",
-      "type": "llm",
-      "name": "gpt-5.6-luna"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-ce0002fb-6c70-4ef5-99e2-1f7f4db0ad89",
       "id": "kimi-k3",
       "type": "llm",
       "name": "kimi-k3"
@@ -1753,12 +1684,6 @@
     },
     {
       "providerAlias": "floodgate",
-      "id": "gpt-5.6-sol",
-      "type": "llm",
-      "name": "gpt-5.6-sol"
-    },
-    {
-      "providerAlias": "floodgate",
       "id": "claude-opus-5",
       "type": "llm",
       "name": "claude-opus-5"
@@ -1798,12 +1723,6 @@
       "id": "claude-opus-5",
       "type": "llm",
       "name": "claude-opus-5"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-95e66841-5dce-4eb8-95ae-2198bf2fc67a",
-      "id": "gpt-5.6-sol",
-      "type": "llm",
-      "name": "gpt-5.6-sol"
     },
     {
       "providerAlias": "openai-compatible-chat-95e66841-5dce-4eb8-95ae-2198bf2fc67a",
@@ -1906,24 +1825,6 @@
       "id": "glm-5.2-premium",
       "type": "llm",
       "name": "glm-5.2-premium"
-    },
-    {
-      "providerAlias": "shiteru-zs",
-      "id": "gpt-5.6-sol",
-      "type": "llm",
-      "name": "gpt-5.6-sol"
-    },
-    {
-      "providerAlias": "shiteru-zs",
-      "id": "gpt-5.6-terra",
-      "type": "llm",
-      "name": "gpt-5.6-terra"
-    },
-    {
-      "providerAlias": "shiteru-zs",
-      "id": "gpt-5.6-luna",
-      "type": "llm",
-      "name": "gpt-5.6-luna"
     },
     {
       "providerAlias": "shiteru-zs",
@@ -2383,24 +2284,6 @@
     },
     {
       "providerAlias": "shiteru-shared-zs",
-      "id": "gpt-5.6-luna",
-      "type": "llm",
-      "name": "gpt-5.6-luna"
-    },
-    {
-      "providerAlias": "shiteru-shared-zs",
-      "id": "gpt-5.6-sol",
-      "type": "llm",
-      "name": "gpt-5.6-sol"
-    },
-    {
-      "providerAlias": "shiteru-shared-zs",
-      "id": "gpt-5.6-terra",
-      "type": "llm",
-      "name": "gpt-5.6-terra"
-    },
-    {
-      "providerAlias": "shiteru-shared-zs",
       "id": "grok-4.6",
       "type": "llm",
       "name": "grok-4.6"
@@ -2608,24 +2491,6 @@
       "id": "glm-5.3-flash",
       "type": "llm",
       "name": "glm-5.3-flash"
-    },
-    {
-      "providerAlias": "shiteru-shared",
-      "id": "gpt-5.6-luna",
-      "type": "llm",
-      "name": "gpt-5.6-luna"
-    },
-    {
-      "providerAlias": "shiteru-shared",
-      "id": "gpt-5.6-sol",
-      "type": "llm",
-      "name": "gpt-5.6-sol"
-    },
-    {
-      "providerAlias": "shiteru-shared",
-      "id": "gpt-5.6-terra",
-      "type": "llm",
-      "name": "gpt-5.6-terra"
     },
     {
       "providerAlias": "shiteru-shared",
