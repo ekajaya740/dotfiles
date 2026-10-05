@@ -65,12 +65,6 @@ case "$DOTFILES_OS_ID" in
         ;;
 esac
 
-if [[ "$DOTFILES_OS_ID" == "manjaro" ]]; then
-    export DOTFILES_IS_MANJARO="1"
-else
-    export DOTFILES_IS_MANJARO="0"
-fi
-
 DOTFILES_OMARCHY_FLAG="0"
 if [[ "$DOTFILES_OS_ID" == "omarchy" ]]; then
     DOTFILES_OMARCHY_FLAG="1"
