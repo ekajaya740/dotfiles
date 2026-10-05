@@ -1,3 +1,4 @@
+require("config.remote_clipboard").setup()
 local opt = vim.opt
 -- line numbers
 opt.relativenumber = true
