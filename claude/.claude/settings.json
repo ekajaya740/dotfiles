@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://ai.workofekajaya.com",
+    "ANTHROPIC_MODEL": "coder",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "coder",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "advisor",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "ollama-cloud/glm-5.3-flash",
+    "ANTHROPIC_SMALL_FAST_MODEL": "ollama-cloud/glm-5.3-flash",
+    "CLAUDE_CODE_MAX_CONTEXT_TOKENS": "1000000"
+  },
+  "apiKeyHelper": "zsh -c 'printenv NINEROUTER_API_KEY'",
+  "statusLine": {
+    "type": "command",
+    "command": "node $HOME/.claude/skills/jev-router/hooks/statusline.mjs"
+  },
+  "enabledPlugins": {
+    "mattpocock-skills@mattpocock": true,
+    "i-have-adhd@i-have-adhd": true
+  },
+  "extraKnownMarketplaces": {
+    "mattpocock": {
+      "source": {
+        "source": "github",
+        "repo": "mattpocock/skills"
+      }
+    },
+    "i-have-adhd": {
+      "source": {
+        "source": "github",
+        "repo": "ayghri/i-have-adhd"
+      }
+    }
+  },
+  "skipDangerousModePermissionPrompt": true
+}

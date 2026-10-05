@@ -11,9 +11,10 @@ DOTFILES="${HOME}/dotfiles"
 [[ -d "$DOTFILES/.git" ]] || { echo "ERROR: no dotfiles repo at $DOTFILES"; exit 1; }
 command -v stow >/dev/null || { echo "ERROR: stow is not installed"; exit 1; }
 
-# Keep this list to packages that exist in the repo and are tracked. `claude/`
-# is gitignored so it is never present on a fresh clone; `codex` is not in the
-# repo at all. Both would only ever emit skip warnings.
+# Keep this list to packages that exist in the repo and are tracked. `codex` is
+# not in the repo at all and would only ever emit a skip warning. `claude/` is
+# also excluded — it is deployed by claude/install.sh, not stowed (the claude
+# CLI rewrites settings.json, so a symlink would not survive).
 STOW_PACKAGES=(nvim tmux zsh vim opencode omp pi agent hermes pen)
 
 # pen: ~/.pencil also holds app state (sessions/, agent-auth), so it must not be
@@ -57,6 +58,14 @@ fi
 if command -v jq &>/dev/null; then
     jq empty "$DOTFILES/opencode/.config/opencode/oh-my-openagent.json" 2>/dev/null && echo "OK: oh-my-openagent.json"
     jq empty "$DOTFILES/pen/.pencil/models.json" 2>/dev/null && echo "OK: pen models.json"
+    jq empty "$DOTFILES/claude/.claude/settings.json" 2>/dev/null && echo "OK: claude settings.json"
 fi
+
+# Claude user-scope MCP servers are merged (never stowed) into ~/.claude.json,
+# which also holds secrets and project state.
+if [[ -f "$DOTFILES/claude/install.sh" ]]; then
+    bash "$DOTFILES/claude/install.sh" >/dev/null 2>&1 && echo "OK: claude MCP servers merged" || echo "WARN: claude MCP merge failed"
+fi
+
 
 echo "sync complete: $(date)"
