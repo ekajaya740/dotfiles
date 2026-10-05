@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+#
+# ime-cycle - cycle fcitx5 input methods in a fixed order:
+#
+#   1. keyboard-us   English (direct / passthrough)
+#   2. mozc          日本語 (Japanese)
+#   3. pinyin        中文・简体 (Chinese, Simplified - fcitx5 pinyin)
+#   4. rime          中文・繁體 (Chinese, Traditional - Rime luna_pinyin)
+#   ... then back to 1.
+#
+# Bound to ALT+SPACE (see ~/.config/hypr/bindings.lua).
+#
+# Why not `fcitx5-remote -t`?
+#   -t only switches the *active* state (typing in the IM vs. passthrough to the
+#   current method). It is not an input-method picker, so it can only ever land
+#   on keyboard-us and one remembered method, which is why Chinese was
+#   unreachable and the wrong method kept coming back. `-s` switches to the
+#   method we actually name.
+#
+# Why two Chinese engines?
+#   fcitx5's own pinyin (the `pinyin` IM) only ever produces Simplified, and its
+#   Traditional support (the OpenCC chittrans addon) is a global on/off toggle
+#   with no separate method and no queryable state. Rime luna_pinyin is a real,
+#   distinct engine whose default output is Traditional, so the two scripts get
+#   their own stop and each is a definite engine rather than a hidden flag.
+#
+# fcitx5-remote's `-s <name>` switches method *and* activates fcitx5, so the
+# order below is the whole behaviour: each step means "start typing in this
+# method", with keyboard-us as the off/passthrough state.
+#
+# If fcitx5 is not running, `-s` still succeeds silently against a dead bus, so
+# bail out with the exit status rather than pretend we switched anything.
+set -euo pipefail
+
+command -v fcitx5-remote >/dev/null || exit 0
+fcitx5-remote --check || exit 0
+
+current=$(fcitx5-remote -n)
+
+# keyboard-us is the passthrough layout; -s does not always report it, so treat
+# an empty reply as "not in an input method".
+case "$current" in
+"" | keyboard-us) next=mozc ;;      # English   -> Japanese
+mozc)            next=pinyin ;;     # Japanese  -> Chinese (Simplified)
+pinyin)          next=rime ;;       # Simplified -> Traditional
+rime)            next=keyboard-us ;; # Traditional -> English
+*)               next=mozc ;;       # hangul or anything else -> start at Japanese
+esac
+
+fcitx5-remote -s "$next"
