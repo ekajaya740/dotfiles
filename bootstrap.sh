@@ -44,7 +44,7 @@ detect_platform() {
             if [[ -f /etc/os-release ]]; then
                 . /etc/os-release
                 case "$ID" in
-                    arch|archlinux|manjaro|omarchy) echo "arch"  ;;
+                    arch|archlinux|omarchy) echo "arch"  ;;
                     debian|ubuntu|pop|linuxmint)    echo "debian" ;;
                     *)                              echo "linux"  ;;
                 esac

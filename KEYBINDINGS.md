@@ -234,6 +234,19 @@ Configured via Oh My Zsh with the following plugins:
 | `gp` | `git push` |
 | `gl` | `git pull` |
 
+
+## Hyprland
+
+Managed in `~/.config/hypr/bindings.lua` (repo source: `hypr-lua/omarchy4/bindings.lua`).
+Omarchy 4 already ships most binds; these are the personal overrides.
+
+| Key | Action |
+|-----|--------|
+| `SUPER + SHIFT + T` | Activity (btop) |
+| `SUPER + M` | Exit Hyprland |
+| `SUPER + SHIFT + H` | Hermes agent (`hermes --yolo`) |
+| `ALT + SPACE` | Toggle input method (fcitx5) |
+
 ---
 
 ## Notes

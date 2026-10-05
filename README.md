@@ -74,7 +74,6 @@ The zsh configuration automatically detects your platform:
 
  **Omarchy** - Detected via `/etc/os-release` ID, `~/.local/share/omarchy`, `~/.config/omarchy`, or `Hyprland` desktop
  **Arch Linux** - Detected via `/etc/os-release` ID matching `arch`, `archlinux`, or `omarchy`
- **Manjaro** - Detected via `/etc/os-release` ID matching `manjaro`
  **macOS** - Detected via `uname`
 
 Omarchy-specific behavior:
