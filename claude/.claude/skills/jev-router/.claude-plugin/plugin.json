@@ -1,0 +1,22 @@
+{
+  "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
+  "name": "jev-router",
+  "version": "0.1.0",
+  "description": "Route Claude Code subagent calls through TypeSafe Jev (9router SystemOne): pick the cheapest sufficient agent type and model for read-only lookups.",
+  "author": {
+    "name": "ekajaya"
+  },
+  "hooks": "./hooks/hooks.json",
+  "mcpServers": {
+    "jev": {
+      "command": "npx",
+      "args": ["-y", "@jkudish/jev-mcp"],
+      "env": {
+        "JEV_PROVIDER": "compatible",
+        "JEV_API_BASE_URL": "https://ai.workofekajaya.com/v1/systemone",
+        "JEV_API_KEY": "${NINEROUTER_API_KEY}",
+        "JEV_MCP_MODEL": "openrouter/typesafe/jev-1.13"
+      }
+    }
+  }
+}

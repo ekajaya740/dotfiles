@@ -1,0 +1,22 @@
+{
+  "_comment": "User-scope MCP servers for Claude Code. Tracked as a template because the live ~/.claude.json also holds OAuth/account/project state that is machine-local. claude/install.sh merges this 'mcpServers' block into ~/.claude.json. The jev MCP server is registered by the jev-router plugin instead, so it is not duplicated here.",
+  "mcpServers": {
+    "codebase-memory-mcp": {
+      "command": "sh",
+      "args": ["-c", "exec \"$HOME/.local/bin/codebase-memory-mcp\" \"$@\"", "codebase-memory-mcp"]
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"]
+    },
+    "firecrawl": {
+      "type": "http",
+      "url": "https://mcp.firecrawl.dev/v2/mcp",
+      "enabled": false
+    },
+    "pencil": {
+      "command": "/Applications/Pen.app/Contents/Resources/app.asar.unpacked/out/mcp-server-darwin-arm64",
+      "args": ["--app", "desktop", "--agent", "claudeCodeCLI"]
+    }
+  }
+}

@@ -1,12 +1,16 @@
 # dotfiles
 
-Personal configuration for Neovim (LazyVim + coc.nvim), tmux, zsh, OpenCode, and [oh-my-pi](https://github.com/can1357/oh-my-pi).
+Personal configuration for Neovim (LazyVim + coc.nvim), tmux, zsh, OpenCode, [oh-my-pi](https://github.com/can1357/oh-my-pi), and Claude Code.
 
 **Neovim includes:**
 - [rest.nvim](https://github.com/rest-nvim/rest.nvim) - HTTP client for testing APIs directly from `.http` files (see [AGENTS.md](./AGENTS.md) for usage)
 
 **oh-my-pi (OMP)** includes:
 - [oh-my-pi](https://github.com/can1357/oh-my-pi) - AI coding agent for the terminal (`omp` CLI), configured with 9router models (see [AGENTS.md](./AGENTS.md) for details)
+
+**Claude Code** includes:
+- 9router Anthropic gateway (`ANTHROPIC_BASE_URL`) with the combo models as Claude model aliases, so Claude Code rides the same fallback chains as the other harnesses
+- A `jev-router` plugin whose `PreToolUse` hook asks TypeSafe Jev (via 9router SystemOne) which agent and model a subagent call needs — read-only lookups are routed to the Explore agent on Haiku (see [AGENTS.md](./AGENTS.md))
 
 **Pi agent extensions:**
 - [pi-notify-pp](https://github.com/kim0/pi-notify-pp) - Native terminal notifications for Pi agent turns (OSC 777, works with Ghostty/iTerm2)
@@ -25,6 +29,9 @@ Personal configuration for Neovim (LazyVim + coc.nvim), tmux, zsh, OpenCode, and
 - `omp/.omp/agent/models.yml` -> `~/.omp/agent/models.yml` (custom providers & models)
 - `pi/.pi/agent/extensions/pi-notify-pp/` -> `~/.pi/agent/extensions/pi-notify-pp/` (Pi Notify++ extension)
 - `pen/.pencil/models.json` -> `~/.pencil/models.json` (9router provider for Pen; stow with `--no-folding`)
+- `claude/.claude/settings.json` -> merged into `~/.claude/settings.json` by `claude/install.sh` (9router gateway, model aliases, status line)
+- `claude/.claude/mcp.json.template` -> merged into `~/.claude.json` by `claude/install.sh` (user-scope MCP servers)
+- `claude/.claude/skills/jev-router/` -> `~/.claude/skills/jev-router` (Jev subagent-routing plugin; symlinked by `claude/install.sh`)
 
 ## Dependencies
 
@@ -207,6 +214,7 @@ bun install -g @oh-my-pi/pi-coding-agent
 - Restart your shell or run `exec zsh` to activate mise and all tools.
 - Restart OpenCode so provider/agent config reloads.
 - Run `omp` once before stowing to create `~/.omp/agent/` with local state, then `stow omp` to symlink config files.
+- Run `claude` once so `~/.claude/` exists, then deploy its config: `bash claude/install.sh` (merges `settings.json` and the Jev MCP servers, and symlinks the `jev-router` plugin). The plugin loads on the next session (`/reload-plugins` to load it now). Jev routing needs `NINEROUTER_API_KEY` in `~/.zshenv.local`.
 
 ## Linting
 

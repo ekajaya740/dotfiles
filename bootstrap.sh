@@ -147,6 +147,10 @@ STOW_PACKAGES=(nvim tmux zsh vim opencode omp pi agent hermes pen)
 # sessions/ and agent-auth under ~/.pencil alongside models.json.
 STOW_NO_FOLDING=(pen)
 
+# `claude/` is NOT stowed: the claude CLI rewrites ~/.claude/settings.json in
+# place (destroying a symlink), and a plugin assembled from per-file symlinks is
+# rejected. It is deployed by claude/install.sh instead, like jev/.
+
 stow_packages() {
     local adopt=false
     local args=()
@@ -342,6 +346,12 @@ setup_machine_specific() {
     if [[ -f "$DOTFILES_REPO/jev/install.sh" ]]; then
         info "installing Jev toolchain"
         bash "$DOTFILES_REPO/jev/install.sh" || warn "jev install had errors (non-fatal)"
+    fi
+
+    # Claude Code: user-scope MCP servers live in ~/.claude.json, which also
+    # holds OAuth tokens and project state, so it is merged (not stowed).
+    if [[ -f "$DOTFILES_REPO/claude/install.sh" ]]; then
+        bash "$DOTFILES_REPO/claude/install.sh" || warn "claude MCP merge had errors (non-fatal)"
     fi
 
     ok "Machine-specific config applied"
