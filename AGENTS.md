@@ -18,6 +18,7 @@ This document provides guidelines for AI agents and automation tools working wit
 ├── pi/.pi/agent/extensions/   → ~/.pi/agent/extensions (pi-notify-pp)
 ├── omarchy/.config/hypr/       → ~/.config/hypr (hyprland + related configs)
 ├── agent/.agent/commands/     → ~/.agent/commands (custom omp commands)
+├── claude/.claude/            → ~/.claude (deployed by claude/install.sh, not stowed)
 └── pen/.pencil/models.json    → ~/.pencil/models.json (9router custom provider)
 ```
 
@@ -28,17 +29,18 @@ different sync rules and different failure modes.
 
 | Category | Packages | What it is | Sync rule |
 |----------|----------|------------|-----------|
-| **Agent harness** | `omp`, `opencode`, `hermes`, `pen`, `pi`, `agent` | Config for an AI coding/chat harness | Stow the *config only*. The harness's own state (sessions, DBs, plugins, caches) stays machine-local — see each section below. |
+| **Agent harness** | `omp`, `opencode`, `hermes`, `pen`, `pi`, `agent`, `claude` | Config for an AI coding/chat harness | Stow the *config only*. The harness's own state (sessions, DBs, plugins, caches) stays machine-local — see each section below. |
 | **Other** | `nvim`, `tmux`, `zsh`, `vim`, `omarchy` | Editor, multiplexer, shell, WM | Straight stow; these own their whole config dir. |
 
 Harness packages that share a directory with app state must be stowed with
 `--no-folding` (`omp`, `pen`), or the app writes its state into the repo — see
-**Safety Rules**.
+**Safety Rules**. `claude` is different again: it is not stowed at all (the
+claude CLI rewrites `settings.json`), but deployed by `claude/install.sh`.
 
 **Harness state is never synced.** Sessions, credentials, plugin installs and
 caches live in machine-local dirs (`~/.omp/plugins`, `~/.hermes/plugins`,
-`~/.pi/agent/npm`, …). Reproduce them with `bootstrap.sh`, which runs
-`jev/install.sh`; never commit them.
+`~/.pi/agent/npm`, `~/.claude`, …). Reproduce them with `bootstrap.sh`, which
+runs `jev/install.sh`; never commit them.
 
 ## Workflow
 
@@ -190,7 +192,7 @@ stow omp agent
 
 ### MCP Servers
 
-Configured in `omp/.omp/agent/mcp.json` (oMP), `opencode/.config/opencode/opencode.json` (OpenCode), and `hermes/.hermes/config.yaml` (`mcp_servers:`); Claude Code reads `~/.claude.json` (machine-local, `claude/` is gitignored).
+Configured in `omp/.omp/agent/mcp.json` (oMP), `opencode/.config/opencode/opencode.json` (OpenCode), `hermes/.hermes/config.yaml` (`mcp_servers:`), and `claude/.claude/mcp.json.template` (Claude Code — merged into `~/.claude.json` by `claude/install.sh`). The `jev` MCP server is registered by the `jev-router` Claude plugin instead.
 
 | Server | Type | Command | Purpose |
 |--------|------|---------|---------|
@@ -397,6 +399,93 @@ a compiled binary ships.
 ```bash
 ~/.local/bin/jev doctor          # key present, endpoint reachable, routing config
 bash jev/install.sh --check      # what a fresh device would install
+```
+
+## Claude Code
+
+[Claude Code](https://code.claude.com) — Anthropic's terminal coding agent. CLI command: `claude`.
+
+### Config Files Managed in This Repo
+
+- `claude/.claude/settings.json` → merged into `~/.claude/settings.json` by `claude/install.sh`
+- `claude/.claude/skills/jev-router/` → symlinked to `~/.claude/skills/jev-router` by `claude/install.sh`
+- `claude/.claude/mcp.json.template` → merged into `~/.claude.json` by `claude/install.sh` (user-scope MCP servers)
+
+### NOT Managed (machine-local state)
+
+`~/.claude` holds auth and runtime state: `.credentials.json`, `history.jsonl`,
+`sessions/`, `projects/`, `plugins/`, `cache/`, `daemon/`, …. Only
+`settings.json` and `skills/jev-router` are managed, and **neither is stowed** —
+the claude CLI rewrites `settings.json` in place (which would break a symlink),
+and a plugin must be a self-contained directory. `claude/install.sh` merges
+`settings.json` into `~/.claude/settings.json` and symlinks the plugin. `~/.claude.json`
+is not tracked either — it holds the OAuth account and per-project state, so its
+`mcpServers` block is merged from the template.
+
+### Model Configuration
+
+Claude Code speaks the Anthropic Messages API. 9router serves it at
+`https://ai.workofekajaya.com/v1/messages`, so Claude Code rides the same 9router
+combos as the other harnesses — no separate provider. `settings.json` sets:
+
+| Setting | Value | Purpose |
+|---------|-------|---------|
+| `ANTHROPIC_BASE_URL` | `https://ai.workofekajaya.com` | 9router gateway |
+| `ANTHROPIC_MODEL` | `coder` | primary model (combo) |
+| `ANTHROPIC_DEFAULT_SONNET_MODEL` | `coder` | standard work |
+| `ANTHROPIC_DEFAULT_OPUS_MODEL` | `advisor` | hardest work |
+| `ANTHROPIC_DEFAULT_HAIKU_MODEL` | `ollama-cloud/glm-5.3-flash` | cheap/fast jobs |
+| `ANTHROPIC_SMALL_FAST_MODEL` | `ollama-cloud/glm-5.3-flash` | background jobs |
+| `CLAUDE_CODE_MAX_CONTEXT_TOKENS` | `1000000` | combos expose a 1M window |
+
+The 9router key is **not** in the file — a settings `env` value is not expanded,
+so a literal `$NINEROUTER_API_KEY` would be sent as-is. `apiKeyHelper` runs
+`zsh -c 'printenv NINEROUTER_API_KEY'` per request instead, reading the key from
+`~/.zshenv.local`. `CLAUDE_CODE_MAX_CONTEXT_TOKENS` also silences the
+`unrecognized_model` notice (the combo names are not in Claude's model catalog).
+
+### jev-router (Jev subagent routing)
+
+`claude/.claude/skills/jev-router/` is a Claude Code plugin (auto-loads from the
+skills dir as `jev-router@skills-dir`). It carries:
+
+- a `PreToolUse` hook on `Task|Agent` that asks TypeSafe Jev — through 9router
+  SystemOne (`POST /v1/systemone`, model `openrouter/typesafe/jev-1.13`) — which
+  agent type and model a subagent needs;
+- the `jev` MCP server (`@jkudish/jev-mcp`, `JEV_PROVIDER=compatible`) at the
+  same SystemOne endpoint, so `/jev` tools work without native routing.
+
+The hook makes one change only: when Jev picks a read-only lookup **and**
+`Explore`/`haiku` at ≥ 0.8 confidence, the call is rewritten to the `Explore`
+agent on the `haiku` alias. Everything else runs as Claude set it up, and any Jev
+error or timeout leaves the call untouched (fail-open). Downward only — a call
+already on `haiku` is never touched, and the model is never raised.
+
+| Env var | Default | Effect |
+|---------|---------|--------|
+| `JEV_ROUTER_MODE` | `apply` | `advise` observes (status line) without rewriting |
+| `JEV_ROUTER_AGENT_MIN` / `JEV_ROUTER_MODEL_MIN` | `0.8` | confidence gates |
+| `JEV_ROUTER_DEBUG` | off | log the pick to stderr |
+| `JEV_API_BASE_URL` / `JEV_MCP_MODEL` | 9router | override the Jev backend |
+
+### Deploying
+
+`claude/` is not a stow package — deploy it, like `jev/`:
+
+```bash
+cd ~/dotfiles
+bash claude/install.sh   # merge settings.json + MCP servers, link the plugin
+```
+
+Run `claude` once first so `~/.claude/` exists. `/reload-plugins` (or a new
+session) loads `jev-router`.
+
+### Validation
+
+```bash
+jq empty claude/.claude/settings.json
+node --check claude/.claude/skills/jev-router/hooks/route.mjs
+claude plugin list | grep jev-router
 ```
 
 ## Pi Coding Agent Extensions
