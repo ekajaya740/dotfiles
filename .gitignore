@@ -28,9 +28,11 @@ omp/.omp/agent/*.db-shm
 omp/.omp/agent/*.db-wal
 omp/.omp/agent/sessions/
 omp/.omp/agent/terminal-sessions/
+omp/.omp/agent/custom-session-files/
 omp/.omp/agent/blobs/
 omp/.omp/agent/cache/
 omp/.omp/agent/memories/
+omp/.omp/agent/predict/
 omp/.omp/agent/last-changelog-version
 omp/.omp/cache/
 omp/.omp/puppeteer/
@@ -66,3 +68,9 @@ hermes/.hermes/.skills_prompt_snapshot.json
 hermes/.hermes/.hermes-update-*
 hermes/.hermes/.mcp-discovery.lock
 hermes/.hermes/.npm_lock_hash_*
+
+# Hyprland Lua port: only the live overrides under hypr-lua/ are versioned
+hypr-lua/standalone/
+hypr-lua/APPLY.md
+hypr-lua/apply.sh
+hypr-lua/fix-snapper.sh
