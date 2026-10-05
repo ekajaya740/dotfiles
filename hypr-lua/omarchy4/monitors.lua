@@ -1,0 +1,18 @@
+-- Personal monitors overrides. Loaded by ~/.config/hypr/hyprland.lua via
+-- require("hypr.monitors"), after Omarchy's defaults.
+--
+-- Nothing to do here.
+--
+-- Omarchy 4's stock ~/.config/hypr/monitors.lua already sets exactly what the
+-- old .conf did:
+--
+--   local omarchy_gdk_scale = 2
+--   hl.env("GDK_SCALE", tostring(omarchy_gdk_scale))
+--   hl.monitor({ output = "", mode = "preferred", position = "auto", scale = "auto" })
+--
+-- The commented per-monitor examples (4K fractional scaling, 1080p 1x, the
+-- Framework 13 / XDR example) are also already present in that stock file, so
+-- duplicating them here would just be noise.
+--
+-- Add a monitor override here if you ever need one:
+--   hl.monitor({ output = "DP-2", mode = "2560x1440@144", position = "0x0", scale = 1 })

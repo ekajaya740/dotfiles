@@ -1,0 +1,19 @@
+-- Personal autostart overrides. Loaded by ~/.config/hypr/hyprland.lua via
+-- require("hypr.autostart"), after Omarchy's defaults.
+--
+-- Nothing to do here.
+--
+-- The old .conf ran:  exec-once = fcitx5 -d --replace
+--
+-- Omarchy 4 replaced that with a proper systemd user service,
+-- omarchy-fcitx5.service, which this machine already has ENABLED and ACTIVE:
+--
+--   /usr/share/omarchy/default/systemd/user/omarchy-fcitx5.service
+--   ExecStart=/usr/bin/fcitx5 --disable notificationitem
+--
+-- Starting fcitx5 again here would race that service. fcitx5 exits 0 when it
+-- detects another instance owning the bus, so it would not break anything, but
+-- it is pure noise. Your ~/.config/fcitx5 and ~/.XCompose carry over as-is.
+--
+-- Example if you ever need a real addition:
+--   o.launch_on_start("my-service")

@@ -1,0 +1,15 @@
+-- Personal look'n'feel overrides. Loaded by ~/.config/hypr/hyprland.lua via
+-- require("hypr.looknfeel"), after Omarchy's defaults.
+--
+-- Nothing to do here.
+--
+-- The old looknfeel.conf was the stock template with every setting commented
+-- out, so there was never anything to port. Omarchy 4's stock
+-- ~/.config/hypr/looknfeel.lua is likewise all-commented, with the same
+-- options available.
+--
+-- Uncomment and edit if you want to diverge from Omarchy's theme:
+--   hl.config({ general = { gaps_in = 0, gaps_out = 0, border_size = 0 } })
+--   hl.config({ decoration = { rounding = 8 } })
+--   hl.config({ animations = { enabled = false } })
+--   hl.config({ layout = { single_window_aspect_ratio = { 1, 1 } } })

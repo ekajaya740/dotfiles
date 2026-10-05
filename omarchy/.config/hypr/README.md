@@ -54,11 +54,33 @@ Supported path: `omarchy-upgrade-to-quattro` (ships with Omarchy 3.8.5). It:
   after reboot Lua is active and those files are inert
 - moves theme state to `~/.local/state/omarchy/current`
 
-**After running it, port these into the new Lua files (before reboot ideally):**
+**The Lua port is live and versioned** — the five overrides are kept in
+`hypr-lua/omarchy4/` in this repo and installed (real files, not symlinks) as
+`~/.config/hypr/{autostart,bindings,input,looknfeel,monitors}.lua`, loaded by
+Omarchy 4's stock `hyprland.lua` via `require("hypr.*")` after its defaults.
+
+Verified with `Hyprland --verify-config -c ~/.config/hypr/hyprland.lua`
+→ `config ok` on 0.56.2.
+
+What the port contains:
 - `autostart.lua`: fcitx5 line
 - `input.lua`: kb_options, repeat rate/delay, numlock, touchpad, scroll rules
-- `bindings.lua`: all app/webapp binds (see list above); `bindd` maps to
-  `hl.bind("MODS + KEY", hl.dsp.exec_cmd("..."), { description = "..." })`-style
-- `hyprlock` font if quattro's hyprlock template uses JetBrainsMono
+- `bindings.lua`: all 27 app/webapp binds; `bindd = MODS, KEY, Desc, exec, cmd`
+  maps to `hl.bind("MODS + KEY", hl.dsp.exec_cmd("cmd"), { description = "Desc" })`
+  — note the description moves from positional into the flags table
+- `monitors.lua`: `GDK_SCALE=2` + monitor line (it was in monitors.conf upstream)
+- `looknfeel.lua` / `envs.lua`: ported as commented stubs, matching upstream
 
-Full pre-upgrade snapshot: `~/dotfiles/omarchy-legacy-backup/` (hypr + omarchy dirs).
+`hyprlock.conf`, `hypridle.conf`, `hyprsunset.conf` and `xdph.conf` stay hyprlang
+— they are read by separate binaries that still use it. Do not convert those.
+
+Two findings worth keeping:
+- **0 bind collisions.** All 27 binds were checked against every Omarchy default
+  fragment actually sourced. `plain-bindings.conf` is *not* sourced and would
+  otherwise report 7 phantom collisions.
+- quattro installs its own `hyprland.lua` and sources the Omarchy defaults. Do
+  not overwrite it — drop the port in `~/.config/hypr/custom/` and `require()`
+  the modules from the end of quattro's entrypoint.
+
+Pre-upgrade snapshot: `~/dotfiles/omarchy-legacy-backup/hypr-conf-20260922/`
+(real files; a plain `cp -a` of `~/.config/hypr` copies *symlinks*, not content).
