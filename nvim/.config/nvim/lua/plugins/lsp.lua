@@ -214,6 +214,14 @@ return {
 				end
 			end
 
+			-- oxlint (Rust linter for JS/TS). Registered through the new
+			-- vim.lsp.config API rather than the servers table above: the legacy
+			-- lspconfig stub (lspconfig.configs.oxlint) still shells out to the
+			-- removed `oxc_language_server` binary, while lspconfig's newer
+			-- lsp/oxlint.lua runs `oxlint --lsp` -- the binary Mason installs.
+			vim.lsp.config("oxlint", { capabilities = capabilities })
+			vim.lsp.enable("oxlint")
+
 			-- diagnostic display: virtual_text, signs, severity_sort, underline
 			vim.diagnostic.config({
 				underline = true,
