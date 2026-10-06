@@ -5,8 +5,7 @@ modelRoles:
   plan: 9router/coder
   commit: 9router/coder
   slow: 9router/coder
-  designer: 9router/designer:auto
-  vision: 9router/ollama-cloud/gemma4:31b:auto
+  vision: 9router/coder
   task: 9router/coder
   advisor: 9router/advisor:high
   tiny: 9router/coder
@@ -20,8 +19,8 @@ display:
   tabWidth: 4
 compaction:
   enabled: true
-  reserveTokens: 16384
-  keepRecentTokens: 20000
+  thresholdPercent: 80
+  keepRecentTokens: 30000
 retry:
   networkOnly: true
   maxRetries: 3
@@ -32,10 +31,6 @@ async:
   enabled: false
 skills:
   showImages: true
-inspect_image:
-  mode: "on"
-providers:
-  {}
 setupVersion: 2
 extensions:
   - ~/dotfiles/pi/.pi/agent/extensions/pi-notify-pp/index.ts
