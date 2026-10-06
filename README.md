@@ -58,6 +58,7 @@ must be stowed with `--no-folding` (handled by `bootstrap.sh` via
 - `jev/install.sh` -> installs the Jev toolchain into machine-local dirs (no config of its own)
 - `9router/export.sh` -> refreshes `9router/config-export.json`, an auto-exported snapshot of the 9Router gateway
 - `hypr-lua/omarchy4/` -> Omarchy 4 Lua port (not yet stowed)
+- `.agents/skills/` -> **not tracked** (third-party agent skills; see *Agent Skills* below)
 
 ## Dependencies
 

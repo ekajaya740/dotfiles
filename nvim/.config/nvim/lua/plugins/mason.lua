@@ -17,6 +17,7 @@ return {
 				"typescript-language-server",
 				"js-debug-adapter",
 				"vtsls",
+				"oxlint",
 
 				-- JSON/YAML
 				"json-lsp",

@@ -81,3 +81,11 @@ hypr-lua/standalone/
 hypr-lua/APPLY.md
 hypr-lua/apply.sh
 hypr-lua/fix-snapper.sh
+
+# Third-party agent skills (mattpocock/skills et al) installed with
+# `npx skills add <owner>/<repo>`. They are MIT-licensed upstream, but they are
+# not ours to redistribute from this public repo, so the working tree keeps them
+# while git ignores them. `skills-lock.json` records the upstream source and the
+# per-skill content hash that was installed, so the exact revision stays
+# reproducible without vendoring the files.
+.agents/skills/
