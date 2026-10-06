@@ -264,7 +264,7 @@ Config lives at `~/.hermes/config.yaml`.
 
 ### Config Files Managed in This Repo
 
-- `hermes/.hermes/config.yaml` → `~/.hermes/config.yaml` (v46 schema — models, toolsets, MCP servers, platforms)
+- `hermes/.hermes/config.yaml` → `~/.hermes/config.yaml` (v49 schema — models, toolsets, MCP servers, platforms)
 - `hermes/.hermes/AGENTS.md` → `~/.hermes/AGENTS.md` (agent instructions)
 - `hermes/.hermes/SOUL.md` → `~/.hermes/SOUL.md` (persona)
 - `hermes/.hermes/CLAUDE.md` → `~/.hermes/CLAUDE.md` (Claude Code interop)
