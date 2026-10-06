@@ -730,52 +730,59 @@ Or run `bootstrap.sh` which handles all of the above automatically.
 
 ## Agent Skills
 
-Skills from third parties (currently [`mattpocock/skills`](https://github.com/mattpocock/skills))
+Third-party skills (currently [`mattpocock/skills`](https://github.com/mattpocock/skills))
 are installed into `.agents/skills/` and loaded by omp from there.
 
-**They are deliberately not tracked by git.** Upstream is MIT, but vendoring
+**Nothing about them is tracked in this repo.** Upstream is MIT, but vendoring
 someone else's skills into this public repo is a redistribution we do not want,
 so `.agents/skills/` is in `.gitignore` and the working tree keeps the files
-while git ignores them.
+while git ignores them. The install lock is not tracked here either — this repo
+is dotfiles, not the skills collection.
 
-### What is tracked
+### Where skills are actually managed
 
-| Path | Role |
-|------|------|
-| `skills-lock.json` | The pin: upstream `source` + `skillPath` + `computedHash` per skill |
-| `.agents/skills/` | The files themselves — on disk, never committed |
+The skills collection lives in its own repo, [`ekajaya740/skills`](https://github.com/ekajaya740/skills)
+(`~/skills`). It is the home for both first-party skills and downloaded ones,
+and it is where the skills lock is tracked.
 
-`skills-lock.json` is the source of truth for *which* revision is installed, so
-a machine can be reproduced without the repo carrying the content.
+This is wired up through the CLI's own conventions:
+
+- `~/.agents/skills` is a **symlink to `~/skills`**, so global installs land in
+  the collection repo rather than in dotfiles.
+- The global lock is `~/.agents/.skill-lock.json`, which is itself a **symlink
+  to `~/skills/.skill-lock.json`**. The CLI writes with a plain `writeFile`, so
+  it writes *through* the symlink — the lock stays tracked in the collection
+  repo while the CLI sees it at the path it expects. Do not replace that
+  symlink with a regular file; the two copies will drift.
+
+The lock file *name* is scope-dependent: the global lock is `.skill-lock.json`,
+while `npx skills add` run with a cwd inside a project writes `skills-lock.json`
+at that project's root. Running `skills add` from `~/dotfiles` would drop a
+`skills-lock.json` here and content into `.agents/skills/` — do it from
+`~/skills` (or globally) instead.
 
 ### Installing and updating
 
 ```bash
-# Restore on a fresh machine, from the tracked skills-lock.json
-npx skills@latest experimental_install
-
-# Update the installed skills to their latest upstream versions
+# Update installed skills to their latest upstream versions
 npx skills@latest update
+
+# List what is installed, with sources
+npx skills@latest list -g
 
 # Claude Code uses its own managed plugin instead of the vendored copies
 claude plugin update mattpocock-skills
 ```
 
-`experimental_install` is the CLI's own restore verb (it reads
-`skills-lock.json`); the lock pins `source` + `skillPath` + `computedHash` per
-skill, which is what makes a fresh clone reproducible even though the content
-is not committed.
-
-After an update, commit the refreshed `skills-lock.json` — that diff is the
-record of what changed. The skill files themselves must never appear in
-`git status`; if they do, the ignore rule has been lost.
+The skill files themselves must never appear in this repo's `git status`; if
+they do, the ignore rule has been lost.
 
 ### Notes
 
-- `~/.agents/skills` is a symlink to `~/skills` (the `ekajaya740/skills` repo)
-  and is a *different* set — that repo holds first-party skills and is tracked
-  normally. Do not move third-party skills into it.
 - Claude Code gets the same upstream skills through the
   `mattpocock-skills@mattpocock` plugin (`~/.claude/plugins/cache/`), pinned by
   `gitCommitSha` in `~/.claude/plugins/installed_plugins.json`. Installing both
   the plugin and the vendored copies leaves every skill duplicated — prefer one.
+- `~/skills` also holds symlinks into Omarchy's package-owned skills
+  (`/usr/share/omarchy/default/agents/skills/…`); those are not content, so do
+  not expect them to carry a license file of their own.
