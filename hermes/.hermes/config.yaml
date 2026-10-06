@@ -58,11 +58,7 @@ terminal:
   home_mode: auto
   shell_init_files: []
   auto_source_bashrc: true
-  docker_image: nikolaik/python-nodejs:python3.11-nodejs20
   docker_forward_env: []
-  singularity_image: docker://nikolaik/python-nodejs:python3.11-nodejs20
-  modal_image: nikolaik/python-nodejs:python3.11-nodejs20
-  daytona_image: nikolaik/python-nodejs:python3.11-nodejs20
   container_cpu: 1
   container_memory: 5120
   container_disk: 51200
@@ -543,13 +539,13 @@ paste_collapse_threshold_fallback: 5
 paste_collapse_char_threshold: 2000
 computer_use:
   cua_telemetry: false
-_config_version: 46
+_config_version: 49
 plugins:
   enabled:
-  - omh
-  - rtk-rewrite
-  - hermes-handoff
-  - hermes-jev
+    - omh
+    - rtk-rewrite
+    - hermes-handoff
+    - hermes-jev
 mcp_servers:
   hevy:
     command: npx
