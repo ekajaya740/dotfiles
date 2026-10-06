@@ -1,23 +1,34 @@
 # dotfiles
 
-Personal configuration for Neovim (LazyVim + coc.nvim), tmux, zsh, OpenCode, [oh-my-pi](https://github.com/can1357/oh-my-pi), and Claude Code.
+Personal configuration for Neovim (LazyVim + coc.nvim), Vim, tmux, zsh,
+OpenCode, [oh-my-pi](https://github.com/can1357/oh-my-pi), [Hermes](https://github.com/earendil-works/hermes),
+[Pen](https://pen.dev), [Pi](https://github.com/earendil-works/pi), and Claude Code.
+Everything is stowed into `$HOME` with GNU Stow, except the pieces noted below.
 
 **Neovim includes:**
 - [rest.nvim](https://github.com/rest-nvim/rest.nvim) - HTTP client for testing APIs directly from `.http` files (see [AGENTS.md](./AGENTS.md) for usage)
 
-**oh-my-pi (OMP)** includes:
-- [oh-my-pi](https://github.com/can1357/oh-my-pi) - AI coding agent for the terminal (`omp` CLI), configured with 9router models (see [AGENTS.md](./AGENTS.md) for details)
+**AI harnesses** all ride the same **9router** gateway, so they share model
+combos and fallback chains:
 
-**Claude Code** includes:
-- 9router Anthropic gateway (`ANTHROPIC_BASE_URL`) with the combo models as Claude model aliases, so Claude Code rides the same fallback chains as the other harnesses
-- A `jev-router` plugin whose `PreToolUse` hook asks TypeSafe Jev (via 9router SystemOne) which agent and model a subagent call needs — read-only lookups are routed to the Explore agent on Haiku (see [AGENTS.md](./AGENTS.md))
+- **oh-my-pi (OMP)** - AI coding agent for the terminal (`omp` CLI), with 9router model roles (see [AGENTS.md](./AGENTS.md) for details)
+- **Hermes** - gateway-capable agent with Discord/Telegram/Slack front ends, a dashboard, memory, and TTS/STT
+- **Pen (pen.dev)** - design tool whose bundled agent uses the 9router provider stowed from this repo
+- **OpenCode** - terminal coding agent
+- **Claude Code** - 9router Anthropic gateway (`ANTHROPIC_BASE_URL`) with the combo models as Claude model aliases, plus a `jev-router` plugin whose `PreToolUse` hook asks TypeSafe Jev (via 9router SystemOne) which agent and model a subagent call needs — read-only lookups are routed to the Explore agent on Haiku (see [AGENTS.md](./AGENTS.md))
 
 **Pi agent extensions:**
 - [pi-notify-pp](https://github.com/kim0/pi-notify-pp) - Native terminal notifications for Pi agent turns (OSC 777, works with Ghostty/iTerm2)
 
 ## Repository Layout
 
+### Stowed packages
+
+Deployed by `stow <package>` (see `bootstrap.sh`); the package name is the
+top-level directory.
+
 - `nvim/.config/nvim/` -> `~/.config/nvim`
+- `vim/.vimrc`, `vim/.vim/` -> `~/.vimrc`, `~/.vim`
 - `tmux/.tmux.conf` -> `~/.tmux.conf`
 - `zsh/.zshenv` -> `~/.zshenv`
 - `zsh/.zprofile` -> `~/.zprofile`
@@ -27,11 +38,26 @@ Personal configuration for Neovim (LazyVim + coc.nvim), tmux, zsh, OpenCode, [oh
 - `opencode/.config/opencode/oh-my-openagent.json` -> `~/.config/opencode/oh-my-openagent.json`
 - `omp/.omp/agent/config.yml` -> `~/.omp/agent/config.yml` (settings, model roles)
 - `omp/.omp/agent/models.yml` -> `~/.omp/agent/models.yml` (custom providers & models)
+- `omp/.omp/agent/mcp.json` -> `~/.omp/agent/mcp.json` (MCP servers)
+- `hermes/.hermes/config.yaml` -> `~/.hermes/config.yaml` (v46 schema: models, toolsets, MCP servers, platforms)
+- `hermes/.hermes/AGENTS.md`, `SOUL.md`, `CLAUDE.md` -> `~/.hermes/` (instructions, persona, Claude interop)
+- `hermes/.hermes/memories/` -> `~/.hermes/memories/` (curated memory)
 - `pi/.pi/agent/extensions/pi-notify-pp/` -> `~/.pi/agent/extensions/pi-notify-pp/` (Pi Notify++ extension)
 - `pen/.pencil/models.json` -> `~/.pencil/models.json` (9router provider for Pen; stow with `--no-folding`)
+- `omarchy/.config/hypr/` -> `~/.config/hypr` (Hyprland/Omarchy; **Arch-only, stow by hand** — not in `STOW_PACKAGES`)
+
+`omp` and `pen` share their target directory with app-managed state, so they
+must be stowed with `--no-folding` (handled by `bootstrap.sh` via
+`STOW_NO_FOLDING`).
+
+### Not stowed (installer scripts and tooling)
+
 - `claude/.claude/settings.json` -> merged into `~/.claude/settings.json` by `claude/install.sh` (9router gateway, model aliases, status line)
 - `claude/.claude/mcp.json.template` -> merged into `~/.claude.json` by `claude/install.sh` (user-scope MCP servers)
 - `claude/.claude/skills/jev-router/` -> `~/.claude/skills/jev-router` (Jev subagent-routing plugin; symlinked by `claude/install.sh`)
+- `jev/install.sh` -> installs the Jev toolchain into machine-local dirs (no config of its own)
+- `9router/export.sh` -> refreshes `9router/config-export.json`, an auto-exported snapshot of the 9Router gateway
+- `hypr-lua/omarchy4/` -> Omarchy 4 Lua port (not yet stowed)
 
 ## Dependencies
 
@@ -188,7 +214,10 @@ mkdir -p ~/.config/opencode
 
 ```bash
 cd ~/dotfiles
-stow nvim tmux zsh opencode omp pi
+stow nvim tmux zsh vim opencode omp pi hermes
+
+# pen shares ~/.pencil with app state, so it must not be folded.
+stow --no-folding pen
 ```
 
 ### 4) Install mise and dev tools
