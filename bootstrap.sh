@@ -140,7 +140,7 @@ install_packages() {
 }
 
 # ── stow packages ────────────────────────────────────────────
-STOW_PACKAGES=(nvim tmux zsh vim opencode omp pi agent hermes pen)
+STOW_PACKAGES=(nvim tmux zsh vim opencode omp pi hermes pen)
 
 # Packages whose target dir also holds app-managed state must not be folded into
 # a single symlink, or the app would write its state into the repo. Pen keeps
