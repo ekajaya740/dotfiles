@@ -15,7 +15,7 @@ command -v stow >/dev/null || { echo "ERROR: stow is not installed"; exit 1; }
 # not in the repo at all and would only ever emit a skip warning. `claude/` is
 # also excluded — it is deployed by claude/install.sh, not stowed (the claude
 # CLI rewrites settings.json, so a symlink would not survive).
-STOW_PACKAGES=(nvim tmux zsh vim opencode omp pi agent hermes pen)
+STOW_PACKAGES=(nvim tmux zsh vim opencode omp pi hermes pen)
 
 # pen: ~/.pencil also holds app state (sessions/, agent-auth), so it must not be
 # folded into a single symlink pointing at the repo.
