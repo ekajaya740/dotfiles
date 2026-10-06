@@ -39,7 +39,7 @@ top-level directory.
 - `omp/.omp/agent/config.yml` -> `~/.omp/agent/config.yml` (settings, model roles)
 - `omp/.omp/agent/models.yml` -> `~/.omp/agent/models.yml` (custom providers & models)
 - `omp/.omp/agent/mcp.json` -> `~/.omp/agent/mcp.json` (MCP servers)
-- `hermes/.hermes/config.yaml` -> `~/.hermes/config.yaml` (v46 schema: models, toolsets, MCP servers, platforms)
+- `hermes/.hermes/config.yaml` -> `~/.hermes/config.yaml` (v49 schema: models, toolsets, MCP servers, platforms)
 - `hermes/.hermes/AGENTS.md`, `SOUL.md`, `CLAUDE.md` -> `~/.hermes/` (instructions, persona, Claude interop)
 - `hermes/.hermes/memories/` -> `~/.hermes/memories/` (curated memory)
 - `pi/.pi/agent/extensions/pi-notify-pp/` -> `~/.pi/agent/extensions/pi-notify-pp/` (Pi Notify++ extension)
