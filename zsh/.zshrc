@@ -181,3 +181,4 @@ export PATH="$HOME/.local/bin:$PATH"
 
 # Vite+ bin (https://viteplus.dev)
 [[ -r "$HOME/.vite-plus/env" ]] && . "$HOME/.vite-plus/env"
+export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
