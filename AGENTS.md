@@ -17,7 +17,6 @@ This document provides guidelines for AI agents and automation tools working wit
 ├── omp/.omp/agent/            → ~/.omp/agent (config + models only)
 ├── pi/.pi/agent/extensions/   → ~/.pi/agent/extensions (pi-notify-pp)
 ├── omarchy/.config/hypr/       → ~/.config/hypr (hyprland + related configs)
-├── agent/.agent/commands/     → ~/.agent/commands (custom omp commands)
 ├── claude/.claude/            → ~/.claude (deployed by claude/install.sh, not stowed)
 └── pen/.pencil/models.json    → ~/.pencil/models.json (9router custom provider)
 ```
@@ -29,7 +28,7 @@ different sync rules and different failure modes.
 
 | Category | Packages | What it is | Sync rule |
 |----------|----------|------------|-----------|
-| **Agent harness** | `omp`, `opencode`, `hermes`, `pen`, `pi`, `agent`, `claude` | Config for an AI coding/chat harness | Stow the *config only*. The harness's own state (sessions, DBs, plugins, caches) stays machine-local — see each section below. |
+| **Agent harness** | `omp`, `opencode`, `hermes`, `pen`, `pi`, `claude` | Config for an AI coding/chat harness | Stow the *config only*. The harness's own state (sessions, DBs, plugins, caches) stays machine-local — see each section below. |
 | **Other** | `nvim`, `tmux`, `zsh`, `vim`, `omarchy` | Editor, multiplexer, shell, WM | Straight stow; these own their whole config dir. |
 
 Harness packages that share a directory with app state must be stowed with
@@ -70,8 +69,8 @@ If symlinks break or need refresh:
 
 ```bash
 cd ~/dotfiles
-stow -D nvim tmux opencode omp agent pi hermes omarchy pen  # Unstow
-stow nvim tmux opencode omp agent pi hermes omarchy pen     # Restow
+stow -D nvim tmux opencode omp pi hermes omarchy pen  # Unstow
+stow nvim tmux opencode omp pi hermes omarchy pen     # Restow
 
 # Pen keeps app state (sessions/, agent-auth) in ~/.pencil — stow it without
 # folding, or ~/.pencil would become a symlink into the repo.
@@ -187,7 +186,7 @@ Run `omp` at least once before stowing to create `~/.omp/agent/` with local stat
 
 ```bash
 cd ~/dotfiles
-stow omp agent
+stow omp
 ```
 
 ### MCP Servers
@@ -203,34 +202,6 @@ Configured in `omp/.omp/agent/mcp.json` (oMP), `opencode/.config/opencode/openco
 
 **codebase-memory-mcp** is a high-performance code intelligence MCP server. It indexes codebases into a persistent knowledge graph for fast structural queries. Installed at `~/.local/bin/codebase-memory-mcp`. Configured with the native binary path (not `npx -y`) in omp/opencode/hermes MCP configs and `~/.claude.json`. The `npx -y codebase-memory-mcp` fallback is intentionally replaced because the native binary must match the shared coordination daemon version.
 
-
-### Custom Commands (`.agent/commands/`)
-
-User-level custom omp commands that dispatch directly to a specific agent, bypassing the default model's interpretation.
-
-| Command | File | Effect |
-|---------|------|--------|
-| `/designer` | `~/.agent/commands/designer.md` | Forwards your prompt to the `designer` agent with zero deviation |
-
-Usage: `/designer <your design prompt>` — the designer agent runs on `9router/designer:auto` (configured via `modelRoles.designer`).
-
-The `$@` placeholder in the command body passes your inline arguments straight to the agent assignment. The body is rigid — the main model has no room to paraphrase or re-route.
-
-#### Adding new commands
-
-Create `agent/.agent/commands/<name>.md` with YAML frontmatter:
-```markdown
----
-name: <name>
-description: <description shown in help>
----
-
-Use the task tool with the following parameters — do not paraphrase or change the agent name:
-- agent: "<agent-name>"
-- tasks: [{ id: "main", description: "<desc>", assignment: "$@" }]
-```
-
-Then stow: `stow agent`.
 
 ### Orchestrator Mode (default agent routing)
 
