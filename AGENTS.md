@@ -13,23 +13,35 @@ This document provides guidelines for AI agents and automation tools working wit
 ~/dotfiles/
 ├── nvim/.config/nvim/          → ~/.config/nvim
 ├── tmux/.tmux.conf             → ~/.tmux.conf
+├── zsh/.zshenv .zprofile .zshrc .p10k.zsh → ~/.zshenv, ~/.zprofile, ~/.zshrc, ~/.p10k.zsh
+├── vim/.vimrc, vim/.vim/       → ~/.vimrc, ~/.vim
 ├── opencode/.config/opencode/  → ~/.config/opencode/
-├── omp/.omp/agent/            → ~/.omp/agent (config + models only)
-├── pi/.pi/agent/extensions/   → ~/.pi/agent/extensions (pi-notify-pp)
-├── omarchy/.config/hypr/       → ~/.config/hypr (hyprland + related configs)
-├── claude/.claude/            → ~/.claude (deployed by claude/install.sh, not stowed)
-└── pen/.pencil/models.json    → ~/.pencil/models.json (9router custom provider)
+├── omp/.omp/agent/             → ~/.omp/agent (config + models only)
+├── pi/.pi/agent/extensions/    → ~/.pi/agent/extensions (pi-notify-pp)
+├── hermes/.hermes/             → ~/.hermes (config + memories)
+├── pen/.pencil/models.json     → ~/.pencil/models.json (--no-folding)
+├── omarchy/.config/hypr/       → ~/.config/hypr (Hyprland/Omarchy; Arch-only, stow manually)
+├── claude/.claude/             → ~/.claude (deployed by claude/install.sh, NOT stowed)
+├── jev/                        → no config; jev/install.sh installs the Jev toolchain
+├── 9router/                    → no config; export.sh refreshes config-export.json
+└── hypr-lua/omarchy4/          → no config; Omarchy 4 Lua port (not stowed)
 ```
 
 ### Config Categories
 
-Every package here is one of two kinds. Know which before editing — they have
+Every package here is one of three kinds. Know which before editing — they have
 different sync rules and different failure modes.
 
 | Category | Packages | What it is | Sync rule |
 |----------|----------|------------|-----------|
-| **Agent harness** | `omp`, `opencode`, `hermes`, `pen`, `pi`, `claude` | Config for an AI coding/chat harness | Stow the *config only*. The harness's own state (sessions, DBs, plugins, caches) stays machine-local — see each section below. |
-| **Other** | `nvim`, `tmux`, `zsh`, `vim`, `omarchy` | Editor, multiplexer, shell, WM | Straight stow; these own their whole config dir. |
+| **Agent harness** (stowed) | `omp`, `opencode`, `hermes`, `pen`, `pi` | Config for an AI coding/chat harness | Stow the *config only*. The harness's own state (sessions, DBs, plugins, caches) stays machine-local — see each section below. |
+| **Other** (stowed) | `nvim`, `tmux`, `zsh`, `vim`, `omarchy` | Editor, multiplexer, shell, WM | Straight stow; these own their whole config dir. |
+| **Deployed / not stowed** | `claude`, `jev`, `9router`, `hypr-lua` | Installer scripts, config backups, unshipped ports | Never stowed. Run the package's own script (`claude/install.sh`, `jev/install.sh`) or refresh tooling (`9router/export.sh`). |
+
+`omarchy` is stowed by hand on Arch/Omarchy hosts only — it is deliberately
+absent from `STOW_PACKAGES` in `bootstrap.sh`/`sync-dotfiles.sh`, because
+`~/.config/hypr` is meaningless on macOS. The other stowed packages are listed
+in both scripts.
 
 Harness packages that share a directory with app state must be stowed with
 `--no-folding` (`omp`, `pen`), or the app writes its state into the repo — see
@@ -48,6 +60,19 @@ runs `jev/install.sh`; never commit them.
 1. Edit files in `~/dotfiles/` only
 2. Changes are immediately reflected via symlinks
 3. Validate before committing
+
+**Keep the docs in sync — update them in the same commit.** Any change that
+alters what this repo *contains* must update the docs that describe it:
+
+| Change | Update |
+|--------|--------|
+| Package added/removed/renamed, or stow flags changed | `AGENTS.md` tree + Config Categories, `README.md` Repository Layout, and `STOW_PACKAGES` in **both** `bootstrap.sh` and `sync-dotfiles.sh` |
+| `modelRoles` in `omp/.omp/agent/config.yml` | the model table in the OMP section |
+| Config file path or filename | every section and layout listing that names it |
+| New harness / tool / section | a `##` section in `AGENTS.md` and a line in `README.md` |
+
+Never leave a doc describing a package, role, or path that no longer exists —
+stale docs are worse than none, because agents act on them.
 
 ### Validation Checklist
 
@@ -69,8 +94,11 @@ If symlinks break or need refresh:
 
 ```bash
 cd ~/dotfiles
-stow -D nvim tmux opencode omp pi hermes omarchy pen  # Unstow
-stow nvim tmux opencode omp pi hermes omarchy pen     # Restow
+stow -D nvim tmux zsh vim opencode omp pi hermes pen  # Unstow
+stow nvim tmux zsh vim opencode omp pi hermes pen     # Restow
+
+# Arch/Omarchy hosts only — ~/.config/hypr does not exist on macOS.
+stow omarchy
 
 # Pen keeps app state (sessions/, agent-auth) in ~/.pencil — stow it without
 # folding, or ~/.pencil would become a symlink into the repo.
@@ -105,10 +133,10 @@ stow --no-folding pen
 
 ```bash
 # Edit in repo
-vim ~/dotfiles/opencode/.config/opencode/oh-my-opencode.json
+vim ~/dotfiles/opencode/.config/opencode/oh-my-openagent.json
 
 # Validate
-jq empty ~/dotfiles/opencode/.config/opencode/oh-my-opencode.json
+jq empty ~/dotfiles/opencode/.config/opencode/*.json
 
 # Changes apply immediately (symlinked)
 ```
@@ -155,13 +183,20 @@ All AI model traffic goes through the **9router** gateway (`https://ai.workofeka
 
 | Role | Model | Purpose |
 |------|-------|---------|
-| default | `9router/cost-efficient` | Primary agent |
-| smol | `9router/cost-efficient` | Quick/light tasks |
-| plan | `9router/cost-efficient` | Planning & architecture |
-| commit | `9router/cost-efficient` | Commit generation |
-| designer | `9router/designer:auto` | Design / UI work |
+| default | `9router/coder` | Primary agent |
+| smol | `9router/coder` | Quick/light tasks |
+| tiny | `9router/coder` | Smallest/cheapest jobs |
+| plan | `9router/coder` | Planning & architecture |
+| commit | `9router/coder` | Commit generation |
+| slow | `9router/coder` | Deep reasoning |
+| task | `9router/coder` | Subagent dispatch |
 | advisor | `9router/advisor:high` | Advice / review |
-| vision | `9router/ollama-cloud/gemma4:31b:auto` | Image-capable fallback |
+| vision | `9router/coder` | Image-capable fallback |
+
+**This table mirrors `modelRoles` in `omp/.omp/agent/config.yml` — that file is the
+source of truth.** Update this table in the same commit as any `modelRoles`
+change, or it drifts (it previously listed `cost-efficient` and a `designer` role
+that no longer exist).
 
 Set `NINEROUTER_API_KEY` in your shell environment (`~/.zshenv.local`) to authenticate against the gateway.
 
@@ -209,18 +244,72 @@ The default omp agent is configured as an **orchestrator** — it routes special
 
 | Route | Agent | Enables |
 |-------|-------|---------|
-| UI/UX design | `designer` | Re-enabled from `task.disabledAgents` |
 | Codebase exploration | `explore` | Re-enabled from `task.disabledAgents` |
 | Code review | `reviewer` | Always available (`/review` or task) |
 | Commit/push | CLI `omp commit` | CLI tool, not a task agent |
 | Vision analysis | `inspect_image` tool | Routes to `modelRoles.vision` automatically |
 
 The default omp agent reads the orchestrator instructions and delegates:
-- Design/UI work → spawn `designer` agent
 - Exploration → spawn `explore` agent
 - Simple ops → do directly (reading files, running commands)
 
-To add an agent to the routing table, remove it from `task.disabledAgents` in `config.yml` and add a row to the routing table.
+To add an agent to the routing table, enable it via `task.disabledAgents` in
+`config.yml` (omit or remove the agent from that list) and add a row above.
+
+## Hermes
+
+[Hermes](https://github.com/earendil-works/hermes) — a gateway-capable AI agent
+with Discord/Telegram/Slack front ends, a dashboard, TTS/STT, memory, and cron.
+Config lives at `~/.hermes/config.yaml`.
+
+### Config Files Managed in This Repo
+
+- `hermes/.hermes/config.yaml` → `~/.hermes/config.yaml` (v46 schema — models, toolsets, MCP servers, platforms)
+- `hermes/.hermes/AGENTS.md` → `~/.hermes/AGENTS.md` (agent instructions)
+- `hermes/.hermes/SOUL.md` → `~/.hermes/SOUL.md` (persona)
+- `hermes/.hermes/CLAUDE.md` → `~/.hermes/CLAUDE.md` (Claude Code interop)
+- `hermes/.hermes/memories/MEMORY.md`, `USER.md` → `~/.hermes/memories/` (curated memory)
+
+### NOT Managed (machine-local state)
+
+Sessions, plugin installs (`~/.hermes/plugins`), credentials, and the Jev
+toolchain are machine-local. Reproduce them with `bootstrap.sh` (which runs
+`jev/install.sh`).
+
+### Model Configuration
+
+Hermes reaches the same 9router combos through a **local** endpoint
+(`http://127.0.0.1:20128/v1`) rather than the public gateway — the key still
+comes from `NINEROUTER_API_KEY`:
+
+| Setting | Value |
+|---------|-------|
+| `model.provider` / `model.default` | `9router` / `personal-chat` |
+| `model.base_url` | `http://127.0.0.1:20128/v1` |
+| `model.key_env` | `NINEROUTER_API_KEY` |
+| `providers.9router` | same local base_url + key env |
+| `fallback_providers` | 3 entries |
+
+A second provider, `shiteru` (`SHITERU_API_KEY`), is declared alongside it.
+
+### MCP Servers
+
+Configured under `mcp_servers:` in `config.yaml`: `hevy` (`${HEVY_API_KEY}`),
+`arxiv`, `pencil`, `codebase-memory-mcp` (native binary), and `jev`
+(`JEV_PROVIDER=openrouter`). `investment_vault` is present but `enabled: false`.
+
+### Gateway and Platforms
+
+Hermes runs a gateway with a dashboard at `https://hermes.workofekajaya.com`
+and a Discord front end enabled (`platforms.discord`, home channel
+`#ai-logs`). Cron, kanban dispatch, and TTS/STT (Edge voices by default) are
+configured in the same file.
+
+### Validation
+
+```bash
+python3 -c "import yaml; yaml.safe_load(open('hermes/.hermes/config.yaml')); print('config.yaml OK')"
+```
 
 ## Pen (pen.dev)
 
