@@ -1,0 +1,85 @@
+name: Release
+
+# Releases are driven by the version at the top of CHANGELOG.md, so shipping a
+# release means adding a new '## [x.y.z]' section and merging it to main. There
+# is no separate step to run: this workflow notices the bump and tags it.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "CHANGELOG.md"
+      - "scripts/release_dotfiles.py"
+      - ".github/workflows/release.yml"
+  workflow_dispatch:
+
+# Required to push tags and create releases.
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Tag version bumps
+    runs-on: ubuntu-latest
+    # workflow_dispatch can be pointed at any branch, but only main carries the
+    # release changelog; tagging a feature branch would announce an unreleased
+    # version. The push trigger is already main-only.
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          # Full history and all tags: the script decides what to release by
+          # comparing the changelog version against existing tags, so a shallow
+          # clone or a missing tag would cause a duplicate release.
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Install validation tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends shellcheck jq stow
+          python3 -m pip install --quiet pyyaml
+
+      - name: Refuse to release an invalid tree
+        run: ./scripts/validate.sh
+
+      - name: Create a tag for the version bump
+        id: tag
+        run: |
+          set -o pipefail
+          python3 scripts/release_dotfiles.py --tag | tee /tmp/release.log
+
+          # Which tag did we create? Anything the script reported as created.
+          tags=$(sed -n 's/^  created //p' /tmp/release.log | tr '\n' ' ')
+          echo "tags=$tags" >> "$GITHUB_OUTPUT"
+          if [ -z "${tags// /}" ]; then
+            echo "Nothing to release."
+          fi
+
+      - name: Push tag
+        if: steps.tag.outputs.tags != ''
+        run: git push origin ${{ steps.tag.outputs.tags }}
+
+      - name: Publish GitHub release
+        if: steps.tag.outputs.tags != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Notes come from the annotated tag, whose message the release script
+          # builds from the matching CHANGELOG section. --verify-tag guards
+          # against announcing a tag that never reached the remote.
+          for tag in ${{ steps.tag.outputs.tags }}; do
+            echo "Releasing $tag"
+            gh release create "$tag" \
+              --verify-tag \
+              --notes-from-tag \
+              --title "$tag"
+          done
