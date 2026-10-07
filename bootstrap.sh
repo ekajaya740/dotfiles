@@ -9,32 +9,62 @@ IFS=$'\n\t'
 DOTFILES_REPO="${DOTFILES_REPO:-${HOME}/dotfiles}"
 DOTFILES_URL="${DOTFILES_URL:-https://github.com/ekajaya740/dotfiles.git}"
 
-SKIP_DEPS=false
-SYNC_ONLY=false
-
-while [[ $# -gt 0 ]]; do
-    case "$1" in
-        --skip-deps) SKIP_DEPS=true; shift ;;
-        --sync-only) SYNC_ONLY=true; shift ;;
-        --help|-h)
-            echo "Usage: bootstrap.sh [--skip-deps] [--sync-only]"
-            echo ""
-            echo "  --skip-deps    Skip installing system packages and tools (stow only)"
-            echo "  --sync-only    Only restow symlinks, skip everything else"
-            exit 0
-            ;;
-        *) err "unknown flag: $1"; exit 1 ;;
-    esac
-    shift
-done
-
 # ── utilities ────────────────────────────────────────────────
+# Defined before the argument parser, which reports unknown flags via err().
 info()  { printf "\033[1;34m[INFO]\033[0m  %s\n" "$*"; }
 ok()    { printf "\033[1;32m[ OK ]\033[0m  %s\n" "$*"; }
 warn()  { printf "\033[1;33m[WARN]\033[0m  %s\n" "$*"; }
 err()   { printf "\033[1;31m[ERR]\033[0m  %s\n" "$*" >&2; }
 
 has_cmd() { command -v "$1" &>/dev/null; }
+
+SKIP_DEPS=false
+SYNC_ONLY=false
+ADOPT=false
+
+# Package selection. Collected here as raw tokens because packages.sh is only
+# available once the repo is in place; resolve_selection() runs after ensure_repo.
+SELECTION=()
+SELECT_ALL=false
+
+# Each arm consumes exactly the arguments it needs; the loop must not also shift,
+# or a single flag would run the body off the end of argv and die under set -u.
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --skip-deps) SKIP_DEPS=true; shift ;;
+        --sync-only) SYNC_ONLY=true; shift ;;
+        --adopt|-f|--force) ADOPT=true; shift ;;
+        --only)
+            [[ -n "${2:-}" ]] || { err "--only needs a value, e.g. --only omp,hermes"; exit 1; }
+            # Split on commas and whitespace so both --only a,b and --only "a b" work.
+            IFS=', ' read -r -a _only <<< "$2"
+            for _p in ${_only[@]+"${_only[@]}"}; do [[ -n "$_p" ]] && SELECTION+=("$_p"); done
+            shift 2
+            ;;
+        --harness|--editor|--shell) SELECTION+=("${1#--}"); shift ;;
+        --all) SELECT_ALL=true; shift ;;
+        --help|-h)
+            echo "Usage: bootstrap.sh [options]"
+            echo ""
+            echo "  --skip-deps    Skip installing system packages and tools (stow only)"
+            echo "  --sync-only    Only restow symlinks, skip everything else"
+            echo "  --adopt        Replace conflicting files with the repo's versions"
+            echo ""
+            echo "Package selection (default: all packages):"
+            echo "  --only LIST    Stow only these, comma-separated"
+            echo "                 e.g. --only omp,hermes,pen"
+            echo "  --harness      Shortcut for the agent harness configs"
+            echo "                 (omp opencode hermes pen pi)"
+            echo "  --editor       Shortcut for nvim vim"
+            echo "  --shell        Shortcut for zsh tmux"
+            echo "  --all          Stow every package (the default)"
+            echo ""
+            echo "Available packages and groups are defined in scripts/packages.sh."
+            exit 0
+            ;;
+        *) err "unknown flag: $1"; exit 1 ;;
+    esac
+done
 
 # ── platform detection ──────────────────────────────────────
 detect_platform() {
@@ -140,47 +170,73 @@ install_packages() {
 }
 
 # ── stow packages ────────────────────────────────────────────
-STOW_PACKAGES=(nvim tmux zsh vim opencode omp pi hermes pen)
-
-# Packages whose target dir also holds app-managed state must not be folded into
-# a single symlink, or the app would write its state into the repo. Pen keeps
-# sessions/ and agent-auth under ~/.pencil alongside models.json.
-STOW_NO_FOLDING=(pen)
+# Package lists and the --no-folding rule live in scripts/packages.sh so the
+# installers and the CI validator cannot drift apart. Sourced from the repo
+# rather than the script's own directory, because bootstrap.sh is documented to
+# be runnable straight from a curl'd copy — which means the repo may not exist
+# yet, so this must run AFTER ensure_repo has cloned it.
+load_packages() {
+    local packages_sh="$DOTFILES_REPO/scripts/packages.sh"
+    if [[ -f "$packages_sh" ]]; then
+        # shellcheck source=scripts/packages.sh
+        source "$packages_sh"
+    else
+        err "scripts/packages.sh not found in $DOTFILES_REPO"
+        exit 1
+    fi
+}
 
 # `claude/` is NOT stowed: the claude CLI rewrites ~/.claude/settings.json in
 # place (destroying a symlink), and a plugin assembled from per-file symlinks is
 # rejected. It is deployed by claude/install.sh instead, like jev/.
 
-stow_packages() {
-    local adopt=false
-    local args=()
-    for arg in "$@"; do
-        case "$arg" in
-            -f|--adopt|--force) adopt=true ;;
-        esac
-    done
+# Which packages this run should touch. Empty SELECTION (and --all) means every
+# package; otherwise resolve_selection validates the names and expands groups.
+resolve_packages() {
+    if $SELECT_ALL || [[ ${#SELECTION[@]} -eq 0 ]]; then
+        STOW_SELECTION=("${ALL_PACKAGES[@]}")
+        return 0
+    fi
 
-    info "stowing packages: ${STOW_PACKAGES[*]}"
+    local resolved
+    if ! resolved="$(resolve_selection ${SELECTION[@]+"${SELECTION[@]}"})"; then
+        err "invalid package selection"
+        exit 1
+    fi
+    [[ -n "$resolved" ]] || { err "no packages selected"; exit 1; }
+    STOW_SELECTION=()
+    while IFS= read -r pkg; do STOW_SELECTION+=("$pkg"); done <<< "$resolved"
+}
+
+stow_packages() {
+    local adopt=$ADOPT
+
+    resolve_packages
+
+    info "stowing packages: $(IFS=' '; echo "${STOW_SELECTION[*]}")"
     $adopt && info "  --adopt mode: existing files will be replaced"
 
-    # un-stow everything first to avoid conflicts
-    for pkg in "${STOW_PACKAGES[@]}"; do
+    # Un-stow first to avoid conflicts. This must cover the SAME set as the stow
+    # loop below: unstowing everything and then stowing only a subset would
+    # silently unlink the packages the user did not ask for.
+    for pkg in ${STOW_SELECTION[@]+"${STOW_SELECTION[@]}"}; do
         if [[ -d "$DOTFILES_REPO/$pkg" ]]; then
             stow -D "$pkg" 2>/dev/null || true
         fi
     done
 
     # stow each package — skip on conflict unless --adopt
-    for pkg in "${STOW_PACKAGES[@]}"; do
+    for pkg in ${STOW_SELECTION[@]+"${STOW_SELECTION[@]}"}; do
         if [[ ! -d "$DOTFILES_REPO/$pkg" ]]; then
             warn "skipping $pkg — directory not found"
             continue
         fi
 
         local flags=()
-        for nf in "${STOW_NO_FOLDING[@]}"; do
-            [[ "$pkg" == "$nf" ]] && flags+=(--no-folding)
-        done
+        # --no-folding for packages whose target dir also holds app state.
+        while IFS= read -r f; do
+            [[ -n "$f" ]] && flags+=("$f")
+        done < <(stow_flags_for "$pkg")
 
         if $adopt; then
             stow ${flags[@]+"${flags[@]}"} --adopt "$pkg" 2>&1 || warn "failed to stow $pkg"
@@ -298,8 +354,12 @@ setup_mise() {
         eval "$("$mise_bin" activate bash --shims)"
     fi
 
-    # Install dev tools via mise
-    info "installing node, yarn, make, neovim, vim, opencode, pi via mise"
+    # Install dev tools via mise. dsh (DeepSeek Harness) comes from the npm
+    # backend — `mise use -g npm:@deepseek-ai/dsh@<ver>` — so it is pinned like
+    # every other tool here. It is a developer preview that ships
+    # compatibility-breaking changes, so pin a version rather than tracking
+    # @latest, and bump deliberately.
+    info "installing node, yarn, make, neovim, vim, opencode, pi, dsh via mise"
     mise use -g \
         node@lts \
         yarn@latest \
@@ -307,7 +367,8 @@ setup_mise() {
         neovim@stable \
         vim@latest \
         opencode@latest \
-        pi@latest
+        pi@latest \
+        "npm:@deepseek-ai/dsh@${DSH_VERSION:-0.2.0-rc.2}"
 
     ok "mise tools installed"
 
@@ -382,14 +443,15 @@ post_install_checks() {
     if [[ -f "$HOME/.pencil/models.json" ]]; then
         has_cmd jq && jq empty "$HOME/.pencil/models.json" && ok "pen models.json valid"
     elif [[ -d "$HOME/.pencil" ]]; then
-        warn "~/.pencil/models.json missing — re-run: stow --no-folding pen"
+        warn "$HOME/.pencil/models.json missing — re-run: stow --no-folding pen"
     fi
 
     # Fold hazard: tracked stow packages whose target dir also holds app state
     # must stay real directories, never symlinks into the repo — otherwise the
     # app writes state (sessions, tokens) into git. Mirrors STOW_NO_FOLDING.
     local folded=()
-    for d in "$HOME/.pencil"; do
+    local state_dirs=("$HOME/.pencil")
+    for d in "${state_dirs[@]}"; do
         [[ -L "$d" ]] && folded+=("$d")
     done
     if [[ ${#folded[@]} -gt 0 ]]; then
@@ -423,6 +485,9 @@ main() {
 
     # 1. Clone / pull repo
     ensure_repo
+
+    # Package lists and helpers now that the repo exists.
+    load_packages
 
     if ! $SKIP_DEPS; then
         # 2. Install GNU Stow (prerequisite for everything else)
@@ -476,22 +541,28 @@ main() {
         info "skipping system package and tool installation (--skip-deps)"
     fi
 
-    # 4. mise (node, yarn, make, neovim, vim, opencode, pi)
-    setup_mise
+    # Steps 4-7 install toolchains (mise, oh-my-zsh, p10k, fzf). --sync-only
+    # promises "only restow symlinks, skip everything else", so it must skip
+    # these too — running them here used to upgrade tools under a plain restow.
+    if $SYNC_ONLY; then
+        info "skipping toolchain setup (--sync-only)"
+    else
+        # 4. mise (node, yarn, make, neovim, vim, opencode, pi)
+        setup_mise
 
-    # 5. Oh My Zsh
-    setup_ohmyzsh
+        # 5. Oh My Zsh
+        setup_ohmyzsh
 
-    # 6. Powerlevel10k
-    setup_powerlevel10k
+        # 6. Powerlevel10k
+        setup_powerlevel10k
 
-    # 7. fzf keybindings
-    setup_fzf
+        # 7. fzf keybindings
+        setup_fzf
+    fi
 
-    # 8. Stow everything
+    # 8. Stow the selected packages (all of them unless --only/--harness was given)
     stow_packages
 
-    # --sync-only: restow done, skip everything else
     if $SYNC_ONLY; then
         ok "symlinks synced"
         return 0

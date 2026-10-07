@@ -1,0 +1,117 @@
+# dsh home-level patch — machine-local preferences for every profile
+#
+# This is $DSH_HOME/cordis.patch.yml, synced from dotfiles. Per the dsh CLI
+# reference it is applied to every profile and outranks each profile's own
+# cordis.patch.yml, which makes it the right place for settings that should
+# follow the machine rather than a specific profile.
+#
+# Layer order, lowest to highest:
+#   1. bundle patches named in the profile manifest's dsh.profile.bundles
+#   2. the profile's own cordis.patch.yml
+#   3. this file
+#   4. each --patch <path> overlay, in argv order
+#
+# A patch REPLACES the targeted row's complete `config` value; it does not
+# deep-merge keys. Restate every key you care about, or it is dropped.
+#
+# An unmatched patch target is reported on stderr and is NOT a silent no-op, so
+# every row id below is verified against the pinned release's
+# `@deepseek-ai/dsh-base` cordis.patch.yml. Row ids drift between releases —
+# `subagent-spawn` became `subagent-spawn-in-process`, `telemetry-otel` became
+# `session-telemetry-otel`, and the Codex/Claude Code rows were dropped
+# entirely. Re-verify ids against the bundle whenever DSH_VERSION is bumped.
+#
+# The document root is a list of patch rows, so it must stay a list even when
+# rows are commented out: a comments-only file parses as null, not as an empty
+# list.
+
+# ── Subagent backends ────────────────────────────────────────────────
+#
+# Nothing to disable. dsh-base mounts the in-process swarm by default:
+# `subagent` (the registry seam), `subagent-spawn-in-process` (fresh child,
+# provider name `spawn`), `subagent-fork-in-process` (child seeded from a prefix
+# of the parent context, provider name `fork`), plus the delegation tools
+# `tool-subagent`, `tool-subagent-fork`, `tool-subagent-control` and
+# `tool-subagent-list-agents`.
+#
+# That is the native equivalent of omp's `task` tool, and it is entirely
+# in-process. The Codex and Claude Code product providers that earlier releases
+# mounted (`subagent-codex`, `subagent-claude-code`) are gone from the pinned
+# release and are not installed here — so "no shelling out to another harness"
+# needs no patch row, it is simply the default. Do not re-add those rows: in
+# this version they would be unmatched targets and would warn on every boot.
+
+# ── Request-extension egresses (both default ON) ─────────────────────
+#
+# Two independent contributions attach to every official DeepSeek request via
+# the extension registry, and BOTH default to `enabled: true` in this release.
+# Unlike the OTel row below, these two ARE honoured from config, so turning
+# them off here actually works.
+#
+#   session-log-deepseek          -> `dsh_session_log`
+#       The incremental session log: unaccepted message/tool log suffixes,
+#       up to 8 MiB per request. This is the one carrying message text.
+#
+#   plugin-package-inventory-deepseek -> `dsh_plugin_packages`
+#       The active plugin/package inventory. Metadata rather than content, but
+#       it still describes the machine's setup on every request.
+#
+# Both stay outside model input, so disabling them does not change what the
+# model sees — it only stops the upload. Verified against the pinned release:
+# `@deepseek-ai/dsh-session-log-deepseek@0.2.0-rc.2` declares
+# `enabled: Volatile<boolean>` "Defaults to true", and
+# `@deepseek-ai/dsh-plugin-package-inventory-deepseek@0.2.0-rc.2` declares
+# `enabled?: boolean` "Defaults to true".
+
+- id: session-log-deepseek
+  config:
+    enabled: false
+
+- id: plugin-package-inventory-deepseek
+  config:
+    enabled: false
+
+# ── Routing dsh through 9router (optional) ───────────────────────────
+#
+# The shipped default sends requests to DeepSeek's official API, with the key
+# from DEEPSEEK_API_KEY (exported from ~/.zshenv.local). That needs no patch.
+#
+# To ride 9router instead, note that `llm-deepseek` speaks the Anthropic
+# **Messages** API, not chat-completions: its root defaults to
+# `https://api.deepseek.com/anthropic` and model requests append
+# `/v1/messages`. 9router already serves that shape — the Claude Code section
+# of AGENTS.md pairs ANTHROPIC_BASE_URL=https://ai.workofekajaya.com with
+# 9router's /v1/messages endpoint — so the adapter fits with no translation.
+#
+# Use the PUBLIC gateway, not 127.0.0.1:20128. The local endpoint only exists
+# on this Mac, so a remote `headless` box would fail to connect.
+#
+# A patch REPLACES the row's whole `config`, so restate the fields you keep.
+# Model ids pass straight through to the wire; the catalog below is advisory
+# and only feeds GUI selection. Ids mirror the combos omp/hermes already use.
+#
+# - id: llm-deepseek
+#   config:
+#     apiKeyEnv: NINEROUTER_API_KEY
+#     baseURL: https://ai.workofekajaya.com
+#     models:
+#       - id: coder
+#         name: coder
+#       - id: advisor
+#         name: advisor
+#
+# `dsh-llm-pi-ai` is the alternative, built for multiple pi-ai providers and
+# OpenAI-compatible gateways — reach for it only if dsh must route several
+# providers at once. Both adapters can be mounted together, since their route
+# names do not collide.
+
+# ── OTel telemetry cannot be disabled here ───────────────────────────
+#
+# The third egress, `session-telemetry-otel`, mirrors session-log events to
+# OTLP/HTTP. A patch canNOT turn it off: dsh composes its tree in code and its
+# own notes say the launchers patch the row disabled precisely because "config
+# cannot disable a row". Setting `enabled: false` for it would be a lie that
+# silently does nothing.
+#
+# The real lever is the environment variable DSH_TELEMETRY_DISABLED (any
+# non-empty value), set in zsh/.zshenv.

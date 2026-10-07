@@ -44,11 +44,56 @@ top-level directory.
 - `hermes/.hermes/memories/` -> `~/.hermes/memories/` (curated memory)
 - `pi/.pi/agent/extensions/pi-notify-pp/` -> `~/.pi/agent/extensions/pi-notify-pp/` (Pi Notify++ extension)
 - `pen/.pencil/models.json` -> `~/.pencil/models.json` (9router provider for Pen; stow with `--no-folding`)
+- `dsh/.dsh/cordis.patch.yml` -> `~/.dsh/cordis.patch.yml` (DeepSeek Harness home-level patch; stow with `--no-folding`)
 - `omarchy/.config/hypr/` -> `~/.config/hypr` (Hyprland/Omarchy; **Arch-only, stow by hand** — not in `STOW_PACKAGES`)
 
-`omp` and `pen` share their target directory with app-managed state, so they
-must be stowed with `--no-folding` (handled by `bootstrap.sh` via
-`STOW_NO_FOLDING`).
+`omp`, `pen` and `dsh` share their target directory with app-managed state
+(databases, sessions, credentials), so they must be stowed with `--no-folding`
+(handled by `bootstrap.sh` and `sync-dotfiles.sh` via `STOW_NO_FOLDING`).
+
+**DeepSeek Harness (`dsh`)** is pinned by `bootstrap.sh` and set up as the
+long-term replacement for `hermes` and `omp`. Only the home-level patch is
+synced; the swarm and kanban are first-party/native and the rest is per-profile:
+
+- **In-process multi-agent swarm** — `subagent` / `subagent-spawn-in-process` /
+  `subagent-fork-in-process` ship in `dsh-base`, with `tool-subagent` and
+  `tool-subagent-control` as the model-facing delegation tools. Per-subagent
+  model selection is first-party (`modelSelectionSettings`), so mirroring omp's
+  `modelRoles` needs no plugin. Nothing shells out to Codex or Claude Code —
+  those backends are absent from the pinned release.
+- **Kanban** — `@dsh-suite/plugin-team-board` gives a shared board
+  (`ctx.teamBoard`) with `task_create` / `task_claim` / `task_update` visible
+  across agents and subagents, persisted at `$DSH_HOME/team-board/board.json`.
+  Verify its tools reach a web session first: in `web` the model-facing tools
+  are owned by the agent preset, so a profile plugin that registers on the host
+  plane may not be visible to the agent.
+- **Profiles** — `web` (browser UI) and `headless` (one-shot CLI). Native
+  multi-profile, stronger than hermes': plugins are per-profile. Profile trees
+  are machine-local and never synced.
+- **Telemetry** — three egresses. `session-log-deepseek` (message text) and
+  `plugin-package-inventory-deepseek` are switched off with `enabled: false` in
+  the home patch; `session-telemetry-otel` **cannot** be disabled from config and
+  uses `DSH_TELEMETRY_DISABLED=1` in `zsh/.zshenv`.
+- **Remote access** is Tailscale-only (`dsh-tailscale-gateway`), never a public
+  `0.0.0.0` bind, because the agent has a shell.
+
+See the *DeepSeek Harness (dsh)* section in [AGENTS.md](./AGENTS.md) for the row
+map, layer order, and plugin commands.
+
+### Stowing a subset
+
+`bootstrap.sh` and `sync-dotfiles.sh` accept the same selection flags, so a
+fresh machine can take just the harness configs:
+
+```bash
+./bootstrap.sh --harness --skip-deps --sync-only   # harness configs only
+./bootstrap.sh --only omp,hermes                   # arbitrary subset
+./sync-dotfiles.sh --sync-only --harness           # daily sync, harness only
+```
+
+Groups (`harness`, `editor`, `shell`) and the package list live in
+`scripts/packages.sh`, shared by both scripts and the CI validator. Selecting a
+subset never unlinks the packages you left out.
 
 ### Not stowed (installer scripts and tooling)
 
@@ -59,6 +104,15 @@ must be stowed with `--no-folding` (handled by `bootstrap.sh` via
 - `9router/export.sh` -> refreshes `9router/config-export.json`, an auto-exported snapshot of the 9Router gateway
 - `hypr-lua/omarchy4/` -> Omarchy 4 Lua port (not yet stowed)
 - `.agents/skills/` -> **not tracked** (third-party agent skills; managed in the separate `ekajaya740/skills` collection repo — see *Agent Skills* below)
+
+### Repo tooling and CI
+
+- `scripts/packages.sh` -> the single source of truth for package lists, groups, and the `--no-folding` rule; sourced by both installers and the validator
+- `scripts/validate.sh` -> the check suite (ShellCheck, JSON, YAML, `stow --simulate`, changelog); run it locally with `make validate`
+- `scripts/release_dotfiles.py` -> tags the version at the top of `CHANGELOG.md`
+- `CHANGELOG.md` -> drives releases; the newest `## [x.y.z]` section is what ships
+- `.github/workflows/validate.yml` -> runs `scripts/validate.sh` on every push and PR
+- `.github/workflows/release.yml` -> on a `CHANGELOG.md` bump to `main`, tags `dotfiles-vX.Y.Z` and publishes the release
 
 ## Dependencies
 
@@ -246,18 +300,37 @@ bun install -g @oh-my-pi/pi-coding-agent
 - Run `omp` once before stowing to create `~/.omp/agent/` with local state, then `stow omp` to symlink config files.
 - Run `claude` once so `~/.claude/` exists, then deploy its config: `bash claude/install.sh` (merges `settings.json` and the Jev MCP servers, and symlinks the `jev-router` plugin). The plugin loads on the next session (`/reload-plugins` to load it now). Jev routing needs `NINEROUTER_API_KEY` in `~/.zshenv.local`.
 
-## Linting
+## Validation and Releases
 
-Run shell linting with shellcheck:
+One script holds every check, and CI runs that same script, so a green local run
+means a green pipeline:
 
 ```bash
-make lint-shell
+make validate          # or: ./scripts/validate.sh
 ```
+
+It runs ShellCheck over the shell scripts, parses every JSON and YAML config,
+dry-runs `stow` for all nine packages, and validates `CHANGELOG.md`. Every check
+is fail-closed — a missing tool or a broken file exits non-zero.
+
+### Cutting a release
+
+Releases come from `CHANGELOG.md`: add a `## [x.y.z] - YYYY-MM-DD` section at the
+top with the release notes and merge to `main`. CI then tags `dotfiles-vX.Y.Z`
+and publishes a GitHub release from those notes. To see what is pending, or to
+tag locally:
+
+```bash
+make release-check                              # what would be released?
+python3 scripts/release_dotfiles.py --tag       # create the tag locally
+```
+
+`make lint-shell` still runs ShellCheck over just the zsh configs; it is
+informational, because ShellCheck does not understand zsh syntax.
 
 ## Keybindings
 
 See [KEYBINDINGS.md](./KEYBINDINGS.md) for a complete reference of custom keybindings for tmux, Neovim, and zsh.
-
 
 ## For Agents
 

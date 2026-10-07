@@ -32,6 +32,27 @@ if command -v dircolors >/dev/null 2>&1; then
     export LS_COLORS='di=34:ln=35:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43'
 fi
 
+# ── DeepSeek Harness (dsh) ───────────────────────────────────────────
+# dsh has several outbound paths and they are NOT switched the same way, so
+# this variable is only part of the opt-out:
+#
+#   session-log-deepseek          -> `dsh_session_log` on each DeepSeek request
+#       Carries message text. Defaults to enabled. Turned off with
+#       `enabled: false` in ~/.dsh/cordis.patch.yml — CONFIG, not this var.
+#
+#   plugin-package-inventory-deepseek -> `dsh_plugin_packages`
+#       Plugin inventory, defaults to enabled. Also `enabled: false` in the patch.
+#
+#   session-telemetry-otel        -> OTLP export
+#       This one is ENV-ONLY. A patch cannot switch it off: dsh composes its
+#       tree in code and its own notes say the launchers patch the row disabled
+#       because "config cannot disable a row". Hence this export.
+#
+# So the env var alone does NOT cover the session-log path; the patch covers
+# that. Set here rather than ~/.zshenv.local because it is not a secret and the
+# posture should follow the machine. Any non-empty value works, including '0'.
+export DSH_TELEMETRY_DISABLED=1
+
 # Homebrew (macOS)
 if [[ -x /opt/homebrew/bin/brew ]]; then
     eval "$(/opt/homebrew/bin/brew shellenv)"

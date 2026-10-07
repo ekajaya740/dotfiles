@@ -76,6 +76,19 @@ hermes/.hermes/.hermes-update-*
 hermes/.hermes/.mcp-discovery.lock
 hermes/.hermes/.npm_lock_hash_*
 
+# dsh (DeepSeek Harness) — only the home-level cordis.patch.yml is synced.
+# Everything else under the dsh/ package is machine state or secrets: profiles/
+# is pnpm-managed, logs/ holds startup diagnostics that can echo credential
+# values, and .credentials.yaml holds provider keys. Guards against folding
+# ~/.dsh into the repo and against a stray `git add`.
+dsh/.dsh/*
+!dsh/.dsh/cordis.patch.yml
+dsh/.dsh/.credentials.yaml
+dsh/.dsh/.env
+dsh/.dsh/logs/
+dsh/.dsh/**/node_modules/
+dsh/.dsh/**/pnpm-lock.yaml
+
 # Hyprland Lua port: only the live overrides under hypr-lua/ are versioned
 hypr-lua/standalone/
 hypr-lua/APPLY.md
@@ -89,3 +102,7 @@ hypr-lua/fix-snapper.sh
 # the separate ekajaya740/skills collection repo (~/skills), not here.
 .agents/skills/
 skills-lock.json
+
+# Python bytecode from the repo's own scripts (scripts/release_dotfiles.py)
+__pycache__/
+*.pyc
