@@ -11,35 +11,86 @@ DOTFILES="${HOME}/dotfiles"
 [[ -d "$DOTFILES/.git" ]] || { echo "ERROR: no dotfiles repo at $DOTFILES"; exit 1; }
 command -v stow >/dev/null || { echo "ERROR: stow is not installed"; exit 1; }
 
-# Keep this list to packages that exist in the repo and are tracked. `codex` is
-# not in the repo at all and would only ever emit a skip warning. `claude/` is
-# also excluded — it is deployed by claude/install.sh, not stowed (the claude
-# CLI rewrites settings.json, so a symlink would not survive).
-STOW_PACKAGES=(nvim tmux zsh vim opencode omp pi hermes pen)
+# ── package selection ────────────────────────────────────────
+# Same flags as bootstrap.sh. Names and groups come from scripts/packages.sh.
+SELECTION=()
+SELECT_ALL=false
 
-# pen: ~/.pencil also holds app state (sessions/, agent-auth), so it must not be
-# folded into a single symlink pointing at the repo.
-STOW_NO_FOLDING=(pen)
+usage() {
+    cat <<'EOF'
+Usage: sync-dotfiles.sh [options]
+
+  --only LIST    Restow only these packages, comma-separated
+                 e.g. --only omp,hermes,pen
+  --harness      Shortcut for the agent harness configs
+  --editor       Shortcut for nvim vim
+  --shell        Shortcut for zsh tmux
+  --all          Restow every package (the default)
+  --sync-only    Accepted for symmetry with bootstrap.sh; this script always
+                 only restows, so the flag changes nothing
+  -h, --help     Show this help
+
+Packages and groups are defined in scripts/packages.sh.
+EOF
+}
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --only)
+            [[ -n "${2:-}" ]] || { echo "ERROR: --only needs a value, e.g. --only omp,hermes"; exit 1; }
+            IFS=', ' read -r -a _only <<< "$2"
+            for _p in ${_only[@]+"${_only[@]}"}; do [[ -n "$_p" ]] && SELECTION+=("$_p"); done
+            shift 2
+            ;;
+        --harness|--editor|--shell) SELECTION+=("${1#--}"); shift ;;
+        --all) SELECT_ALL=true; shift ;;
+        # This script is always sync-only; the flag is accepted so the same
+        # command line works for bootstrap.sh and sync-dotfiles.sh alike.
+        --sync-only) shift ;;
+        -h|--help) usage; exit 0 ;;
+        *) echo "ERROR: unknown flag: $1"; usage >&2; exit 1 ;;
+    esac
+done
 
 # Run git/stow from the repo: stow uses CWD as its source dir and looks for
 # .stowrc relative to it, so a wrong CWD would stow the wrong tree.
 cd "$DOTFILES"
 
+# Package lists and the --no-folding rule live in scripts/packages.sh, shared
+# with bootstrap.sh and the CI validator so the three cannot drift apart.
+# shellcheck source=scripts/packages.sh
+source "$DOTFILES/scripts/packages.sh"
+
+# Which packages this run should touch.
+if $SELECT_ALL || [[ ${#SELECTION[@]} -eq 0 ]]; then
+    STOW_SELECTION=("${ALL_PACKAGES[@]}")
+else
+    resolved="$(resolve_selection ${SELECTION[@]+"${SELECTION[@]}"})" \
+        || { echo "ERROR: invalid package selection"; exit 1; }
+    [[ -n "$resolved" ]] || { echo "ERROR: no packages selected"; exit 1; }
+    STOW_SELECTION=()
+    while IFS= read -r _pkg; do STOW_SELECTION+=("$_pkg"); done <<< "$resolved"
+fi
+
 # Pull latest (ff-only to avoid merge commits)
 git pull --ff-only origin main 2>&1 || echo "WARN: pull failed (uncommitted changes?)"
 
-# Restow to catch any new/changed packages
-for pkg in "${STOW_PACKAGES[@]}"; do
+echo "restowing: $(IFS=' '; echo "${STOW_SELECTION[*]}")"
+
+# Restow to catch any new/changed packages. The unstow pass must cover the same
+# set as the stow pass: unstowing everything and then stowing only a subset
+# would unlink the packages that were not selected.
+for pkg in ${STOW_SELECTION[@]+"${STOW_SELECTION[@]}"}; do
     if [[ -d "$DOTFILES/$pkg" ]]; then
         stow -D "$pkg" 2>/dev/null || true
     fi
 done
-for pkg in "${STOW_PACKAGES[@]}"; do
+for pkg in ${STOW_SELECTION[@]+"${STOW_SELECTION[@]}"}; do
     if [[ -d "$DOTFILES/$pkg" ]]; then
         flags=()
-        for nf in "${STOW_NO_FOLDING[@]}"; do
-            [[ "$pkg" == "$nf" ]] && flags+=(--no-folding)
-        done
+        while IFS= read -r f; do
+            [[ -n "$f" ]] && flags+=("$f")
+        done < <(stow_flags_for "$pkg")
         stow ${flags[@]+"${flags[@]}"} "$pkg" 2>/dev/null && echo "OK: stowed $pkg" || echo "WARN: stow $pkg failed"
     fi
 done

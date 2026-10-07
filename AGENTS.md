@@ -16,15 +16,20 @@ This document provides guidelines for AI agents and automation tools working wit
 ├── zsh/.zshenv .zprofile .zshrc .p10k.zsh → ~/.zshenv, ~/.zprofile, ~/.zshrc, ~/.p10k.zsh
 ├── vim/.vimrc, vim/.vim/       → ~/.vimrc, ~/.vim
 ├── opencode/.config/opencode/  → ~/.config/opencode/
-├── omp/.omp/agent/             → ~/.omp/agent (config + models only)
+├── omp/.omp/agent/             → ~/.omp/agent (config + models only; --no-folding)
 ├── pi/.pi/agent/extensions/    → ~/.pi/agent/extensions (pi-notify-pp)
 ├── hermes/.hermes/             → ~/.hermes (config + memories)
 ├── pen/.pencil/models.json     → ~/.pencil/models.json (--no-folding)
+├── dsh/.dsh/                   → ~/.dsh (DeepSeek Harness home patch; --no-folding)
 ├── omarchy/.config/hypr/       → ~/.config/hypr (Hyprland/Omarchy; Arch-only, stow manually)
 ├── claude/.claude/             → ~/.claude (deployed by claude/install.sh, NOT stowed)
 ├── jev/                        → no config; jev/install.sh installs the Jev toolchain
 ├── 9router/                    → no config; export.sh refreshes config-export.json
-└── hypr-lua/omarchy4/          → no config; Omarchy 4 Lua port (not stowed)
+├── hypr-lua/omarchy4/          → no config; Omarchy 4 Lua port (not stowed)
+├── scripts/validate.sh         → the check suite; CI runs this exact script
+├── scripts/release_dotfiles.py → tags CHANGELOG.md versions (see CI and Releases)
+├── CHANGELOG.md                → drives releases; newest version first
+└── .github/workflows/          → validate.yml + release.yml
 ```
 
 ### Config Categories
@@ -34,17 +39,21 @@ different sync rules and different failure modes.
 
 | Category | Packages | What it is | Sync rule |
 |----------|----------|------------|-----------|
-| **Agent harness** (stowed) | `omp`, `opencode`, `hermes`, `pen`, `pi` | Config for an AI coding/chat harness | Stow the *config only*. The harness's own state (sessions, DBs, plugins, caches) stays machine-local — see each section below. |
+| **Agent harness** (stowed) | `omp`, `opencode`, `hermes`, `pen`, `pi`, `dsh` | Config for an AI coding/chat harness | Stow the *config only*. The harness's own state (sessions, DBs, plugins, caches) stays machine-local — see each section below. |
 | **Other** (stowed) | `nvim`, `tmux`, `zsh`, `vim`, `omarchy` | Editor, multiplexer, shell, WM | Straight stow; these own their whole config dir. |
 | **Deployed / not stowed** | `claude`, `jev`, `9router`, `hypr-lua` | Installer scripts, config backups, unshipped ports | Never stowed. Run the package's own script (`claude/install.sh`, `jev/install.sh`) or refresh tooling (`9router/export.sh`). |
 
 `omarchy` is stowed by hand on Arch/Omarchy hosts only — it is deliberately
-absent from `STOW_PACKAGES` in `bootstrap.sh`/`sync-dotfiles.sh`, because
-`~/.config/hypr` is meaningless on macOS. The other stowed packages are listed
-in both scripts.
+absent from `ALL_PACKAGES` in `scripts/packages.sh`, because `~/.config/hypr` is
+meaningless on macOS. That file is the single source of truth for the package
+list, the group shortcuts, and the `--no-folding` rule; `bootstrap.sh`,
+`sync-dotfiles.sh` and `scripts/validate.sh` all source it, so there is no
+second list to keep in sync.
 
 Harness packages that share a directory with app state must be stowed with
-`--no-folding` (`omp`, `pen`), or the app writes its state into the repo — see
+`--no-folding` (`omp`, `pen`, `dsh`), or the app writes its state into the repo
+— see `STOW_NO_FOLDING` in `scripts/packages.sh`.
+
 **Safety Rules**. `claude` is different again: it is not stowed at all (the
 claude CLI rewrites `settings.json`), but deployed by `claude/install.sh`.
 
@@ -66,21 +75,41 @@ alters what this repo *contains* must update the docs that describe it:
 
 | Change | Update |
 |--------|--------|
-| Package added/removed/renamed, or stow flags changed | `AGENTS.md` tree + Config Categories, `README.md` Repository Layout, and `STOW_PACKAGES` in **both** `bootstrap.sh` and `sync-dotfiles.sh` |
+| Package added/removed/renamed, or stow flags changed | `ALL_PACKAGES` / `STOW_NO_FOLDING` in **`scripts/packages.sh`** (the only place they live), plus the `AGENTS.md` tree + Config Categories and `README.md` Repository Layout |
 | `modelRoles` in `omp/.omp/agent/config.yml` | the model table in the OMP section |
 | Config file path or filename | every section and layout listing that names it |
 | New harness / tool / section | a `##` section in `AGENTS.md` and a line in `README.md` |
+| A check added to `scripts/validate.sh` | the [Validation Checklist](#validation-checklist) here, and the CI section below |
 
 Never leave a doc describing a package, role, or path that no longer exists —
 stale docs are worse than none, because agents act on them.
 
 ### Validation Checklist
 
-```bash
-# Syntax validation
-jq empty opencode/.config/opencode/*.json
+Everything the repo checks lives in one script, and CI runs the same script, so
+a green local run means a green pipeline:
 
-# Verify symlinks
+```bash
+./scripts/validate.sh    # or: make validate
+```
+
+It runs, fail-closed:
+
+1. **ShellCheck** on every tracked `*.sh` (`--severity=warning`).
+2. **JSON** parse of every tracked `*.json` / `*.json.template`.
+3. **YAML** parse of every tracked `*.yml` / `*.yaml` (workflows excluded).
+4. **`stow --simulate`** of all nine packages into a scratch target — proves
+   every tracked file still maps to a real destination, without touching `$HOME`.
+5. **`release_dotfiles.py --check`**, which also validates `CHANGELOG.md`.
+
+The severity is passed explicitly because older ShellCheck builds ignore
+`severity` in `.shellcheckrc`, and a gate that silently reports nothing is worse
+than no gate. Do not add `|| true` to any check here.
+
+For spot checks:
+
+```bash
+# Verify symlinks resolve
 ls -l ~/.config/nvim ~/.tmux.conf ~/.config/opencode/ ~/.omp/agent/
 
 # Test configs
@@ -90,20 +119,91 @@ tmux -f ~/.tmux.conf list-keys 2>/dev/null | head -1
 
 ### Restowing
 
-If symlinks break or need refresh:
+If symlinks break or need refresh, prefer the scripts, which apply the correct
+`--no-folding` flags and keep the package lists in one place:
 
 ```bash
 cd ~/dotfiles
-stow -D nvim tmux zsh vim opencode omp pi hermes pen  # Unstow
-stow nvim tmux zsh vim opencode omp pi hermes pen     # Restow
+./sync-dotfiles.sh --sync-only              # restow every package
+./sync-dotfiles.sh --sync-only --harness    # restow only the harness configs
+./sync-dotfiles.sh --sync-only --only omp,hermes
+```
+
+By hand, the flags are on you — `omp`, `pen` and `dsh` must not be folded:
+
+```bash
+cd ~/dotfiles
+stow nvim tmux zsh vim opencode hermes pi   # packages that fold safely
+stow --no-folding omp pen dsh               # packages holding app state
 
 # Arch/Omarchy hosts only — ~/.config/hypr does not exist on macOS.
 stow omarchy
-
-# Pen keeps app state (sessions/, agent-auth) in ~/.pencil — stow it without
-# folding, or ~/.pencil would become a symlink into the repo.
-stow --no-folding pen
 ```
+
+### Selecting Packages
+
+`bootstrap.sh` and `sync-dotfiles.sh` can stow a subset instead of everything.
+The names and groups come from `scripts/packages.sh`, so a typo fails loudly
+rather than quietly stowing nothing.
+
+```bash
+./bootstrap.sh --harness --skip-deps --sync-only   # relink harness configs only
+./bootstrap.sh --only omp,hermes                   # arbitrary subset
+./bootstrap.sh --editor --shell                    # nvim vim zsh tmux
+./bootstrap.sh --all                               # the default
+```
+
+Groups: `harness` (`omp opencode hermes pen pi dsh`), `editor` (`nvim vim`),
+`shell` (`zsh tmux`). `--sync-only` skips toolchain setup (mise, oh-my-zsh,
+p10k, fzf) and only restows; `--skip-deps` additionally skips system packages.
+`--only` and a group flag may be combined, and duplicates are collapsed.
+
+Note that `--only` narrows the **unstow** pass too, so selecting a subset never
+unlinks the packages you left out.
+
+## CI and Releases
+
+Two workflows, both in `.github/workflows/`:
+
+| Workflow | Trigger | Does |
+|----------|---------|------|
+| `validate.yml` | every push to `main` and every PR | installs the tools, runs `scripts/validate.sh` |
+| `release.yml` | push to `main` touching `CHANGELOG.md` (or manual dispatch on `main`) | validates, then tags and publishes |
+
+Both jobs install `shellcheck`, `jq`, `stow`, and PyYAML before running the
+script — `validate.sh` fails closed when a tool is missing, so a job that
+skipped the install step would fail rather than silently skip checks.
+
+### Releases
+
+Releases are driven by `CHANGELOG.md`; there is no separate version file and no
+manual tagging step.
+
+1. Add a `## [x.y.z] - YYYY-MM-DD` section at the **top** of `CHANGELOG.md`,
+   above the current newest release, with the notes for this release.
+2. Merge to `main`.
+
+`release.yml` then runs `scripts/release_dotfiles.py --tag`, which compares that
+version against existing tags and, if untagged, creates `dotfiles-vX.Y.Z`
+annotated with the changelog section, pushes it, and opens a GitHub release
+whose body is the tag message.
+
+Rules the script enforces — each fails closed rather than skipping:
+
+- Versions are `x.y.z`, and the newest heading must be **first** in the file.
+- A version may appear only once, and must have notes under it.
+- An existing tag means "already released": re-running is a no-op.
+
+Local equivalents:
+
+```bash
+make release-check   # what would be released? writes nothing
+python3 scripts/release_dotfiles.py --tag   # create the tag locally
+```
+
+Never hand-edit a version heading to a value that is already tagged, and never
+reorder released sections — the script reads the file top-down and refuses to
+guess.
 
 ## Safety Rules
 
@@ -118,14 +218,17 @@ stow --no-folding pen
   app's own credential store. Bare names like `"VAR"` are literals, not
   references, and fail with 401.
 - **Symlinks point one way: repo → `$HOME`.** Never make a tracked directory the
-  parent of machine state. If an app writes state into a stowed dir (see `pen`),
-  stow with `--no-folding` and add a `.gitignore` rule for the state files.
+  parent of machine state. If an app writes state into a stowed dir, stow with
+  `--no-folding` and add a `.gitignore` rule for the state files. `omp` and
+  `pen` are both in this category, and their `STOW_NO_FOLDING` lists must stay
+  in sync across `bootstrap.sh`, `sync-dotfiles.sh`, and `scripts/validate.sh`.
+  Without `--no-folding`, `stow omp` folds all of `~/.omp` into a single
+  symlink, and the agent's databases and sessions land in the repo.
 - Preserve existing user model/provider configurations unless explicitly asked
 - Keep changes minimal and consistent with existing style
 - When editing `bootstrap.sh` or `sync-dotfiles.sh`, keep them consistent: any
   package, `--no-folding` exception, or validation added to one belongs in both.
 - Test changes in headless mode when possible
-
 
 ## Common Tasks
 
@@ -180,6 +283,11 @@ cd ~/dotfiles && stow <package>
 ### Model Configuration
 
 All AI model traffic goes through the **9router** gateway (`https://ai.workofekajaya.com/v1`, an OpenAI-compatible proxy). Models are declared in `omp/.omp/agent/models.yml` and referenced as `9router/<model-id>`.
+
+**Exception: `dsh` is not on 9router by default.** It ships pointing at
+DeepSeek's official API with `DEEPSEEK_API_KEY`, per the "direct key first"
+choice — see the dsh *Model Routing and Gateways* section for the 9router
+recipe. Every other harness (omp, opencode, hermes, pen) rides 9router.
 
 | Role | Model | Purpose |
 |------|-------|---------|
@@ -405,6 +513,348 @@ A key pasted through Pen's UI takes precedence and is stored in
 
 ```bash
 jq empty pen/.pencil/models.json
+```
+
+## DeepSeek Harness (dsh)
+
+[DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) (`dsh`) is
+DeepSeek's open-source agent harness — "everything is a plugin", built on the
+[Cordis](https://github.com/cordiverse/cordis) plugin framework. It is the
+intended long-term replacement for `omp` and `hermes` here, so it is stowed
+alongside them rather than added as an ad-hoc install.
+
+### Config Files Managed in This Repo
+
+- `dsh/.dsh/cordis.patch.yml` → `~/.dsh/cordis.patch.yml` (home-level patch)
+
+### Layer Order
+
+`dsh` composes its effective config over an empty root, applying layers
+lowest-priority first. Later layers win per row:
+
+1. each bundle patch named in the profile manifest's `dsh.profile.bundles`
+2. the profile's own `cordis.patch.yml`
+3. the **home-level** `$DSH_HOME/cordis.patch.yml` — the file this repo syncs,
+   applied to every profile, so it is the right place for machine-wide settings
+4. each `--patch <path>` overlay, in argv order
+
+**A patch replaces the targeted row's complete `config` value — it does not
+deep-merge keys.** A partial patch silently drops every key it does not restate.
+
+### Why Only the Home Patch Is Synced
+
+`dsh` auto-initializes the shipped profiles (`web`, `headless`, `sdk`,
+`sdk-minimal`, `acp`) from templates on first use, and the launcher claims the
+profile directory **exclusively** — it rejects a target whose directory already
+exists. Pre-creating `profiles/web/` in this repo would therefore make
+`dsh web` fail on a fresh machine, so this package deliberately ships only the
+home-level patch. Profile-specific overlays are machine-local; add one with
+`dsh plugin --profile <name> add <package>`.
+
+### Not Synced (machine-local state and secrets)
+
+| Path | Why it stays local |
+|------|--------------------|
+| `.credentials.yaml` | **Provider API keys** |
+| `logs/` | Startup diagnostics that can echo credential values |
+| `profiles/` | pnpm-managed; holds `node_modules/` and lockfiles |
+
+The root `.gitignore` ignores everything under `dsh/.dsh/` except
+`cordis.patch.yml`, so a fold or a stray `git add` cannot leak these.
+
+### Stowing
+
+`~/.dsh` also holds the state above, so the package **must** be stowed with
+`--no-folding`. Plain `stow dsh` on a machine without an existing `~/.dsh` would
+replace the directory with a symlink into the repo and let `dsh` write its
+credentials there.
+
+```bash
+cd ~/dotfiles
+stow --no-folding dsh
+```
+
+`bootstrap.sh` and `sync-dotfiles.sh` handle this automatically (`dsh` is in
+`STOW_NO_FOLDING`).
+
+### Installing Plugins
+
+Plugins are managed per profile through pnpm, so they are machine-local and
+never tracked here:
+
+```bash
+dsh plugin --profile web add <package>     # initializes the profile if missing
+dsh plugin --profile web remove <package>
+```
+
+The CLI ships `@deepseek-ai/dsh-mcp-client` for patch layers, but **no MCP
+server is enabled by default**, because each server command is trusted
+executable code outside the agent sandbox.
+
+### Multi-Agent Swarm (in-process)
+
+The swarm is **first-party and already mounted by `dsh-base`** — nothing extra
+to install. The native equivalent of omp's `task` tool:
+
+| Row | Package | Role |
+|-----|---------|------|
+| `subagent` | `@deepseek-ai/dsh-subagent` | Registry seam (`ctx.subagents`) |
+| `subagent-spawn-in-process` | `@deepseek-ai/dsh-subagent-spawn-in-process` | Fresh child agent, provider name `spawn` |
+| `subagent-fork-in-process` | `@deepseek-ai/dsh-subagent-fork-in-process` | Child seeded from a prefix of the parent context, provider name `fork` |
+| `tool-subagent` | `@deepseek-ai/dsh-tool-subagent` | Model-facing `subagent` tool (backgroundMode `continuable`) |
+| `tool-subagent-fork` | `@deepseek-ai/dsh-tool-subagent` | Same tool bound to the `fork` provider |
+| `tool-subagent-control` | `@deepseek-ai/dsh-tool-subagent-control` | `send_message`, `interrupt_agent`, `list_agents` |
+
+Row ids are version-specific — these are from the pinned `0.2.0-rc.2` bundle,
+where `subagent-spawn`/`subagent-fork` and `telemetry-otel` were renamed. An
+unmatched patch target is reported on stderr, so re-verify against
+`@deepseek-ai/dsh-base`'s `cordis.patch.yml` whenever `DSH_VERSION` moves.
+
+Fork vs spawn is the useful distinction: **fork** inherits the parent's context
+prefix (for follow-on work that needs the conversation), **spawn** starts clean
+(for independent tasks). That mirrors omp routing exploration to a fresh
+sub-agent.
+
+**No Codex or Claude Code backend is involved, and none needs disabling.**
+Earlier dsh releases mounted `subagent-codex` and `subagent-claude-code`
+product providers; the pinned release has dropped them, so the swarm is
+in-process by default. Do **not** re-add patch rows for those ids — they are
+unmatched targets in this version and would warn on every boot.
+
+**Per-subagent model routing is first-party** — the omp `modelRoles` analogue
+needs no plugin. The shipped preset mounts the delegation tool with
+`modelSelectionSettings: true`:
+
+```yaml
+- id: tool-subagent
+  name: '@deepseek-ai/dsh-tool-subagent'
+  config:
+    provider: spawn
+    toolName: subagent
+    modelSelectionSettings: true      # exposes provider/model/reasoning_effort
+    backgroundMode: continuable
+```
+
+That setting makes the tool expose provider/model/reasoning-effort selection to
+the delegating model plus a `list_subagent_models` tool, and it is a Web
+Settings toggle (row `subagent-model-selection-settings`). So where omp pins
+static roles in `modelRoles`, dsh lets the orchestrator choose per delegation.
+
+### Multi-Agent Kanban
+
+Hermes' kanban is a board *plus* a dispatcher: `auto_decompose`, a 60s
+`dispatch_interval_seconds` tick, and claim/assign across workers. dsh has no
+single first-party equivalent; it splits across two pieces:
+
+| Concern | dsh |
+|---------|-----|
+| Board with claim/assign across agents | `@dsh-suite/plugin-team-board` (community) |
+| Decompose + run orchestration | `@deepseek-ai/dsh-tool-workflow` (first-party) |
+| Workers | the in-process swarm above |
+
+`@dsh-suite/plugin-team-board` materializes its state as a Cordis **service key
+`ctx.teamBoard`** (not a module global), so the board is visible across sessions
+and subagents, and exposes `task_create` / `task_claim` / `task_update` /
+`task_list` / `task_delete` as model tools. It persists to
+`$DSH_HOME/team-board/board.json`, which is the source of truth across restarts
+(the session journal does not survive a process restart). A visual panel lives
+at Settings → Plugins → Team Board.
+
+**Verify before relying on it.** In the `web` profile the model-facing tools are
+owned by the **agent preset**, not the host plane: the web bundle disables the
+host copies of `tool-subagent`, `tool-subagent-fork`, `tool-subagent-control`,
+`tool-subagent-list-agents` and `tool-workflow` (`disabled: true` in
+`@deepseek-ai/dsh-web-app`'s `cordis.patch.yml`), and the preset's
+`presets/standard.patch.yml` mounts its own. Each agent reads the merged catalog
+its scope chain selects, so a profile-installed plugin registering into the
+global layer *should* reach the agent — but a plugin that registers tools only
+for the host plane may be invisible in a web session.
+
+The check is one command, and it is worth running before building on this:
+
+```bash
+dsh plugin --profile web add @dsh-suite/plugin-team-board
+dsh --profile web --dump-config | grep -A3 team-board   # is it mounted, and where?
+# then in a web session: does the model actually have task_create/task_claim?
+```
+
+If the tools do not appear, the fallback is to copy the shipped preset and add
+the rows there — preset edits are the supported route for changing what an
+agent's model can call. The same caveat applies to **every** tool-providing
+plugin in this setup, not just the board.
+
+### Model Routing and Gateways
+
+Two adapters ship, and they are for different jobs:
+
+| Adapter | Route | API shape | Use when |
+|---------|-------|-----------|----------|
+| `@deepseek-ai/dsh-llm-deepseek` | `deepseek-official` | **Anthropic Messages** (`/v1/messages`) | Direct DeepSeek only |
+| `@deepseek-ai/dsh-llm-pi-ai` | per-provider, from `providers` | pi-ai catalogs | **Multi-provider or OpenAI-compatible gateways** |
+
+**The Messages detail matters.** `llm-deepseek` is not a chat-completions
+client: its default root is `https://api.deepseek.com/anthropic` and model
+requests append `/v1/messages`. That is exactly the shape 9router already
+serves — see the Claude Code section below, where
+`ANTHROPIC_BASE_URL=https://ai.workofekajaya.com` is paired with 9router's
+`/v1/messages` endpoint. So the adapter fits the gateway without a translation
+layer, and the adapter's rule that "an exact final `/v1` segment is reused"
+lines up with that base URL.
+
+Use the **public** gateway, not `127.0.0.1:20128`: the local endpoint only
+exists on this Mac, so a remote `headless` box would fail with a connection
+error. Point `baseURL` at `https://ai.workofekajaya.com` and let the adapter
+append `/v1/messages`:
+
+```yaml
+- id: llm-deepseek
+  config:
+    apiKeyEnv: NINEROUTER_API_KEY
+    baseURL: https://ai.workofekajaya.com
+    models:                       # advisory catalog; ids pass through to the wire
+      - id: coder
+        name: coder
+      - id: advisor
+        name: advisor
+```
+
+The model ids mirror the combos already used by omp/hermes (`coder`,
+`personal-chat`, `advisor:high`), and the adapter passes unlisted ids through
+unchanged, so a catalog entry is only needed for GUI selection.
+
+`dsh-llm-pi-ai` is the alternative, and the one built for "multiple pi-ai
+providers, OpenAI-compatible gateways, or self-hosted servers" — reach for it
+only if you later route several providers through dsh. Both can be mounted
+together, since their route names do not collide.
+
+The shipped default needs no patch at all: `llm-deepseek` points at DeepSeek's
+official API using `DEEPSEEK_API_KEY` (exported from `~/.zshenv.local`).
+
+**Per-subagent model choice** is separate from provider plumbing: the delegation
+tool's `modelSelectionSettings: true` lets the orchestrator pick a model per
+subagent (see the swarm section).
+
+### Multi-Profile
+
+dsh has native multi-profile support, and it is stronger than hermes' — the
+profile is a real unit, and its *plugins* are per-profile:
+
+```bash
+dsh <name>                              # shorthand for: dsh --profile <name>
+dsh plugin --profile <name> add <pkg>   # initializes the profile if missing
+dsh --profile <name> --dump-config      # inspect the composed tree
+```
+
+This repo uses two: **`web`** (browser UI, the swarm + kanban surfaces) and
+**`headless`** (one-shot CLI — `dsh --profile headless "run the tests"` — the
+surface for scripted and remote work). There is no `cli` profile; the shipped
+templates are `web`, `headless`, `sdk`, `sdk-minimal`, `acp`. To derive a custom
+one:
+
+```bash
+dsh --profile mine --from-default-profile web
+```
+
+Profiles live at `$DSH_HOME/profiles/<name>/` and are pnpm projects holding
+`node_modules/`. **They are machine-local and never synced** — which is why only
+the home patch is tracked. Reproduce a profile on a new machine with
+`dsh plugin --profile <name> add ...`.
+
+### Telemetry: Three Egresses, Two Levers
+
+dsh has **three independent outbound paths**, and they are not switched the same
+way. Getting this wrong means believing you opted out when you did not.
+
+| Egress | Payload | How to turn it off |
+|--------|---------|--------------------|
+| `session-log-deepseek` | `dsh_session_log` — unaccepted message/tool log suffixes, up to 8 MiB per request. **Carries message text.** | `enabled: false` in the home patch |
+| `plugin-package-inventory-deepseek` | `dsh_plugin_packages` — active plugin/package inventory | `enabled: false` in the home patch |
+| `session-telemetry-otel` | Releases a session-log prefix to OTLP, but **only after explicit user feedback** — `mode` defaults to `FEEDBACK_ONLY` and the bundle notes "ordinary activity never triggers capture" | **env var only** |
+
+The first two default to `enabled: true` in `0.2.0-rc.2` — verified in the
+packages' own declarations (`session-log-deepseek` declares
+`enabled: Volatile<boolean>` "Defaults to true"; the inventory declares
+`enabled?: boolean` "Defaults to true"). Both are config-controllable and are
+switched off in `dsh/.dsh/cordis.patch.yml`. **`session-log-deepseek` is the
+one that matters**: it rides every DeepSeek request, so it is the continuous
+path and the one carrying message text.
+
+The OTel row is **not** config-controllable. dsh composes its tree in code and
+its own notes say the launchers patch the row disabled precisely because
+*"config cannot disable a row"* — so `enabled: false` for it silently does
+nothing. The lever is the environment:
+
+```bash
+export DSH_TELEMETRY_DISABLED=1   # any non-empty value, incl. '0'/'false'
+```
+
+Set in `zsh/.zshenv` (not `.local`, since it is not a secret) so the posture
+follows the machine. `DSH_TELEMETRY_MODE=DISABLED` also works; `FULL` is
+rejected.
+
+Both levers are asserted in the dsh *Validation* section below, and the
+patch-side half runs in CI via `scripts/validate.sh`.
+
+A fourth path has **no switch at all**: every model and Files call carries
+shared attribution, and model requests carry a stable anonymous user id
+(`$DSH_HOME/.anonymous-user-id`; deleting that file resets the identity). It
+rides the request to whichever endpoint serves it — DeepSeek's API or 9router —
+so routing does not avoid it. Treat the opt-outs as covering content, not all
+metadata.
+
+**Scoping differs per egress, and this matters.** The two request-extension
+contributions (`session-log-deepseek`, `plugin-package-inventory-deepseek`)
+attach to *official DeepSeek* requests only. OTel is **not** scoped that way:
+it exports "for all users and providers, including `deepseek-official`", so
+routing dsh through 9router would not narrow it. None of them change what the
+model sees — only what leaves the machine.
+
+### Remote Access
+
+The web profile binds loopback (`127.0.0.1:3080`) and dsh intentionally rejects
+`--host 0.0.0.0`, because the agent has a shell. Remote access is therefore a
+plugin decision, and the safe shape is identity-based rather than a public bind:
+
+```bash
+dsh plugin --profile web add github:TiantianFlow/dsh-tailscale-gateway
+```
+
+`dsh-tailscale-gateway` allowlists users from the `Tailscale-User-Login` header
+that Tailscale Serve injects and keeps the upstream on loopback — no public
+port. Alternatives seen in the catalog (`dsh-pocket`, `dsh-web-remote`) expose a
+LAN or Cloudflare tunnel with token auth; prefer Tailscale where possible. A
+plain SSH port-forward to loopback is the zero-plugin option.
+
+### Installing and Pinning
+
+`dsh` is pinned in `bootstrap.sh`'s mise block via the npm backend:
+
+```bash
+mise use -g npm:@deepseek-ai/dsh@0.2.0-rc.2   # DSH_VERSION overrides the pin
+```
+
+It is pinned rather than `@latest` on purpose: dsh is a developer preview that
+ships compatibility-breaking changes, so bump `DSH_VERSION` deliberately.
+Plugins are machine-local (see Multi-Profile), so the package set is reproduced
+with `dsh plugin --profile <name> add`, not by this repo.
+
+### Validation
+
+`scripts/validate.sh` (and therefore CI) already covers the patch, so a local
+run is the first check:
+
+```bash
+./scripts/validate.sh    # or: make validate
+```
+
+That asserts the patch parses, that its root is a list of rows, **and** that
+both telemetry opt-out rows are still present with `enabled: false` — dropping
+one silently re-enables an upload, so it is a hard failure rather than a note.
+
+The OTel lever is env-only and cannot be asserted from the patch:
+
+```bash
+grep -q '^export DSH_TELEMETRY_DISABLED=' zsh/.zshenv && echo "otel opt-out OK"
 ```
 
 ## Jev Toolchain
