@@ -178,7 +178,20 @@ def main() -> int:
     if args.check:
         return 0
 
-    git(*tag_identity(), "tag", "-a", tag, "-m", release_body(version, date, notes), check=True)
+    # --cleanup=verbatim is load-bearing: git's default 'strip' cleanup deletes
+    # lines beginning with '#', which would silently remove every `### Added` /
+    # `### Changed` / `### Fixed` heading from the release body. The published
+    # notes would then jump from the intro straight to bullets.
+    git(
+        *tag_identity(),
+        "tag",
+        "-a",
+        tag,
+        "--cleanup=verbatim",
+        "-m",
+        release_body(version, date, notes),
+        check=True,
+    )
     print(f"  created {tag}")
     return 0
 
