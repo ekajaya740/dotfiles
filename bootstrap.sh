@@ -415,6 +415,15 @@ setup_machine_specific() {
         bash "$DOTFILES_REPO/claude/install.sh" || warn "claude MCP merge had errors (non-fatal)"
     fi
 
+    # dsh (DeepSeek Harness): the service env holds provider keys and the
+    # profile plugin set is machine state, so neither can be stowed. The script
+    # creates the env from the template and (with --plugins) replays plugins.txt.
+    # Only the env is created here — replaying plugins needs the dsh CLI on PATH
+    # and would rewrite the profile on every bootstrap, so it stays opt-in.
+    if [[ -f "$DOTFILES_REPO/dsh/install.sh" ]]; then
+        bash "$DOTFILES_REPO/dsh/install.sh" || warn "dsh wiring had errors (non-fatal)"
+    fi
+
     ok "Machine-specific config applied"
 
 }
