@@ -1,0 +1,7 @@
+# Repo-internal tooling: not part of the stowed home tree.
+#
+# install.sh deploys the parts of the dsh wiring that cannot be symlinked
+# (the service env, which holds secrets) and can replay plugins.txt. Neither
+# belongs in $HOME: stow would otherwise create ~/install.sh and ~/plugins.txt.
+install.sh
+plugins.txt

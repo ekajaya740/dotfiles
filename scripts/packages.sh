@@ -20,7 +20,9 @@ ALL_PACKAGES=(nvim tmux zsh vim opencode omp pi hermes pen dsh)
 # symlink pointing into the repo and the app writes its state into git.
 #   omp:  ~/.omp holds agent/ (DBs, sessions), cache/, plugins/, logs/
 #   pen:  ~/.pencil holds sessions/ and agent-auth
-#   dsh:  ~/.dsh holds profiles/ (pnpm-managed), logs/, and .credentials.yaml
+#   dsh:  ~/.dsh holds profiles/ (pnpm-managed), logs/, and .credentials.yaml;
+#         the package also targets ~/.config/dsh and ~/.config/systemd/user,
+#         both of which hold app-managed state beside the stowed files.
 STOW_NO_FOLDING=(omp pen dsh)
 
 # Named groups for the --harness / --editor / --shell shortcuts.
