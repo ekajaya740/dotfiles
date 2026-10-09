@@ -18,6 +18,12 @@
 
 # ── third-party plugins ─────────────────────────────────────────────────────
 @little-traincar/dsh-imagegen
+# History search across other agents (Claude Code, Codex, Cursor, …). Ships a
+# bundled `deja` binary; DEJA_BIN overrides it. Its dsh.compatibility field
+# claims 0.1.1-rc.2 only, but peerDependencies are empty so nothing gates it —
+# verified loading on 0.2.0-rc.2. Note autoRecall defaults ON, which injects
+# past-session history into the runtime context on every step.
+dsh-deja
 dsh-elephant-memory
 dsh-jev-tools
 dsh-live-voice
