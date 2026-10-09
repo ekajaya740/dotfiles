@@ -1,0 +1,36 @@
+# dsh profile plugin set — the reproducible install list for `dsh plugin add`.
+#
+# Format: one install spec per line, `#` comments and blank lines ignored.
+# Replayed by dsh/install.sh into the web profile. Keep this file as the source
+# of truth for which plugins a fresh machine gets: the live profile's
+# package.json is machine state (pnpm rewrites it atomically, so it cannot be
+# symlinked into the repo) and is not the record of intent.
+#
+# Order does not matter for `dsh plugin add`; bundles are composed by the
+# profile manifest afterwards.
+#
+# Pinned deliberately where upstream tracks @latest or a moving branch.
+
+# ── harness-provided bundles (shipped with dsh; listed for reference only,
+#    they are NOT installed by `dsh plugin add`) ─────────────────────────────
+# @deepseek-ai/dsh-base
+# @deepseek-ai/dsh-web-app
+
+# ── third-party plugins ─────────────────────────────────────────────────────
+@little-traincar/dsh-imagegen
+dsh-elephant-memory
+dsh-jev-tools
+dsh-live-voice
+dsh-mcp
+dsh-telegram
+dsh-voice
+
+# ── pinned / non-registry specs ─────────────────────────────────────────────
+# Kanban board (UI + 15 kanban_* tools).
+@alpacachen/dsh-kanban
+# Desktop pet / mascot (web client plugin).
+github:Sutera-Diffusus/dsh-whale-musume
+# LoopX goal driver. beta.5 does NOT support dsh 0.2.x — its peer range is
+# >=0.1.0-rc.7 <0.1.1 || >=0.1.1-rc.1 <0.2.0-0. beta.6 adds
+# >=0.2.0-rc.2 <0.2.1-0. Keep the explicit tarball so the pin is visible.
+https://github.com/loopx-project/loopx/releases/download/dsh-loopx-plugin-v0.1.1-beta.6/dsh-loopx-plugin-0.1.1-beta.6.tgz

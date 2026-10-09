@@ -76,11 +76,12 @@ hermes/.hermes/.hermes-update-*
 hermes/.hermes/.mcp-discovery.lock
 hermes/.hermes/.npm_lock_hash_*
 
-# dsh (DeepSeek Harness) — only the home-level cordis.patch.yml is synced.
-# Everything else under the dsh/ package is machine state or secrets: profiles/
-# is pnpm-managed, logs/ holds startup diagnostics that can echo credential
-# values, and .credentials.yaml holds provider keys. Guards against folding
-# ~/.dsh into the repo and against a stray `git add`.
+# dsh (DeepSeek Harness). Stowed from dsh/: the home-level cordis.patch.yml,
+# the systemd unit, and the env template. Everything else under ~/.dsh is
+# machine state or secrets: profiles/ is pnpm-managed, logs/ holds startup
+# diagnostics that can echo credential values, and .credentials.yaml holds
+# provider keys. Guards against folding ~/.dsh into the repo and against a
+# stray `git add`. The live service env is deployed by dsh/install.sh.
 dsh/.dsh/*
 !dsh/.dsh/cordis.patch.yml
 dsh/.dsh/.credentials.yaml
@@ -93,6 +94,10 @@ dsh/.dsh/**/pnpm-lock.yaml
 hypr-lua/standalone/
 hypr-lua/APPLY.md
 hypr-lua/apply.sh
+# The real service env holds provider keys and bot tokens; only the template is
+# committed. Deployed by dsh/install.sh (copied, never symlinked).
+dsh/.config/dsh/env
+
 hypr-lua/fix-snapper.sh
 
 # Third-party agent skills (mattpocock/skills et al) installed with

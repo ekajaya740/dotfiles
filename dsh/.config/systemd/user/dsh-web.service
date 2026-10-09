@@ -1,0 +1,45 @@
+# dsh-web.service — DeepSeek Harness (dsh) Web UI, tailnet-only, loopback bind.
+#
+# Stowed from dotfiles/dsh/ to ~/.config/systemd/user/dsh-web.service. Contains
+# no secrets: the service env (provider keys) lives in ~/.config/dsh/env, which
+# is machine-local and never committed (see dsh/.config/dsh/env.example).
+#
+# Binds 127.0.0.1 only: dsh-host-webserver accepts just 127.0.0.1 or 0.0.0.0,
+# and 0.0.0.0 carries no TLS/auth/origin policy of its own, so the loopback
+# posture is the supported one. nginx terminates TLS and proxies from the
+# tailscale IP (see /etc/nginx/sites-available/dsh.workofekajaya.com).
+#
+# --trusted-host is REQUIRED behind a proxy: the /api browser-trust fence
+# rejects any Host that is not loopback or listed, answering 403 before the
+# auth check. Without it the public hostname gets 403, not the 401 that the
+# ?token= exchange can satisfy.
+#
+# Auth: dsh mints a fresh random token every boot and prints
+#   dsh web: http://127.0.0.1:3080/?token=...
+# to stdout (-> journal). Open that URL once per restart at the public
+# hostname to receive the authority-bound session cookie; there is no static
+# password to store. Read it with:
+#   journalctl --user -u dsh-web -n 20 | grep token
+[Unit]
+Description=DeepSeek Harness (dsh) Web UI - tailnet-only
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+WorkingDirectory=/home/personal
+Environment="PATH=/home/personal/.local/share/mise/shims:/home/personal/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+Environment="DSH_HOME=/home/personal/.dsh"
+EnvironmentFile=/home/personal/.config/dsh/env
+ExecStart=/home/personal/.local/share/mise/shims/dsh web --no-open --port 3080 --trusted-host dsh.workofekajaya.com
+Restart=always
+RestartSec=5
+KillMode=mixed
+KillSignal=SIGTERM
+TimeoutStopSec=30
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target
