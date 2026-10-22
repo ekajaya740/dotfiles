@@ -11,7 +11,7 @@ permissions:
 jobs:
   smoke:
     name: Smoke test on self-hosted VPS runner
-    runs-on: ${{ vars.CI_RUNNER }}
+    runs-on: ${{ fromJSON(vars.CI_RUNNER) }}
     steps:
       - name: Prove where this ran
         run: |
