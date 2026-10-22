@@ -1,0 +1,35 @@
+name: VPS Smoke
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ci/vps-smoke]
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    name: Smoke test on self-hosted VPS runner
+    runs-on: ${{ vars.CI_RUNNER }}
+    steps:
+      - name: Prove where this ran
+        run: |
+          echo "hostname=$(hostname)"
+          echo "uname=$(uname -a)"
+          echo "runner_name=${{ runner.name }}"
+          echo "--- id ---"; id
+          echo "--- mounts (top) ---"; mount | grep -E ' / | /opt/runner ' | head -5
+          echo "--- docker daemon ---"; docker info --format '{{.Name}} root={{.DockerRootDir}}' 2>&1 | head -3
+          echo "--- containers visible to this job ---"; docker ps --format '{{.Names}}' 2>&1 | head -5
+          echo "--- host /home/personal visible? ---"; ls /home/personal 2>&1 | head -5
+          echo "--- gh credentials visible? ---"; ls -la ~/.config/gh 2>&1 | head -3
+      - name: Write proof artifact
+        run: |
+          mkdir -p /tmp/proof
+          {
+            echo "runner=${{ runner.name }}"
+            echo "container_id=$(hostname)"
+            echo "host_visible=$(ls /home/personal 2>/dev/null | tr '\n' ' ')"
+          } > /tmp/proof/whoami.txt 2>/dev/null || true
+          cat /tmp/proof/whoami.txt 2>/dev/null || true
