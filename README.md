@@ -113,7 +113,6 @@ subset never unlinks the packages you left out.
 - `CHANGELOG.md` -> drives releases; the newest `## [x.y.z]` section is what ships
 - `.github/workflows/validate.yml` -> runs `scripts/validate.sh` on every push and PR
 - `.github/workflows/release.yml` -> on a `CHANGELOG.md` bump to `main`, tags `dotfiles-vX.Y.Z` and publishes the release
-- `CI_RUNNER` (repo variable) -> decides where those workflows run: unset means GitHub-hosted `ubuntu-latest`, a JSON array of labels (e.g. `["self-hosted","ci-vps"]`) means a self-hosted runner. Fork pull requests always stay on GitHub-hosted runners.
 
 ## Dependencies
 
