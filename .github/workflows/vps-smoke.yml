@@ -20,12 +20,48 @@ jobs:
           echo "host_visible=$(ls /home/personal 2>/dev/null | tr '\n' ' ')"
           echo "host_containers=$(docker ps --format '{{.Names}}' 2>/dev/null | tr '\n' ' ')"
 
-  jit:
-    name: Smoke on one-shot machine
-    runs-on: [self-hosted, ci-jit]
-    steps:
-      - name: Prove where this ran
+      - name: Isolation checks
         run: |
-          echo "hostname=$(hostname)"
-          echo "runner_name=${{ runner.name }}"
-          echo "host_visible=$(ls /home/personal 2>/dev/null | tr '\n' ' ')"
+          set +e
+          echo "--- can the job read the runner credentials? ---"
+          if cat /opt/runner/.credentials >/dev/null 2>&1; then
+            echo "CREDENTIALS_READABLE=yes"
+          else
+            echo "CREDENTIALS_READABLE=no"
+          fi
+          echo "--- can the job read the host gh token? ---"
+          if cat /home/personal/.config/gh/hosts.yml >/dev/null 2>&1; then
+            echo "HOST_GH_TOKEN_READABLE=yes"
+          else
+            echo "HOST_GH_TOKEN_READABLE=no"
+          fi
+          echo "--- can the job see host block devices? ---"
+          echo "BLOCK_DEVS=$(ls /dev | grep -E '^(sd|vd|nvme|loop|xvd)' | tr '\n' ' ')"
+          echo "--- can the job mknod? ---"
+          if mknod /tmp/blk b 8 1 2>/dev/null; then
+            echo "MKNOD=yes"; rm -f /tmp/blk
+          else
+            echo "MKNOD=no"
+          fi
+          echo "--- can the job run a privileged container? (must be denied) ---"
+          if docker run --rm --privileged alpine:3 true >/dev/null 2>/tmp/priv.err; then
+            echo "PRIVILEGED_CONTAINER=allowed"
+          else
+            echo "PRIVILEGED_CONTAINER=denied"
+            head -c 300 /tmp/priv.err
+            echo
+          fi
+          echo "--- can the job bind a host path outside the runner dirs? (must be denied) ---"
+          if docker run --rm -v /:/hostroot alpine:3 true >/dev/null 2>/tmp/bind.err; then
+            echo "HOST_BIND=allowed"
+          else
+            echo "HOST_BIND=denied"
+            head -c 300 /tmp/bind.err
+            echo
+          fi
+          echo "--- can the job run a normal container? (must be allowed) ---"
+          if docker run --rm alpine:3 true >/dev/null 2>&1; then
+            echo "NORMAL_CONTAINER=allowed"
+          else
+            echo "NORMAL_CONTAINER=denied"
+          fi
