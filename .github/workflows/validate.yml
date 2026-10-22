@@ -16,13 +16,7 @@ concurrency:
 jobs:
   validate:
     name: Validate configs
-    # CI_RUNNER is the single switch that decides where this job runs:
-    #   unset -> GitHub-hosted ubuntu-latest (the default)
-    #   set  -> a JSON array of runner labels, e.g. ["self-hosted","ci-vps"]
-    # Fork pull requests always stay on GitHub-hosted runners: a fork can
-    # change the scripts this job runs, and untrusted code has no business
-    # executing on a self-hosted machine.
-    runs-on: ${{ fromJSON(github.event.pull_request.head.repo.fork && '["ubuntu-latest"]' || vars.CI_RUNNER || '["ubuntu-latest"]') }}
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -31,13 +25,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends shellcheck jq stow
-          # PyYAML comes from pip on GitHub-hosted runners and is already in the
-          # self-hosted image; --break-system-packages covers the distro
-          # "externally managed" python on both.
-          if ! python3 -c 'import yaml' 2>/dev/null; then
-            python3 -m pip install --quiet pyyaml \
-              || python3 -m pip install --quiet --break-system-packages pyyaml
-          fi
+          python3 -m pip install --quiet pyyaml
 
       - name: Run checks
         run: ./scripts/validate.sh

@@ -174,19 +174,6 @@ Both jobs install `shellcheck`, `jq`, `stow`, and PyYAML before running the
 script — `validate.sh` fails closed when a tool is missing, so a job that
 skipped the install step would fail rather than silently skip checks.
 
-### Where the jobs run
-
-`runs-on` is not hardcoded. Both workflows read the repository variable
-`CI_RUNNER`, which holds a JSON array of runner labels:
-
-- unset -> `["ubuntu-latest"]`, a GitHub-hosted runner (the default)
-- set -> e.g. `["self-hosted","ci-vps"]`, a self-hosted runner
-
-That is the only switch: pointing CI at a different machine is a variable
-change, not a workflow edit. `validate.yml` also forces GitHub-hosted runners
-for fork pull requests, because a fork's code is untrusted and must not run
-on a self-hosted machine.
-
 ### Releases
 
 Releases are driven by `CHANGELOG.md`; there is no separate version file and no
