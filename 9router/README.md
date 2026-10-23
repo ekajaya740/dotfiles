@@ -170,6 +170,52 @@ The other Claude-capable upstreams are dead for the same purpose:
 `personal-chat`, `advisor`) must use a tool-capable model — deepseek, glm, kimi
 and qwen all accept `tool_calls` and are verified working.
 
+## Reasoning effort in combos: the `model(level)` suffix
+
+Reasoning level is a **client-declared request parameter**, not gateway state.
+9router forwards it and logs the level it resolved as `THINK:<level>`. The
+level rides in the model string as a suffix — `provider/model(level)` — which
+is the established convention here (`shiteru/deepseek-v4.1-flash(high)` in
+`config-export.json`). `combo.js` splits on the first `/` and passes the rest
+through verbatim, so the suffix survives combo resolution.
+
+Refuseless (`openai-compatible` node) advertises `reasoning_efforts:
+[low, high, max]` per model and accepts `max` on the wire. Because the node is
+`openai-compatible`, requests take the PASSTHROUGH path and `reasoning_effort`
+reaches upstream — confirmed by `THINK:max` in the gateway log.
+
+Four `(max)` custom-model rows exist so the level is pickable in the combo
+builder, rather than needing a hand-edited combo string:
+
+```
+refuseless/glm-5.3-abliterated(max)
+refuseless/glm-5.3-flash-abliterated(max)
+refuseless/deepseek-v4.1-flash-fast(max)
+refuseless/deepseek-v4.1-flash-abliterated(max)
+```
+
+The picker lists them under the raw node id
+(`openai-compatible-chat-aa806b9c-…/glm-5.3-abliterated(max)`) because a custom
+row's `providerAlias` is the node id and the route sets `routedModel =
+fullModel`. Both forms route identically — both were tested.
+
+**`minimax-m3.1-flash` is deliberately excluded.** It advertises `max` upstream
+and the suffix is accepted, but 9router classifies it `thinkingFormat:
+"minimax"`, and that branch in `thinkingUnified.js` emits only
+`body.thinking = {type:"adaptive"}` — it never writes `reasoning_effort`, so
+the level is silently dropped (`THINK:auto`). Reasoning-length variance on that
+model is sampling noise, not effort. Enabling `max` there needs a
+`thinkingFormat` reclassification, i.e. a source change.
+
+**Why not fix the picker in source.** `thinkingLevels.js` maps `zai` →
+`["thinking"]` and `minimax` → `["none","thinking"]`, so `max` is never offered
+for those families. The service runs from the bundled
+`.next/standalone` (`custom-server.js`), so editing `app/src/**` has no runtime
+effect, and `~/9router/app` has no `.git` to track a patch. The suffix needs no
+source change and is upgrade-safe; the custom-model rows are DB state, so a
+9router upgrade or DB reset drops them (four `kv` inserts to restore, and they
+are captured in `config-export.json`).
+
 ## The anthropic-compatible node omits `[DONE]` — fixed in source, needs a rebuild
 
 `STREAM_CLOSED` / "SSE stream ended without [DONE]" has a **second, unrelated
