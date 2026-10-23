@@ -946,7 +946,7 @@ combos as the other harnesses — no separate provider. `settings.json` sets:
 | `ANTHROPIC_DEFAULT_OPUS_MODEL` | `advisor` | hardest work |
 | `ANTHROPIC_DEFAULT_HAIKU_MODEL` | `ollama-cloud/glm-5.3-flash` | cheap/fast jobs |
 | `ANTHROPIC_SMALL_FAST_MODEL` | `ollama-cloud/glm-5.3-flash` | background jobs |
-| `CLAUDE_CODE_MAX_CONTEXT_TOKENS` | `1000000` | combos expose a 1M window |
+| `CLAUDE_CODE_MAX_CONTEXT_TOKENS` | `500000` | combos are capped at a 500k window |
 
 The 9router key is **not** in the file — a settings `env` value is not expanded,
 so a literal `$NINEROUTER_API_KEY` would be sent as-is. `apiKeyHelper` runs
