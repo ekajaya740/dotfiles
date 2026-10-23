@@ -7,7 +7,7 @@ modelRoles:
   slow: 9router/coder
   vision: 9router/coder
   task: 9router/coder
-  advisor: 9router/advisor:high
+  advisor: 9router/advisor
   tiny: 9router/coder
   default: 9router/coder
 defaultThinkingLevel: auto
