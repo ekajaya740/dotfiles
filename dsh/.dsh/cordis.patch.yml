@@ -83,12 +83,21 @@
 # of AGENTS.md pairs ANTHROPIC_BASE_URL=https://ai.workofekajaya.com with
 # 9router's /v1/messages endpoint — so the adapter fits with no translation.
 #
-# Use the PUBLIC gateway, not 127.0.0.1:20128. The local endpoint only exists
-# on this Mac, so a remote `headless` box would fail to connect.
+# Use the PUBLIC gateway, not 127.0.0.1:20128, unless dsh runs ON the
+# gateway host. The local endpoint exists only where 9router itself runs; a
+# remote `headless` box must use the public URL. (The gateway host can use
+# either — 127.0.0.1:20128 is the same gateway.)
 #
 # A patch REPLACES the row's whole `config`, so restate the fields you keep.
 # Model ids pass straight through to the wire; the catalog below is advisory
 # and only feeds GUI selection. Ids mirror the combos omp/hermes already use.
+#
+# TWO ROWS ARE REQUIRED. The `llm-deepseek` row registers the provider route;
+# it does not select it. Selection lives in `agent-default-model`, which ships
+# pointing at `model: deepseek-flash` — an id 9router does not serve, so the
+# turn fails with "INVALID_REQUEST: [400]: deepseek-flash is not a valid model
+# ID" (verified 2026-10-23). The route name `deepseek-official` is a fixed
+# constant in the adapter; only the model id changes.
 #
 # - id: llm-deepseek
 #   config:
@@ -99,6 +108,14 @@
 #         name: coder
 #       - id: advisor
 #         name: advisor
+# - id: agent-default-model
+#   config:
+#     provider: deepseek-official
+#     model: coder
+#
+# The missing `data: [DONE]` sentinel in 9router's translated /v1/messages
+# streams is NOT a blocker: the adapter's parser terminates on `message_stop`
+# and throws STREAM_CLOSED only when that event is missing.
 #
 # `dsh-llm-pi-ai` is the alternative, built for multiple pi-ai providers and
 # OpenAI-compatible gateways — reach for it only if dsh must route several
