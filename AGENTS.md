@@ -298,7 +298,7 @@ recipe. Every other harness (omp, opencode, hermes, pen) rides 9router.
 | commit | `9router/coder` | Commit generation |
 | slow | `9router/coder` | Deep reasoning |
 | task | `9router/coder` | Subagent dispatch |
-| advisor | `9router/advisor:high` | Advice / review |
+| advisor | `9router/advisor` | Advice / review |
 | vision | `9router/coder` | Image-capable fallback |
 
 **This table mirrors `modelRoles` in `omp/.omp/agent/config.yml` — that file is the
@@ -719,7 +719,7 @@ append `/v1/messages`:
 ```
 
 The model ids mirror the combos already used by omp/hermes (`coder`,
-`personal-chat`, `advisor:high`), and the adapter passes unlisted ids through
+`personal-chat`, `advisor`), and the adapter passes unlisted ids through
 unchanged, so a catalog entry is only needed for GUI selection.
 
 `dsh-llm-pi-ai` is the alternative, and the one built for "multiple pi-ai
