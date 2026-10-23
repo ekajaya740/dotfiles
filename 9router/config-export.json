@@ -1,5 +1,5 @@
 {
-  "_exported": "2026-10-19T03:02:09Z",
+  "_exported": "2026-10-23T10:35:26Z",
   "_note": "9Router config backup. Secrets masked. Restore via API: nodes->POST /api/provider-nodes, conns->POST /api/providers, models->POST /api/models/custom, combos->POST /api/combos (with real keys).",
   "combos": [
     {
@@ -7,35 +7,39 @@
       "name": "coder",
       "kind": "llm",
       "models": [
-        "shiteru-deepseek-v4.1-flash",
-        "shiteru-glm-5.3-flash",
-        "shiteru-hy4-preview"
+        "refuseless/deepseek-v4.1-flash-fast",
+        "ollama-cloud/minimax-m3.1-flash:cloud",
+        "ollama-cloud/deepseek-v4.1-flash:1017-cloud",
+        "shiteru-deepseek-v4.1-flash"
       ],
       "createdAt": "2026-09-01T05:53:28.026Z",
-      "updatedAt": "2026-10-18T07:04:27.391Z"
+      "updatedAt": "2026-10-23T09:00:34.093Z"
     },
     {
       "id": "031b0d15-335c-4e29-99bc-e4d17b822bb1",
       "name": "advisor",
       "kind": "llm",
       "models": [
-        "openrouter/typesafe/jev-router",
+        "refuseless/deepseek-v4.1-flash-fast",
+        "ollama-cloud/minimax-m3.1-flash:cloud",
+        "ollama-cloud/deepseek-v4.1-flash:1017-cloud",
         "shiteru-deepseek-v4.1-flash",
-        "shiteru-glm-5.3"
+        "openrouter/typesafe/jev-router"
       ],
       "createdAt": "2026-09-01T05:53:28.033Z",
-      "updatedAt": "2026-10-11T08:25:30.888Z"
+      "updatedAt": "2026-10-23T09:01:05.061Z"
     },
     {
       "id": "5c83ba54-1708-4214-8787-f8b96c8dbf94",
       "name": "personal-chat",
       "kind": "llm",
       "models": [
+        "ollama-cloud/minimax-m3.1-flash:cloud",
         "ollama-cloud/deepseek-v4.1-flash:1017-cloud",
         "shiteru-deepseek-v4.1-flash"
       ],
       "createdAt": "2026-09-01T05:53:28.039Z",
-      "updatedAt": "2026-10-18T15:35:08.002Z"
+      "updatedAt": "2026-10-21T02:11:50.671Z"
     },
     {
       "id": "933a77bd-27c2-4df1-92a1-2e19a2b0919b",
@@ -519,20 +523,22 @@
       "name": "sfw-coder",
       "kind": null,
       "models": [
-        "ollama-cloud/glm-5.3-flash"
+        "ollama-cloud/minimax-m3.1-flash:cloud",
+        "ollama-cloud/deepseek-v4.1-flash:1017-cloud"
       ],
       "createdAt": "2026-09-07T02:29:29.468Z",
-      "updatedAt": "2026-09-07T02:29:29.468Z"
+      "updatedAt": "2026-10-21T02:24:13.463Z"
     },
     {
       "id": "0467e95d-eea7-40f2-94e2-69298bf79a48",
       "name": "sfw-advisor",
       "kind": null,
       "models": [
-        "ollama-cloud/glm-5.3-flash"
+        "ollama-cloud/minimax-m3.1-flash:cloud",
+        "ollama-cloud/deepseek-v4.1-flash:1017-cloud"
       ],
       "createdAt": "2026-09-07T02:29:49.983Z",
-      "updatedAt": "2026-09-07T02:29:49.983Z"
+      "updatedAt": "2026-10-21T02:24:27.507Z"
     },
     {
       "id": "34a9aa3d-2c7e-41c1-8e62-bc7687567a0d",
@@ -633,7 +639,7 @@
       "priority": 1,
       "isActive": true,
       "createdAt": "2026-08-27T05:35:34.813Z",
-      "updatedAt": "2026-10-19T02:41:34.693Z",
+      "updatedAt": "2026-10-23T10:18:37.223Z",
       "testStatus": "unavailable",
       "providerSpecificData": {
         "connectionProxyEnabled": false,
@@ -644,18 +650,20 @@
       "errorCode": 404,
       "backoffLevel": 0,
       "modelLock_deepseek-v4-flash:0731": null,
-      "modelLock_typesafe/jev-router": "2026-10-19T02:33:14.400Z",
-      "lastError": "[404]: {\"error\":{\"message\":\"No allowed providers are available for the selected model. Providers serving deepseek/deepseek-v4.1-flash-20260910: open-inference, morph, decart, wafer, sail-research, inf",
-      "lastErrorAt": "2026-10-19T02:41:34.693Z",
+      "modelLock_typesafe/jev-router": "2026-10-23T10:20:37.223Z",
+      "lastError": "[404]: {\"error\":{\"message\":\"No jev-router pool model has an endpoint allowed by your guardrails (https://openrouter.ai/workspaces/default/guardrails), account provider and privacy settings (https://op",
+      "lastErrorAt": "2026-10-23T10:18:37.223Z",
       "modelLock_deepseek-flash": null,
       "modelLock_deepseek-chat": null,
-      "modelLock_deepseek-v4.1-flash": null,
+      "modelLock_deepseek-v4.1-flash": "2026-10-19T19:04:07.049Z",
       "modelLock_typesafe/jev-1.13": null,
       "modelLock_anthropic/claude-sonnet-4": null,
       "modelLock_deepseek-v3": null,
       "modelLock_deepseek/deepseek-chat": null,
       "modelLock_glm-5.3": "2026-10-17T12:30:45.200Z",
-      "modelLock_deepseek-v4.1-flash:1017-cloud": "2026-10-19T02:43:34.693Z"
+      "modelLock_deepseek-v4.1-flash:1017-cloud": "2026-10-19T02:43:34.693Z",
+      "modelLock_deepseek/deepseek-v4.1-flash-1017": "2026-10-19T05:39:17.992Z",
+      "modelLock_deepseek/deepseek-v4.1-flash": "2026-10-19T05:39:18.058Z"
     },
     {
       "id": "fc3d2d0b-c66f-449d-bd36-753070c57771",
@@ -666,8 +674,8 @@
       "priority": 1,
       "isActive": true,
       "createdAt": "2026-08-27T05:38:04.204Z",
-      "updatedAt": "2026-10-18T17:02:10.506Z",
-      "testStatus": "active",
+      "updatedAt": "2026-10-23T10:34:58.031Z",
+      "testStatus": "unavailable",
       "providerSpecificData": {
         "prefix": "ollama-cloud",
         "apiType": "chat",
@@ -678,8 +686,8 @@
         "connectionNoProxy": ""
       },
       "modelLock_llama3.3-70b": null,
-      "errorCode": null,
-      "backoffLevel": 0,
+      "errorCode": 429,
+      "backoffLevel": 15,
       "modelLock_glm-5.3-flash": null,
       "modelLock_kimi-k3": null,
       "modelLock_glm-5.2": null,
@@ -693,7 +701,12 @@
       "modelLock_kimi-k2.6": null,
       "modelLock_glm-5.3:cloud": null,
       "modelLock_gpt-oss:cloud": null,
-      "modelLock_DeepSeek-V4.1-Flash-1017": null
+      "modelLock_DeepSeek-V4.1-Flash-1017": null,
+      "modelLock_minimax-m3.1-flash:cloud": "2026-10-23T10:39:56.716Z",
+      "modelLock_deepseek-v4.1-flash:1017-cloud": "2026-10-23T10:39:58.031Z",
+      "lastError": "[429]: {\"error\":{\"message\":\"you (ekajaya740) have reached your weekly usage limit, upgrade for higher limits: https://ollama.com/upgrade or add usage credits: https://ollama.com/settings (ref: ae10a01",
+      "lastErrorAt": "2026-10-23T10:34:58.031Z",
+      "rateLimitedUntil": null
     },
     {
       "id": "5b23e330-9a7d-4695-8a2c-fc2fb50ab9b7",
@@ -821,9 +834,9 @@
       "priority": 1,
       "isActive": true,
       "createdAt": "2026-09-03T02:00:51.052Z",
-      "updatedAt": "2026-10-19T03:02:06.228Z",
+      "updatedAt": "2026-10-23T10:34:58.253Z",
       "defaultModel": "deepseek-v4-flash",
-      "testStatus": "active",
+      "testStatus": "unavailable",
       "providerSpecificData": {
         "prefix": "shiteru",
         "apiType": "chat",
@@ -834,7 +847,7 @@
         "connectionNoProxy": ""
       },
       "modelLock_qwen-3.8-max:latest": null,
-      "errorCode": null,
+      "errorCode": 402,
       "backoffLevel": 0,
       "modelLock_kimi-k3": null,
       "modelLock_deepseek-v4-flash": null,
@@ -858,18 +871,18 @@
       "modelLock_deepseek-v4.1-flash": null,
       "modelLock_hy4-preview": null,
       "modelLock_gpt-5.6-sol": null,
-      "modelLock_deepseek-v4.1-flash(high)": null,
+      "modelLock_deepseek-v4.1-flash(high)": "2026-10-23T10:36:58.252Z",
       "modelLock_cb/claude-sonnet-4.6": null,
       "modelLock_claude-opus-4.6": null,
       "modelLock_claude-opus-4.7": null,
-      "modelLock_claude-opus-4.8": null,
+      "modelLock_claude-opus-4.8": "2026-10-23T07:04:40.632Z",
       "modelLock_claude-fable-5": null,
       "modelLock_gpt-4o-mini": null,
       "modelLock_gpt-5.6-terra": null,
       "modelLock_kr/claude-opus-4.8": null,
-      "lastError": null,
-      "lastErrorAt": null,
-      "rateLimitedUntil": null
+      "lastError": "[402]: {\"error\":{\"message\":\"Token balance exhausted\",\"type\":\"insufficient_balance\",\"code\":\"insufficient_balance\"}}",
+      "lastErrorAt": "2026-10-23T10:34:58.252Z",
+      "modelLock_claude-sonnet-4.6": "2026-10-23T07:04:33.844Z"
     },
     {
       "id": "b7675e72-6a89-428d-81d9-cc7b44b65d30",
@@ -880,7 +893,7 @@
       "priority": 1,
       "isActive": true,
       "createdAt": "2026-09-03T07:30:11.394Z",
-      "updatedAt": "2026-10-17T12:31:53.080Z",
+      "updatedAt": "2026-10-23T10:34:58.532Z",
       "testStatus": "unavailable",
       "providerSpecificData": {
         "prefix": "shiteru-zs",
@@ -892,7 +905,7 @@
         "connectionNoProxy": ""
       },
       "modelLock_claude-opus-5": null,
-      "errorCode": 403,
+      "errorCode": 402,
       "backoffLevel": 0,
       "modelLock_deepseek-v4-flash": null,
       "modelLock_glm-5.3": "2026-10-14T20:40:36.138Z",
@@ -910,14 +923,16 @@
       "modelLock_gpt-6-astra": null,
       "modelLock_claude-fable-5.1": "2026-10-17T12:33:51.301Z",
       "modelLock_deepseek-v4.1-flash": null,
-      "lastError": "[403]: {\"error\":{\"message\":\"Your current subscription is not eligible for model gpt-5.6-sol\",\"type\":\"permission_error\",\"code\":\"subscription_not_eligible\"}}",
-      "lastErrorAt": "2026-10-17T12:31:53.080Z",
+      "lastError": "[402]: {\"error\":{\"message\":\"Token balance exhausted\",\"type\":\"insufficient_balance\",\"code\":\"insufficient_balance\"}}",
+      "lastErrorAt": "2026-10-23T10:34:58.532Z",
       "modelLock_hy4-preview": "2026-10-14T20:43:57.193Z",
       "modelLock_gpt-5.6-sol": "2026-10-17T12:33:53.080Z",
       "modelLock_cb/claude-sonnet-4.6": "2026-10-12T03:09:23.701Z",
-      "modelLock_deepseek-v4.1-flash(high)": "2026-10-16T14:22:16.615Z",
+      "modelLock_deepseek-v4.1-flash(high)": "2026-10-23T10:36:58.532Z",
       "modelLock_glm-5.2-premium": "2026-10-17T12:33:51.231Z",
-      "modelLock_claude-opus-4.7": "2026-10-17T12:33:52.865Z"
+      "modelLock_claude-opus-4.7": "2026-10-17T12:33:52.865Z",
+      "modelLock_claude-sonnet-4.6": "2026-10-23T07:04:36.964Z",
+      "modelLock_claude-opus-4.8": "2026-10-23T07:04:43.738Z"
     },
     {
       "id": "6e778832-d548-416a-a8fa-5c705c9aa8b3",
@@ -1233,6 +1248,35 @@
       "lastErrorAt": "2026-10-17T12:32:01.611Z",
       "backoffLevel": 0,
       "modelLock_claude-sonnet-5": "2026-10-17T12:34:01.610Z"
+    },
+    {
+      "id": "a4395358-55d9-4b93-8a00-0ea552aa1329",
+      "provider": "openai-compatible-chat-aa806b9c-6cef-4466-88ed-f3eb7fea263b",
+      "authType": "apikey",
+      "name": "Router",
+      "email": null,
+      "priority": 1,
+      "isActive": true,
+      "createdAt": "2026-10-23T08:25:20.169Z",
+      "updatedAt": "2026-10-23T10:35:21.964Z",
+      "defaultModel": "deepseek-v4.1-flash-fast",
+      "testStatus": "active",
+      "providerSpecificData": {
+        "prefix": "refuseless",
+        "apiType": "chat",
+        "baseUrl": "https://api.refuseless.com/v1",
+        "nodeName": "Refuseless",
+        "connectionProxyEnabled": false,
+        "connectionProxyUrl": "",
+        "connectionNoProxy": ""
+      },
+      "modelLock_deepseek-v4.1-flash-fast": null,
+      "lastError": null,
+      "errorCode": null,
+      "lastErrorAt": null,
+      "backoffLevel": 0,
+      "rateLimitedUntil": null,
+      "modelLock_deepseek-v4.1-flash-abliterated(max)": null
     }
   ],
   "nodes": [
@@ -1393,6 +1437,16 @@
       "updatedAt": "2026-10-12T03:15:10.008Z",
       "prefix": "shiteru-zs-anthropic",
       "baseUrl": "https://shiteru-zs.online/v1"
+    },
+    {
+      "id": "openai-compatible-chat-aa806b9c-6cef-4466-88ed-f3eb7fea263b",
+      "type": "openai-compatible",
+      "name": "Refuseless",
+      "createdAt": "2026-10-23T08:24:18.766Z",
+      "updatedAt": "2026-10-23T08:24:18.766Z",
+      "prefix": "refuseless",
+      "apiType": "chat",
+      "baseUrl": "https://api.refuseless.com/v1"
     }
   ],
   "customModels": [
@@ -2246,6 +2300,12 @@
     },
     {
       "providerAlias": "ollama-cloud",
+      "id": "minimax-m3.1-flash:cloud",
+      "type": "llm",
+      "name": "minimax-m3.1-flash:cloud"
+    },
+    {
+      "providerAlias": "ollama-cloud",
       "id": "minimax-m3",
       "type": "llm",
       "name": "minimax-m3"
@@ -2327,6 +2387,60 @@
       "id": "gpt-5.6-sol",
       "type": "llm",
       "name": "gpt-5.6-sol"
+    },
+    {
+      "providerAlias": "openai-compatible-chat-aa806b9c-6cef-4466-88ed-f3eb7fea263b",
+      "id": "deepseek-v4.1-flash-abliterated(max)",
+      "type": "llm",
+      "name": "deepseek-v4.1-flash-abliterated(max)"
+    },
+    {
+      "providerAlias": "openai-compatible-chat-aa806b9c-6cef-4466-88ed-f3eb7fea263b",
+      "id": "deepseek-v4.1-flash-abliterated",
+      "type": "llm",
+      "name": "deepseek-v4.1-flash-abliterated"
+    },
+    {
+      "providerAlias": "openai-compatible-chat-aa806b9c-6cef-4466-88ed-f3eb7fea263b",
+      "id": "deepseek-v4.1-flash-fast(max)",
+      "type": "llm",
+      "name": "deepseek-v4.1-flash-fast(max)"
+    },
+    {
+      "providerAlias": "openai-compatible-chat-aa806b9c-6cef-4466-88ed-f3eb7fea263b",
+      "id": "deepseek-v4.1-flash-fast",
+      "type": "llm",
+      "name": "deepseek-v4.1-flash-fast"
+    },
+    {
+      "providerAlias": "openai-compatible-chat-aa806b9c-6cef-4466-88ed-f3eb7fea263b",
+      "id": "glm-5.3-abliterated(max)",
+      "type": "llm",
+      "name": "glm-5.3-abliterated(max)"
+    },
+    {
+      "providerAlias": "openai-compatible-chat-aa806b9c-6cef-4466-88ed-f3eb7fea263b",
+      "id": "glm-5.3-abliterated",
+      "type": "llm",
+      "name": "glm-5.3-abliterated"
+    },
+    {
+      "providerAlias": "openai-compatible-chat-aa806b9c-6cef-4466-88ed-f3eb7fea263b",
+      "id": "glm-5.3-flash-abliterated(max)",
+      "type": "llm",
+      "name": "glm-5.3-flash-abliterated(max)"
+    },
+    {
+      "providerAlias": "openai-compatible-chat-aa806b9c-6cef-4466-88ed-f3eb7fea263b",
+      "id": "glm-5.3-flash-abliterated",
+      "type": "llm",
+      "name": "glm-5.3-flash-abliterated"
+    },
+    {
+      "providerAlias": "openai-compatible-chat-aa806b9c-6cef-4466-88ed-f3eb7fea263b",
+      "id": "minimax-m3.1-flash",
+      "type": "llm",
+      "name": "minimax-m3.1-flash"
     },
     {
       "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
@@ -3414,6 +3528,12 @@
     },
     {
       "providerAlias": "openai-compatible-chat-f69d9eee-df38-4add-9a67-b7028c4a994a",
+      "id": "minimax-m3.1-flash:cloud",
+      "type": "llm",
+      "name": "minimax-m3.1-flash:cloud"
+    },
+    {
+      "providerAlias": "openai-compatible-chat-f69d9eee-df38-4add-9a67-b7028c4a994a",
       "id": "minimax-m3",
       "type": "llm",
       "name": "minimax-m3"
@@ -4101,7 +4221,7 @@
     "cavemanEnabled": true,
     "ponytailEnabled": false,
     "ponytailLevel": "lite",
-    "cavemanLevel": "full",
+    "cavemanLevel": "ultra",
     "headroomEnabled": false,
     "headroomUrl": "http://localhost:8787",
     "capacityAdapter": {

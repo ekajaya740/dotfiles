@@ -10,6 +10,21 @@ and versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [1.1.0] - 2026-10-23
 
+### Added
+
+- **Max reasoning effort selectable for Refuseless models.** Refuseless
+  advertises `reasoning_efforts: [low, high, max]` per model and honors `max`
+  on the wire, but 9router classifies `glm-5.3*` as `zai` and `minimax-m3.1*`
+  as `minimax`, whose level lists never offer `max`. Four
+  `provider/model(max)` custom-model rows (`glm-5.3-abliterated`,
+  `glm-5.3-flash-abliterated`, `deepseek-v4.1-flash-fast`,
+  `deepseek-v4.1-flash-abliterated`) make the level pickable in the combo
+  builder; the suffix needs no source change and survives combo resolution
+  (`combo.js` passes the model string through verbatim). `minimax-m3.1-flash`
+  is excluded because its `minimax` format branch never emits
+  `reasoning_effort`. Documented in `9router/README.md`, and the refreshed
+  `config-export.json` carries the new rows.
+
 ### Fixed
 
 - **dsh 9router routing: the route row is not the selection.** The
@@ -38,6 +53,7 @@ and versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   routes until a `providers` map supplies them — and as the right choice for
   several providers or a chat-completions-only gateway, not for a single
   OpenAI-compatible gateway such as 9router.
+
 
 ## [1.0.0] - 2026-10-06
 
