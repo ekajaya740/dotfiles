@@ -8,6 +8,37 @@ section's notes — see [AGENTS.md](./AGENTS.md#releases).
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-10-23
+
+### Fixed
+
+- **dsh 9router routing: the route row is not the selection.** The
+  `llm-deepseek` recipe in `AGENTS.md` was incomplete. A patch row registers a
+  provider route; it does not make that route the one agents call. The
+  selection lives in the `agent-default-model` row, which ships pointing at
+  `model: deepseek-flash` — an id 9router does not serve, so a turn failed
+  with `INVALID_REQUEST: [400]: deepseek-flash is not a valid model ID`. The
+  documented recipe now carries both rows, and the section states that the
+  `deepseek-official` route name is a fixed constant.
+- **dsh 9router: the `[DONE]` sentinel is not a constraint.** `9router/README.md`
+  records that 9router's translated `/v1/messages` streams close without
+  `data: [DONE]`, and that the pinned dsh release's `llm-deepseek` parser
+  would fail on it. It does not: the parser terminates on `message_stop` and
+  throws `STREAM_CLOSED` only when that event is missing, and the string
+  `without [DONE]` appears nowhere in the installed dsh. Verified 2026-10-23
+  against the live gateway — a tool-calling turn completes on both the
+  `coder` and `advisor` combos, and an Anthropic `tool_use` → `tool_result`
+  round trip returns an answer. The section now says so, so the sentinel
+  bug is not mistaken for a reason to switch adapters.
+
+### Changed
+
+- **dsh adapter guidance.** `@deepseek-ai/dsh-llm-pi-ai` is documented as
+  shipping in `dsh-base` as row id `llm-pi-ai`, mounted dormant with zero
+  routes until a `providers` map supplies them — and as the right choice for
+  several providers or a chat-completions-only gateway, not for a single
+  OpenAI-compatible gateway such as 9router.
+
 ## [1.0.0] - 2026-10-06
 
 First tagged snapshot of the dotfiles.
@@ -91,4 +122,5 @@ First tagged snapshot of the dotfiles.
   `stow --simulate` dry run silently stopped covering new packages. It now
   sources `scripts/packages.sh`.
 
+[1.1.0]: https://github.com/ekajaya740/dotfiles/releases/tag/dotfiles-v1.1.0
 [1.0.0]: https://github.com/ekajaya740/dotfiles/releases/tag/dotfiles-v1.0.0

@@ -718,14 +718,47 @@ append `/v1/messages`:
         name: advisor
 ```
 
+**The route row alone is not enough — a second row selects the model.** A patch
+row registers a provider route; it does not make that route the one agents
+call. The selection lives in the `agent-default-model` row, which ships
+pointing at `provider: deepseek-official` / `model: deepseek-flash`. Against
+9router that model id does not exist, so the turn fails with
+`INVALID_REQUEST: [400]: deepseek-flash is not a valid model ID` — verified
+2026-10-23. Both rows are required:
+
+```yaml
+- id: llm-deepseek
+  config:
+    apiKeyEnv: NINEROUTER_API_KEY
+    baseURL: https://ai.workofekajaya.com
+    models:
+      - id: coder
+        name: coder
+      - id: advisor
+        name: advisor
+- id: agent-default-model
+  config:
+    provider: deepseek-official   # the route name is a fixed constant
+    model: coder                  # a 9router combo id
+```
+
+The provider route name `deepseek-official` is hardcoded in
+`@deepseek-ai/dsh-llm-deepseek-api-key`; only the model id changes.
+
+**The `[DONE]` sentinel is not a constraint here.** 9router's translated
+`/v1/messages` streams close on `event: message_stop` without a
+`data: [DONE]` sentinel, and `9router/README.md` records that as a gateway bug
+worth a rebuild. It does not affect dsh on the pinned release: the
+`@deepseek-ai/dsh-llm-deepseek` parser terminates on `message_stop` and throws
+`STREAM_CLOSED` only when that event is missing — the string
+`without [DONE]` appears nowhere in the installed dsh. Verified end to end
+2026-10-23: a tool-calling turn against the gateway completes on both the
+`coder` and `advisor` combos. Do not switch adapters over the sentinel.
+
 The model ids mirror the combos already used by omp/hermes (`coder`,
 `personal-chat`, `advisor`), and the adapter passes unlisted ids through
 unchanged, so a catalog entry is only needed for GUI selection.
 
-`dsh-llm-pi-ai` is the alternative, and the one built for "multiple pi-ai
-providers, OpenAI-compatible gateways, or self-hosted servers" — reach for it
-only if you later route several providers through dsh. Both can be mounted
-together, since their route names do not collide.
 
 The shipped default needs no patch at all: `llm-deepseek` points at DeepSeek's
 official API using `DEEPSEEK_API_KEY` (exported from `~/.zshenv.local`).
@@ -733,6 +766,13 @@ official API using `DEEPSEEK_API_KEY` (exported from `~/.zshenv.local`).
 **Per-subagent model choice** is separate from provider plumbing: the delegation
 tool's `modelSelectionSettings: true` lets the orchestrator pick a model per
 subagent (see the swarm section).
+
+`@deepseek-ai/dsh-llm-pi-ai` ships in `dsh-base` as row id `llm-pi-ai` and
+mounts **dormant** — zero routes until a `providers` map supplies them. It is
+the right adapter when several providers must be served at once, or when a
+gateway speaks chat-completions only. For a single OpenAI-compatible gateway
+such as 9router, `llm-deepseek` is the smaller change and needs no
+`providers` map.
 
 ### Multi-Profile
 
