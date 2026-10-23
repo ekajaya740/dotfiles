@@ -1,6 +1,6 @@
 # 9Router Config Backup
 
-Auto-exported snapshot of the 9Router gateway (VPS `9router.service`, port 20128, v0.5.65).
+Auto-exported snapshot of the 9Router gateway (VPS `9router.service`, port 20128, v0.5.104).
 This is the **personal instance** (data dir `/home/personal/9router/data/`).
 
 ## Files
@@ -25,7 +25,7 @@ POST /api/combos               # each combo {name, models: [...], kind: llm}
 Regenerate from the live gateway whenever provider/model/combo topology changes:
 
 ```bash
-python3 /home/personal/dotfiles/9router/export.sh   # (or run export_9router.py equivalent)
+bash /home/personal/dotfiles/9router/export.sh   # or: python3 .../export_9router.py
 cd /home/personal/dotfiles && git add 9router hermes && git commit -m "backup 9router config" && git push
 ```
 
@@ -197,7 +197,10 @@ refuseless/deepseek-v4.1-flash-abliterated(max)
 The picker lists them under the raw node id
 (`openai-compatible-chat-aa806b9c-…/glm-5.3-abliterated(max)`) because a custom
 row's `providerAlias` is the node id and the route sets `routedModel =
-fullModel`. Both forms route identically — both were tested.
+fullModel`. Both forms route identically — both were tested. Unlike the
+`ollama-cloud` case above, no prefix-alias twin is needed here: the rows were
+added under the node id, which is what the provider page and the combo builder
+read, and `/v1/models` still lists them via the prefix form.
 
 **`minimax-m3.1-flash` is deliberately excluded.** It advertises `max` upstream
 and the suffix is accepted, but 9router classifies it `thinkingFormat:
