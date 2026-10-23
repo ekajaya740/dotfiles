@@ -7,7 +7,7 @@
     "ANTHROPIC_DEFAULT_OPUS_MODEL": "advisor",
     "ANTHROPIC_DEFAULT_HAIKU_MODEL": "ollama-cloud/glm-5.3-flash",
     "ANTHROPIC_SMALL_FAST_MODEL": "ollama-cloud/glm-5.3-flash",
-    "CLAUDE_CODE_MAX_CONTEXT_TOKENS": "1000000"
+    "CLAUDE_CODE_MAX_CONTEXT_TOKENS": "500000"
   },
   "apiKeyHelper": "zsh -c 'printenv NINEROUTER_API_KEY'",
   "statusLine": {

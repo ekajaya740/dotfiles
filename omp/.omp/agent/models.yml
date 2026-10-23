@@ -25,7 +25,7 @@ providers:
           output: 0
           cacheRead: 0
           cacheWrite: 0
-        contextWindow: 1000000
+        contextWindow: 500000
         maxTokens: 128000
   9router:
     baseUrl: https://ai.workofekajaya.com/v1
@@ -37,55 +37,55 @@ providers:
         name: Designer (combo)
         reasoning: true
         input: [text, image]
-        contextWindow: 1000000
+        contextWindow: 500000
         maxTokens: 32000
       - id: personal-chat
         name: Personal Chat (combo)
         reasoning: true
         input: [text, image]
-        contextWindow: 1000000
+        contextWindow: 500000
         maxTokens: 32000
       - id: cost-efficient
         name: Cost Efficient (combo)
         reasoning: true
         input: [text]
-        contextWindow: 1000000
+        contextWindow: 500000
         maxTokens: 32000
       - id: advisor
         name: Advisor (combo)
         reasoning: true
         input: [text, image]
-        contextWindow: 1000000
+        contextWindow: 500000
         maxTokens: 32000
       - id: coder
         name: Coder (combo)
         reasoning: true
         input: [text, image]
-        contextWindow: 1000000
+        contextWindow: 500000
         maxTokens: 32000
       - id: sfw-coder
         name: Safe Coder (combo)
         reasoning: true
         input: [text]
-        contextWindow: 1000000
+        contextWindow: 500000
         maxTokens: 32000
       - id: sfw-advisor
         name: Safe Advisor (combo)
         reasoning: true
         input: [text]
-        contextWindow: 1000000
+        contextWindow: 500000
         maxTokens: 32000
       - id: combo-profill-fast
         name: Profill Fast (combo)
         reasoning: true
         input: [text]
-        contextWindow: 1000000
+        contextWindow: 500000
         maxTokens: 32000
       - id: combo-profill-smart
         name: Profill Smart (combo)
         reasoning: true
         input: [text]
-        contextWindow: 1000000
+        contextWindow: 500000
         maxTokens: 32000
       - id: shiteru/deepseek-v4-flash
         name: Deepseek V4 Flash
@@ -95,7 +95,7 @@ providers:
           output: 0
           cacheRead: 0
           cacheWrite: 0
-        contextWindow: 1000000
+        contextWindow: 500000
         maxTokens: 128000
       - id: ollama-cloud/glm-5.3-flash
         name: GLM 5.3 Flash
@@ -106,7 +106,7 @@ providers:
           output: 0
           cacheRead: 0
           cacheWrite: 0
-        contextWindow: 1000000
+        contextWindow: 500000
         maxTokens: 128000
       - id: ollama-cloud/glm-5.1
         name: GLM 5.1 Cloud
@@ -117,7 +117,7 @@ providers:
           output: 0
           cacheRead: 0
           cacheWrite: 0
-        contextWindow: 1000000
+        contextWindow: 500000
         maxTokens: 32000
       - id: ollama-cloud/glm-5.2
         name: GLM 5.2 Cloud
@@ -128,7 +128,7 @@ providers:
           output: 0
           cacheRead: 0
           cacheWrite: 0
-        contextWindow: 1000000
+        contextWindow: 500000
         maxTokens: 32000
       - id: ollama-cloud/kimi-k2.6
         name: Kimi K2.6 Cloud
@@ -139,7 +139,7 @@ providers:
           output: 0
           cacheRead: 0
           cacheWrite: 0
-        contextWindow: 1000000
+        contextWindow: 500000
         maxTokens: 32000
       - id: ollama-cloud/kimi-k2.7-code
         name: Kimi K2.7 Code Cloud
@@ -150,7 +150,7 @@ providers:
           output: 0
           cacheRead: 0
           cacheWrite: 0
-        contextWindow: 1000000
+        contextWindow: 500000
         maxTokens: 32000
       - id: ollama-cloud/kimi-k3
         name: Kimi K3 Cloud
@@ -161,7 +161,7 @@ providers:
           output: 0
           cacheRead: 0
           cacheWrite: 0
-        contextWindow: 1000000
+        contextWindow: 500000
         maxTokens: 65536
       - id: ollama-cloud/minimax-m2.7
         name: MiniMax M2.7 Cloud
@@ -172,7 +172,7 @@ providers:
           output: 0
           cacheRead: 0
           cacheWrite: 0
-        contextWindow: 1000000
+        contextWindow: 500000
         maxTokens: 32000
       - id: ollama-cloud/minimax-m3
         name: MiniMax M3 Cloud
@@ -183,7 +183,7 @@ providers:
           output: 0
           cacheRead: 0
           cacheWrite: 0
-        contextWindow: 1000000
+        contextWindow: 500000
         maxTokens: 32000
       - id: ollama-cloud/gemma4:31b
         name: Gemma 4 31B Cloud
@@ -194,7 +194,7 @@ providers:
           output: 0
           cacheRead: 0
           cacheWrite: 0
-        contextWindow: 1000000
+        contextWindow: 500000
         maxTokens: 32000
       - id: ollama-cloud/qwen3.5:397b
         name: Qwen 3.5 397B Cloud
@@ -205,7 +205,7 @@ providers:
           output: 0
           cacheRead: 0
           cacheWrite: 0
-        contextWindow: 1000000
+        contextWindow: 500000
         maxTokens: 32000
       - id: ollama-cloud/gpt-oss:120b
         name: GPT-OSS 120B
@@ -216,7 +216,7 @@ providers:
           output: 0
           cacheRead: 0
           cacheWrite: 0
-        contextWindow: 1000000
+        contextWindow: 500000
         maxTokens: 32768
       - id: ollama-cloud/gpt-oss:20b
         name: GPT-OSS 20B
@@ -227,7 +227,7 @@ providers:
           output: 0
           cacheRead: 0
           cacheWrite: 0
-        contextWindow: 1000000
+        contextWindow: 500000
         maxTokens: 32768
       - id: ollama-cloud/nemotron-3-ultra
         name: Nemotron 3 Ultra
@@ -238,7 +238,7 @@ providers:
           output: 0
           cacheRead: 0
           cacheWrite: 0
-        contextWindow: 1000000
+        contextWindow: 500000
         maxTokens: 32000
       - id: ollama-cloud/nemotron-3-super
         name: Nemotron 3 Super
@@ -249,7 +249,7 @@ providers:
           output: 0
           cacheRead: 0
           cacheWrite: 0
-        contextWindow: 1000000
+        contextWindow: 500000
         maxTokens: 32000
       - id: ollama-cloud/nemotron-3-nano:30b
         name: Nemotron 3 Nano 30B
@@ -260,7 +260,7 @@ providers:
           output: 0
           cacheRead: 0
           cacheWrite: 0
-        contextWindow: 1000000
+        contextWindow: 500000
         maxTokens: 32000
       - id: ollama-cloud/mistral-large-3:675b
         name: Mistral Large 3 675B
@@ -271,7 +271,7 @@ providers:
           output: 0
           cacheRead: 0
           cacheWrite: 0
-        contextWindow: 1000000
+        contextWindow: 500000
         maxTokens: 32000
       - id: ollama-cloud/deepseek-v4-pro:0813
         name: DeepSeek V4 Pro 0813
@@ -286,7 +286,7 @@ providers:
           output: 0
           cacheRead: 0
           cacheWrite: 0
-        contextWindow: 1000000
+        contextWindow: 500000
         maxTokens: 65536
         compat:
           supportsDeveloperRole: false
@@ -313,7 +313,7 @@ providers:
           output: 0
           cacheRead: 0
           cacheWrite: 0
-        contextWindow: 1000000
+        contextWindow: 500000
         maxTokens: 65536
       - id: ollama-cloud/deepseek-v4-flash:0731
         name: DeepSeek V4 Flash 0731
@@ -328,7 +328,7 @@ providers:
           output: 0
           cacheRead: 0
           cacheWrite: 0
-        contextWindow: 1000000
+        contextWindow: 500000
         maxTokens: 65536
         compat:
           supportsDeveloperRole: false
@@ -352,5 +352,5 @@ providers:
           output: 0
           cacheRead: 0
           cacheWrite: 0
-        contextWindow: 1000000
+        contextWindow: 500000
         maxTokens: 65536
