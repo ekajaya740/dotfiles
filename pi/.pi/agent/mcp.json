@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "genoffice": {
+      "command": "/Applications/GenOffice.app/Contents/Resources/cli/genoffice",
+      "args": ["mcp"],
+      "lifecycle": "eager"
+    }
+  }
+}

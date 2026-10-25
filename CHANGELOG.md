@@ -8,6 +8,53 @@ section's notes — see [AGENTS.md](./AGENTS.md#releases).
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-10-25
+
+### Added
+
+- **GenOffice wired to 9router and to every agent as an MCP server.** The
+  desktop document suite now runs its in-app agent on the `coder` combo, and
+  its 32-command CLI is registered as a stdio MCP server — `genoffice mcp` — in
+  omp, OpenCode, Hermes, Claude Code, Pi and dsh. In the app this means
+  `ai-settings.json` selects `provider: custom` (the default `genspark` is a
+  signed-out account, and `activeProvider()` silently falls back to it when a
+  custom entry is missing a model, base URL or key). The key is stored in that
+  file because the app resolves `profile.apiKeyEnv` from its own `process.env`,
+  which a Finder-launched app does not inherit — so the file stays
+  machine-local, like `~/.pencil/agent-auth`. Verified end to end: one
+  streaming turn through the app's `aiOffice.aiStream` bridge returns from
+  `coder`.
+  The app is a prerequisite, not a dependency the repo can install: the CLI,
+  the MCP server and the agent skill all run the copy inside
+  `/Applications/GenOffice.app`, so `AGENTS.md` now opens the section with the
+  install steps (`brew install --cask genoffice` or the `.dmg`, first launch,
+  `genoffice install-cli`) and the headless caveat for `render`/PDF conversion.
+
+### Changed
+
+- **`pi` is now a `--no-folding` package.** `pi/.pi/agent/mcp.json` is tracked,
+  so `~/.pi/agent` must not fold into a single symlink — otherwise Pi writes
+  `auth.json`, `sessions/` and `npm/` into the repo. `STOW_NO_FOLDING` gains
+  `pi`, and the hand-stow instructions, package counts and layout lines in
+  `AGENTS.md`/`README.md` follow.
+- **Pi gains MCP support.** Pi 0.87 ships no built-in MCP, so
+  `pi-mcp-extension` is installed and reads the new tracked `mcp.json`. The
+  GenOffice entry sets `"lifecycle": "eager"`: the default lazy mode registers
+  nothing until `/mcp:start`, which reads as "wired but dead".
+- **dsh mounts exactly one MCP server.** The home patch gains an
+  `mcp-genoffice` row on the bundled `@deepseek-ai/dsh-mcp-client`, so the
+  document tools reach the model as `mcp__genoffice__<name>`.
+
+### Fixed
+
+- **`claude/install.sh` created a self-referential `jev-router` symlink.** On a
+  host where `~/.claude` is itself a symlink into this repo, `PLUGIN_LINK` and
+  `PLUGIN_SRC` are the same directory; the old `elif` treated the real source
+  as "not a symlink", moved it to `.bak` and linked it to itself, which broke
+  every read under `claude/.claude/skills/` (ELOOP) and turned `validate.sh`
+  red on every sync. The same-directory case is now detected by canonicalised
+  parents and is a no-op that also repairs an existing loop.
+
 ## [1.1.0] - 2026-10-23
 
 ### Added
@@ -138,5 +185,6 @@ First tagged snapshot of the dotfiles.
   `stow --simulate` dry run silently stopped covering new packages. It now
   sources `scripts/packages.sh`.
 
+[1.2.0]: https://github.com/ekajaya740/dotfiles/releases/tag/dotfiles-v1.2.0
 [1.1.0]: https://github.com/ekajaya740/dotfiles/releases/tag/dotfiles-v1.1.0
 [1.0.0]: https://github.com/ekajaya740/dotfiles/releases/tag/dotfiles-v1.0.0
