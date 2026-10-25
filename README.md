@@ -16,9 +16,11 @@ combos and fallback chains:
 - **Pen (pen.dev)** - design tool whose bundled agent uses the 9router provider stowed from this repo
 - **OpenCode** - terminal coding agent
 - **Claude Code** - 9router Anthropic gateway (`ANTHROPIC_BASE_URL`) with the combo models as Claude model aliases, plus a `jev-router` plugin whose `PreToolUse` hook asks TypeSafe Jev (via 9router SystemOne) which agent and model a subagent call needs — read-only lookups are routed to the Explore agent on Haiku (see [AGENTS.md](./AGENTS.md))
+- **GenOffice** - desktop document suite whose in-app agent and `genoffice mcp` server use the same 9router `coder` combo (machine-local settings; see [AGENTS.md](./AGENTS.md))
 
 **Pi agent extensions:**
 - [pi-notify-pp](https://github.com/kim0/pi-notify-pp) - Native terminal notifications for Pi agent turns (OSC 777, works with Ghostty/iTerm2)
+- [pi-mcp-extension](https://github.com/irahardianto/pi-mcp-extension) - MCP client for Pi; serves `~/.pi/agent/mcp.json`, which registers the GenOffice server
 
 ## Repository Layout
 
@@ -42,12 +44,13 @@ top-level directory.
 - `hermes/.hermes/config.yaml` -> `~/.hermes/config.yaml` (v49 schema: models, toolsets, MCP servers, platforms)
 - `hermes/.hermes/AGENTS.md`, `SOUL.md`, `CLAUDE.md` -> `~/.hermes/` (instructions, persona, Claude interop)
 - `hermes/.hermes/memories/` -> `~/.hermes/memories/` (curated memory)
+- `pi/.pi/agent/mcp.json` -> `~/.pi/agent/mcp.json` (MCP servers for the `pi-mcp-extension`)
 - `pi/.pi/agent/extensions/pi-notify-pp/` -> `~/.pi/agent/extensions/pi-notify-pp/` (Pi Notify++ extension)
 - `pen/.pencil/models.json` -> `~/.pencil/models.json` (9router provider for Pen; stow with `--no-folding`)
 - `dsh/.dsh/cordis.patch.yml` -> `~/.dsh/cordis.patch.yml` (DeepSeek Harness home-level patch; stow with `--no-folding`)
 - `omarchy/.config/hypr/` -> `~/.config/hypr` (Hyprland/Omarchy; **Arch-only, stow by hand** — not in `STOW_PACKAGES`)
 
-`omp`, `pen` and `dsh` share their target directory with app-managed state
+`omp`, `pen`, `dsh` and `pi` share their target directory with app-managed state
 (databases, sessions, credentials), so they must be stowed with `--no-folding`
 (handled by `bootstrap.sh` and `sync-dotfiles.sh` via `STOW_NO_FOLDING`).
 
@@ -138,6 +141,7 @@ These are installed automatically via `mise use -g`:
 ### Installed separately (not in mise registry)
 
 - **oh-my-pi (omp)** — installed via `bun install -g @oh-my-pi/pi-coding-agent` or the install script; not available in mise
+- **GenOffice** — the app itself (`brew install --cask genoffice`, or the `.dmg` from [releases](https://github.com/genspark-ai/genoffice/releases/latest)); `genoffice mcp` and the agent skill run the CLI inside the bundle, so the app must be installed before any MCP entry here resolves. `genoffice install-cli` adds the PATH symlink. See [AGENTS.md](./AGENTS.md#genoffice)
 
 ### Recommended
 
@@ -269,10 +273,11 @@ mkdir -p ~/.config/opencode
 
 ```bash
 cd ~/dotfiles
-stow nvim tmux zsh vim opencode omp pi hermes
+stow nvim tmux zsh vim opencode hermes
 
-# pen shares ~/.pencil with app state, so it must not be folded.
-stow --no-folding pen
+# omp, pen, dsh and pi share their target directory with app state, so they
+# must not be folded (see STOW_NO_FOLDING in scripts/packages.sh).
+stow --no-folding omp pen dsh pi
 ```
 
 ### 4) Install mise and dev tools
@@ -310,7 +315,7 @@ make validate          # or: ./scripts/validate.sh
 ```
 
 It runs ShellCheck over the shell scripts, parses every JSON and YAML config,
-dry-runs `stow` for all nine packages, and validates `CHANGELOG.md`. Every check
+dry-runs `stow` for all ten packages, and validates `CHANGELOG.md`. Every check
 is fail-closed — a missing tool or a broken file exits non-zero.
 
 ### Cutting a release

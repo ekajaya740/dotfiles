@@ -369,6 +369,14 @@
       ],
       "enabled": true,
       "type": "local"
+    },
+    "genoffice": {
+      "type": "local",
+      "command": [
+        "/Applications/GenOffice.app/Contents/Resources/cli/genoffice",
+        "mcp"
+      ],
+      "enabled": true
     }
   }
 }

@@ -132,3 +132,25 @@
 #
 # The real lever is the environment variable DSH_TELEMETRY_DISABLED (any
 # non-empty value), set in zsh/.zshenv.
+
+# ── MCP: GenOffice ───────────────────────────────────────────────────
+#
+# GenOffice (docx/xlsx/pptx/pdf engine + in-app AI) ships its whole command
+# surface as a stdio MCP server: `genoffice mcp` answers 32 tools (docs_read,
+# docs_apply, sheet_read, slides_*, pdf_read, render, merge, …) on this
+# machine with no network hop. The launcher resolves the app bundle itself and
+# runs the bundled CLI on the app's own Electron-as-Node runtime, so it works
+# under a scrubbed PATH (verified with `env -i PATH=/usr/bin:/bin`).
+#
+# `@deepseek-ai/dsh-mcp-client` is bundled with the pinned release and mounts
+# dormant; one row per server registers its tools as `mcp__genoffice__<name>`.
+
+- insert:
+    - id: mcp-genoffice
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: genoffice
+        transport: stdio
+        command: /Applications/GenOffice.app/Contents/Resources/cli/genoffice
+        args:
+          - mcp

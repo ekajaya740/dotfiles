@@ -103,7 +103,21 @@ PY
 
 # 3: the jev-router plugin, as a folder symlink (a self-contained plugin dir).
 mkdir -p "$(dirname "$PLUGIN_LINK")"
-if [[ -L "$PLUGIN_LINK" && "$(readlink -f "$PLUGIN_LINK")" == "$(readlink -f "$PLUGIN_SRC")" ]]; then
+
+# On a machine where ~/.claude is itself a symlink into this repo, PLUGIN_LINK
+# and PLUGIN_SRC are the same directory. Linking then produces a
+# self-referential symlink (`jev-router -> .../skills/jev-router`), which breaks
+# every read under skills/ — git, jq and validate.sh all report ELOOP. Compare
+# the canonical parents so that case is a no-op, and repair a loop already made.
+link_dir="$(cd "$(dirname "$PLUGIN_LINK")" && pwd -P)"
+src_dir="$(cd "$(dirname "$PLUGIN_SRC")" && pwd -P)"
+if [[ "$link_dir/$(basename "$PLUGIN_LINK")" == "$src_dir/$(basename "$PLUGIN_SRC")" ]]; then
+    if [[ -L "$PLUGIN_LINK" ]]; then
+        warn "$PLUGIN_LINK is a self-referential symlink — removing it"
+        rm "$PLUGIN_LINK"
+    fi
+    ok "jev-router plugin is the repo copy (~/.claude is symlinked into it)"
+elif [[ -L "$PLUGIN_LINK" && "$(readlink -f "$PLUGIN_LINK")" == "$(readlink -f "$PLUGIN_SRC")" ]]; then
     ok "jev-router plugin already linked"
 elif [[ -e "$PLUGIN_LINK" && ! -L "$PLUGIN_LINK" ]]; then
     warn "$PLUGIN_LINK exists and is not a symlink — moving it aside"
