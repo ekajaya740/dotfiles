@@ -6,7 +6,11 @@ This is the **personal instance** (data dir `/home/personal/9router/data/`).
 ## Files
 
 - `config-export.json` — nodes, connections, custom models, combos, settings.
-  API keys / tokens are **masked** (e.g. `sk_ab…12cd`) — real keys never leave the VPS.
+  Credential-named fields (`apiKey`, `token`, `secret`, …) are **dropped**, not
+  masked: the snapshot carries no key material at all. A value-shaped gate over
+  the finished document (`SECRET_RE` in `export_9router.py`) aborts the export if
+  a key prefix survives anywhere — `sk-*`, `gh*_`, `AKIA*`, JWT, PEM — so real
+  keys never leave the VPS.
 
 ## Restore (disaster recovery)
 
