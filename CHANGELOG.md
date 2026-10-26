@@ -8,6 +8,55 @@ section's notes — see [AGENTS.md](./AGENTS.md#releases).
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2026-10-26
+
+### Added
+
+- **The dsh profile config is versioned, as a seed rather than a symlink.**
+  `~/.dsh/profiles/{web,headless,tui}/` held real config that existed nowhere
+  else: the MCP rows for Hevy and arXiv, the `dsh-auto-archive` schedule, the
+  `hmr` row that `patchReload: "live"` requires, and the 9router
+  `llm-deepseek`/`agent-default-model` pair. Rebuilding them by hand was the
+  only recovery path. They are now tracked at
+  `dsh/.dsh/profiles/<name>/{cordis.patch.yml,package.json,pnpm-workspace.yaml,compatibility.json}`
+  and copied in by `dsh/install.sh --profiles`; `--capture` copies live edits
+  back after a settings change in the dashboard. Seeding rather than stowing is
+  forced by dsh itself: it writes config with `writeFileAtomic`, whose
+  `rename()` replaces a symlink instead of writing through it, so a stowed link
+  would be silently severed on the first save or `dsh plugin add`.
+
+- **The web UI's cookie is re-minted on a timer instead of by hand.**
+  `dsh/bin/dsh-web-cookie-refresh` reads the durable browser-session secret from
+  `~/.dsh/.credentials.yaml`, signs a 25-day cookie for
+  `dsh.workofekajaya.com`, writes it as `/etc/nginx/snippets/dsh-web-cookie.conf`
+  (a `proxy_set_header Cookie` the vhost `include`s) and reloads nginx.
+  `dsh-web-cookie.timer` runs it `OnBootSec=2min` and daily, well inside the
+  cookie's own window — so a restart no longer means opening a fresh `?token=`
+  URL. Tracked alongside it: `dsh-web-cookie.{service,timer}` and the
+  `dsh.workofekajaya.com` nginx vhost (a tracked copy; `/etc/nginx` is
+  root-owned, so installing it stays a manual `cp`).
+
+### Changed
+
+- **`validate.sh` asserts that the dsh profiles are *not* stowed.** The
+  exclusion lives in `dsh/.stow-local-ignore`, whose patterns match against a
+  `"/"`-prefixed package-relative path — get that wrong and the pattern silently
+  matches nothing, re-arming the `rename()` bug above. The gate runs
+  `stow --simulate -v dsh` and fails if any `LINK: .dsh/profiles` line appears,
+  so the outcome is asserted rather than the pattern trusted.
+
+- **The YAML check loads `!!js` tags.** The profile seeds carry
+  `HEVY_API_KEY: !!js process.env.HEVY_API_KEY`, which PyYAML rejects with
+  `could not determine a constructor for the tag` — a permissive loader now
+  registers it so the file is still syntax-checked.
+
+- **`AGENTS.md` is back under the 65,536-byte instruction budget.** It had grown
+  to 68,739 bytes, at which point the harness truncates the tail and the last
+  sections stop reaching the agent. The rest.nvim manual (3.3 KB) and the
+  GenOffice manual (6.9 KB) moved to `docs/rest-nvim.md` and `docs/genoffice.md`
+  behind short pointers, and a duplicated `llm-deepseek` YAML block was
+  collapsed. 68,739 → 59,172 bytes.
+
 ## [1.5.0] - 2026-10-26
 
 ### Changed

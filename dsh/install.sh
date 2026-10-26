@@ -14,9 +14,11 @@
 #   1. dsh commits config writes with dsh-atomic-write, which writes a temp
 #      sibling and rename()s it over the target. rename() REPLACES a symlink
 #      with a regular file, so the write never reaches the repo and the link is
-#      gone. dsh-plugin-manager calls it for package.json, so the profile
-#      manifest and lockfile must stay machine-local. That is why the live
-#      service env is COPIED, never symlinked, and why profiles/ is not stowed.
+#      gone. dsh-plugin-manager calls it for package.json and pnpm-workspace,
+#      and dsh-config-editor calls it for every settings save (its write target
+#      IS cordis.patch.yml), so the whole profile must stay machine-local. That
+#      is why the live service env is COPIED, never symlinked, and why
+#      profiles/ is not stowed.
 #   2. ~/.dsh/{sessions,storages,skills}, profiles/*/node_modules and
 #      .credentials.yaml are machine state or secrets.
 #
@@ -25,13 +27,17 @@
 #   1. ~/.config/dsh/env  ← copied from env.example if ABSENT (never
 #                            overwritten: it holds the provider keys)
 #   2. the profile's plugin set ← replayed from plugins.txt (--plugins)
+#   3. the profile config ← seeded from dsh/.dsh/profiles/ (--profiles)
 #
 # Run `stow dsh` (or bootstrap.sh / sync-dotfiles.sh) for the symlinked files;
 # this script does not touch them.
 #
 # Idempotent. Writes no secrets.
 #
-#   ./install.sh             create the service env if missing
+#   ./install.sh             create the service env if missing; report drift
+#   ./install.sh --profiles  also seed the profile config from the repo
+#   ./install.sh --capture   copy the LIVE profile config back into the repo
+#                            (do this after changing settings in the UI)
 #   ./install.sh --plugins   also replay plugins.txt into the web profile
 #   ./install.sh --check     show what would change, change nothing
 # ─────────────────────────────────────────────────────────────
@@ -39,11 +45,15 @@ set -euo pipefail
 
 CHECK=false
 DO_PLUGINS=false
+DO_PROFILES=false
+DO_CAPTURE=false
 for arg in "$@"; do
     case "$arg" in
-        --check)   CHECK=true ;;
-        --plugins) DO_PLUGINS=true ;;
-        -h|--help) sed -n '2,36p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        --check)    CHECK=true ;;
+        --plugins)  DO_PLUGINS=true ;;
+        --profiles) DO_PROFILES=true ;;
+        --capture)  DO_CAPTURE=true ;;
+        -h|--help)  sed -n '2,44p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
         *) echo "unknown option: $arg" >&2; exit 2 ;;
     esac
 done
@@ -206,14 +216,100 @@ install_plugins() {
     [[ $failed -eq 0 ]] || warn "$failed spec(s) not applied"
 }
 
+# ── 4. profile config (seed, not symlink) ───────────────────
+# The profile's own config cannot be stowed: dsh's writeFileAtomic rename()s a
+# temp file over the target, which replaces a symlink instead of writing
+# through it. So the repo holds a SEED that this copies in, and --capture pulls
+# live edits back. Only intent files are versioned; pnpm-lock.yaml and the
+# node_modules tree are derived and stay machine-local.
+PROFILES_SRC="$DSH_DIR/.dsh/profiles"
+PROFILES_LIVE="$DSH_HOME_LIVE/profiles"
+SEED_FILES=(cordis.patch.yml package.json pnpm-workspace.yaml compatibility.json)
+
+install_profiles() {
+    info "profile config (seed → live)"
+    [[ -d "$PROFILES_SRC" ]] || { warn "missing $PROFILES_SRC"; return 0; }
+
+    local p f src dst changed=0 conflict=0
+    for p in "$PROFILES_SRC"/*/; do
+        p="$(basename "$p")"
+        for f in "${SEED_FILES[@]}"; do
+            src="$PROFILES_SRC/$p/$f"
+            dst="$PROFILES_LIVE/$p/$f"
+            [[ -f "$src" ]] || continue
+            if [[ -f "$dst" ]] && cmp -s "$src" "$dst"; then
+                continue
+            fi
+            changed=$((changed + 1))
+            if [[ -f "$dst" ]]; then
+                # The live file exists and differs. Do NOT clobber: it may hold
+                # a settings change made in the UI that was never captured. Say
+                # so and let the operator choose.
+                conflict=$((conflict + 1))
+                warn "differs, left untouched: $dst"
+                echo "        repo → $src"
+                echo "        adopt the live version: ./install.sh --capture"
+                echo "        overwrite with the repo:  cp '$src' '$dst'"
+            else
+                run mkdir -p "$(dirname "$dst")"
+                run cp "$src" "$dst"
+                ok "seeded $dst"
+            fi
+        done
+    done
+
+    if [[ $changed -eq 0 ]]; then
+        ok "profile config matches the repo"
+    elif [[ $conflict -gt 0 ]]; then
+        warn "$conflict file(s) drifted from the repo — resolve them (see above)"
+    else
+        info "$changed file(s) seeded"
+    fi
+}
+
+capture_profiles() {
+    info "profile config (live → repo)"
+    [[ -d "$PROFILES_LIVE" ]] || { warn "missing $PROFILES_LIVE"; return 0; }
+
+    local p f src dst
+    for p in "$PROFILES_LIVE"/*/; do
+        p="$(basename "$p")"
+        for f in "${SEED_FILES[@]}"; do
+            src="$PROFILES_LIVE/$p/$f"
+            dst="$PROFILES_SRC/$p/$f"
+            [[ -f "$src" ]] || continue
+            if [[ -f "$dst" ]] && cmp -s "$src" "$dst"; then
+                continue
+            fi
+            if $CHECK; then
+                echo "  [dry-run] cp $src $dst"
+                continue
+            fi
+            mkdir -p "$(dirname "$dst")"
+            cp "$src" "$dst"
+            ok "captured $dst"
+        done
+    done
+
+    if ! $CHECK && command -v git >/dev/null 2>&1; then
+        if ! git -C "$REPO_DIR" diff --quiet -- "$PROFILES_SRC" 2>/dev/null; then
+            info "review before committing:"
+            echo "  git -C $REPO_DIR diff -- ${PROFILES_SRC#$REPO_DIR/}"
+        fi
+    fi
+}
+
 install_env
 check_stowed
-$DO_PLUGINS && install_plugins
+$DO_PROFILES && install_profiles
+$DO_CAPTURE  && capture_profiles
+$DO_PLUGINS  && install_plugins
 
 echo
 if $CHECK; then
     info "dry run complete — nothing changed"
 else
     ok "dsh wiring complete"
-    $DO_PLUGINS || info "plugin set not replayed (pass --plugins to apply it)"
+    $DO_PLUGINS  || info "plugin set not replayed (pass --plugins to apply it)"
+    $DO_PROFILES || info "profile config not seeded (pass --profiles to apply it)"
 fi

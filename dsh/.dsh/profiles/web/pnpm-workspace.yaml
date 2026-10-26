@@ -1,0 +1,24 @@
+packages:
+  - .
+
+autoInstallPeers: false
+
+minimumReleaseAgeExclude:
+  - dsh-plugin-mobile-gateway@0.10.2 || 0.10.3
+  - dsh-continual-evolve@0.16.4 || 0.17.0 || 0.19.0
+  - '@michengai/dsh-btw@1.0.0'
+  - '@michengai/dsh-skills-manager@1.2.3 || 1.2.6'
+  - '@deepseek-ai/cosmokit@1.8.6'
+  - '@deepseek-ai/schemastery@3.18.5'
+  - dsh-better-sidebar@0.28.0
+  - dsh-rewind-plugin@0.16.0
+  - '@michengai/dsh-agency-agents@1.2.1 || 1.2.2'
+  - '@michengai/dsh-archive-manager@1.1.1 || 1.1.2'
+  - dsh-free-search@0.9.4 || 0.9.5
+  - '@perrylink/dsh-plugin-doctor@0.7.4'
+  - dsh-mcp-panel@0.6.27
+
+nodeLinker: hoisted
+
+onlyBuiltDependencies:
+  - node-pty@1.1.0

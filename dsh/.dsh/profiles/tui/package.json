@@ -1,0 +1,17 @@
+{
+  "name": "dsh-profile-tui",
+  "private": true,
+  "dependencies": {
+    "@thewaifu/dsh-waifu": "1.5.19",
+    "dsh-update-checker": "^1.7.2"
+  },
+  "dsh": {
+    "profile": {
+      "bundles": [
+        "@deepseek-ai/dsh-base",
+        "@thewaifu/dsh-waifu"
+      ],
+      "patchReload": "live"
+    }
+  }
+}

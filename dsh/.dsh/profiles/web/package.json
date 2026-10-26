@@ -1,0 +1,51 @@
+{
+  "name": "dsh-profile-web",
+  "private": true,
+  "dependencies": {
+    "@michengai/dsh-agency-agents": "^1.2.2",
+    "@michengai/dsh-archive-manager": "^1.1.2",
+    "@michengai/dsh-btw": "^1.0.0",
+    "@michengai/dsh-skills-manager": "1.2.6",
+    "@perrylink/dsh-plugin-doctor": "^0.7.4",
+    "@thewaifu/dsh-market": "1.1.2",
+    "billion-context": "^0.1.202",
+    "dsh-auto-archive": "link:/home/personal/dsh-auto-archive",
+    "dsh-better-sidebar": "^0.26.1",
+    "dsh-continual-evolve": "^0.19.0",
+    "dsh-free-search": "^0.9.5",
+    "dsh-hevy-training": "link:/home/personal/Documents/01-Projects/WORKOUT/dsh-hevy-training",
+    "dsh-image-preview": "link:/home/personal/dsh-image-preview",
+    "dsh-mcp-panel": "^0.6.27",
+    "dsh-rewind-plugin": "0.15.3",
+    "dsh-taskboard": "^0.9.1",
+    "dsh-update-checker": "^1.7.2"
+  },
+  "dsh": {
+    "profile": {
+      "bundles": [
+        "@deepseek-ai/dsh-base",
+        "@deepseek-ai/dsh-web-app",
+        "dsh-better-sidebar",
+        "@thewaifu/dsh-market",
+        "@michengai/dsh-skills-manager",
+        "dsh-rewind-plugin",
+        "billion-context",
+        "@michengai/dsh-archive-manager",
+        "@michengai/dsh-agency-agents",
+        "@michengai/dsh-btw",
+        "dsh-free-search",
+        "dsh-update-checker",
+        "dsh-continual-evolve",
+        "@perrylink/dsh-plugin-doctor",
+        "dsh-taskboard",
+        "dsh-mcp-panel",
+        "@deepseek-ai/dsh-experimental-agent-team-profile",
+        "@deepseek-ai/dsh-experimental-auto-review",
+        "@deepseek-ai/dsh-experimental-schedule-bundle",
+        "dsh-image-preview",
+        "dsh-hevy-training"
+      ],
+      "patchReload": "live"
+    }
+  }
+}

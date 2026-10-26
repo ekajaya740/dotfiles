@@ -1,0 +1,16 @@
+# dsh-web-cookie.service — re-mint the nginx-injected dsh browser-session cookie.
+#
+# The dsh Web UI authenticates with an authority-bound signed cookie whose
+# signing secret is durable but whose issue/expiry window is absolute. This
+# regenerates the cookie into /etc/nginx/snippets/dsh-web-cookie.conf (via the
+# script's own passwordless sudo), so the plain hostname + Basic password keeps
+# working across dsh restarts without any printed ?token= URL.
+#
+# Stowed from dotfiles/dsh/ to ~/.config/systemd/user/dsh-web-cookie.service.
+[Unit]
+Description=Refresh the dsh Web UI nginx cookie snippet
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/home/personal/.local/bin/dsh-web-cookie-refresh

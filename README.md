@@ -45,6 +45,8 @@ top-level directory.
 - `pi/.pi/agent/extensions/pi-notify-pp/` -> `~/.pi/agent/extensions/pi-notify-pp/` (Pi Notify++ extension)
 - `pen/.pencil/models.json` -> `~/.pencil/models.json` (9router provider for Pen; stow with `--no-folding`)
 - `dsh/.dsh/cordis.patch.yml` -> `~/.dsh/cordis.patch.yml` (DeepSeek Harness home-level patch; stow with `--no-folding`)
+- `dsh/.config/systemd/user/`, `dsh/bin/dsh-web-cookie-refresh` -> `~/.config/systemd/user/`, `~/bin/` (web profile unit + daily cookie re-mint)
+- `dsh/.dsh/profiles/{web,headless,tui}/` -> `~/.dsh/profiles/` (**seeded** by `dsh/install.sh --profiles`, not stowed — dsh rewrites these with `writeFileAtomic`, which would sever a symlink)
 - `omarchy/.config/hypr/` -> `~/.config/hypr` (Hyprland/Omarchy; **Arch-only, stow by hand** — not in `STOW_PACKAGES`)
 
 `omp`, `pen`, `dsh` and `pi` share their target directory with app-managed state
@@ -52,8 +54,9 @@ top-level directory.
 (handled by `bootstrap.sh` and `sync-dotfiles.sh` via `STOW_NO_FOLDING`).
 
 **DeepSeek Harness (`dsh`)** is pinned by `bootstrap.sh` and set up as the
-long-term replacement for `omp`. Only the home-level patch is
-synced; the swarm and kanban are first-party/native and the rest is per-profile:
+long-term replacement for `omp`. The home-level patch is stowed and each
+profile's config is seeded from the repo; the swarm and kanban are
+first-party/native and everything else is per-profile:
 
 - **In-process multi-agent swarm** — `subagent` / `subagent-spawn-in-process` /
   `subagent-fork-in-process` ship in `dsh-base`, with `tool-subagent` and
@@ -67,15 +70,21 @@ synced; the swarm and kanban are first-party/native and the rest is per-profile:
   Verify its tools reach a web session first: in `web` the model-facing tools
   are owned by the agent preset, so a profile plugin that registers on the host
   plane may not be visible to the agent.
-- **Profiles** — `web` (browser UI) and `headless` (one-shot CLI). Native
-  multi-profile: plugins are per-profile. Profile trees
-  are machine-local and never synced.
+- **Profiles** — `web` (browser UI), `headless` (one-shot CLI) and `tui`.
+  Native multi-profile: plugins are per-profile. Each profile's
+  `cordis.patch.yml`/manifest is versioned and **copied** into `~/.dsh/profiles/`
+  by `dsh/install.sh --profiles` (`--capture` pulls live edits back), because
+  dsh rewrites config with `writeFileAtomic` and `rename()` would replace a
+  symlink instead of writing through it. `node_modules/` and lockfiles stay
+  machine-local.
 - **Telemetry** — three egresses. `session-log-deepseek` (message text) and
   `plugin-package-inventory-deepseek` are switched off with `enabled: false` in
   the home patch; `session-telemetry-otel` **cannot** be disabled from config and
   uses `DSH_TELEMETRY_DISABLED=1` in `zsh/.zshenv`.
-- **Remote access** is Tailscale-only (`dsh-tailscale-gateway`), never a public
-  `0.0.0.0` bind, because the agent has a shell.
+- **Remote access** is Tailscale-only, never a public `0.0.0.0` bind, because
+  the agent has a shell. This host terminates TLS in nginx on the tailnet IP and
+  proxies to loopback, with the dsh session cookie re-minted daily by
+  `dsh-web-cookie.timer`; `dsh-tailscale-gateway` is the plugin alternative.
 
 See the *DeepSeek Harness (dsh)* section in [AGENTS.md](./AGENTS.md) for the row
 map, layer order, and plugin commands.
