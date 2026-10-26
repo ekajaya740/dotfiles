@@ -1102,7 +1102,6 @@ to reproduce the machine-local half on a new device.
 |-----------|-----------|-------|
 | `omp-jev` | omp | Jev routing; config at `~/.config/omp-jev/config.json` (pointed at 9router SystemOne, model `judge`). |
 | `omp-jev-compaction` | omp | Jev-scored context reduction. Built from source into `~/.omp/plugins-local/`, linked with `omp plugin install <path>`. |
-| `pi-warden` | pi only | Guardrails. `typesafeBackend` in `~/.pi/agent/pi-warden/config.json` is a backend **endpoint object** — `host: https://ai.workofekajaya.com`, `path: /v1/systemone`, `keyEnv: NINEROUTER_API_KEY`, `defaultModel: judge` — not the name `openrouter`, which would send judgments to `openrouter.ai` direct. **Not installed for omp**: omp is kept plugin-free so its only skills are the binary's own, and warden would re-add plugin skill registrations plus per-turn guard calls. |
 
 ### Pen Cannot Run jev-mcp
 
@@ -1114,9 +1113,6 @@ gets Jev only if a compiled binary ships.
 
 ### Consent and Defaults
 
-- `pi-warden`: judgments are **off** until `/warden enable` (its disclosure
-  names the configured backend's host, i.e. `ai.workofekajaya.com`, not
-  `openrouter.ai`). Offline guards work without any key.
 - `omp-jev`: dispatcher ships `enabled: true`.
 - `omp-jev-compaction`: continuous context reduction is **on** by default
   (`context: true`) and sends conversation state to the decision endpoint.
@@ -1236,7 +1232,7 @@ cd ~/dotfiles && stow --no-folding pi
 ```
 
 `--no-folding` is required, not cosmetic: `~/.pi/agent` also holds `auth.json`,
-`sessions/`, `npm/` and `pi-warden/`, so a plain `stow pi` on a host without an
+`sessions/` and `npm/`, so a plain `stow pi` on a host without an
 existing `~/.pi/agent` folds the directory into one symlink and Pi writes that
 state into this repo. `pi` is in `STOW_NO_FOLDING`.
 
