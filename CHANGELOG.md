@@ -8,6 +8,26 @@ section's notes — see [AGENTS.md](./AGENTS.md#releases).
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-10-26
+
+### Changed
+
+- **Claude Code is back on Anthropic's own API.** 1.3.0 pointed
+  `ANTHROPIC_BASE_URL` at the 9router gateway and mapped `coder`/`advisor`/`smol`
+  onto the Sonnet/Opus/Haiku aliases. That replaced an existing Claude
+  subscription with gateway spend, so it is reverted: `settings.json` no longer
+  sets `env`, `apiKeyHelper`, or any `ANTHROPIC_*` model alias, and `claude`
+  authenticates from its own `~/.claude/.credentials.json` again. Claude Code is
+  now the one harness here that does not ride 9router. The `jev-router` plugin
+  still uses 9router SystemOne — it is a routing hook, not the model path.
+
+- **`claude/install.sh` deletes retired managed keys instead of unioning them.**
+  The merge was `{**live, **template}`, so a setting dropped from the template
+  stayed alive in `~/.claude/settings.json` forever — which is exactly how the
+  `ANTHROPIC_BASE_URL` above would have outlived its own removal. The script now
+  pops `env` (narrowed to a `RETIRED_ENV` list, so hand-added vars survive),
+  `apiKeyHelper`, and `statusLine` when the template does not define them.
+
 ## [1.3.0] - 2026-10-26
 
 ### Added

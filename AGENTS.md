@@ -313,10 +313,12 @@ Set `NINEROUTER_API_KEY` in your shell environment (`~/.zshenv.local`) to authen
 | Harness | Setting | Value |
 |---------|---------|-------|
 | OpenCode | `model` / `small_model` | `9router/coder` / `9router/smol` |
-| Claude Code | `ANTHROPIC_DEFAULT_HAIKU_MODEL`, `ANTHROPIC_SMALL_FAST_MODEL` | `smol` |
 | Hermes | `auxiliary.{skills_hub,approval,mcp,title_generation}.model` | `smol` |
 | Hermes | `auxiliary.vision.model` | `ollama-cloud/gemma4:31b` (free, text+image) |
 | Pen | `models[].id` = `smol` (last entry) | `smol` |
+
+Claude Code is deliberately **not** in that table: it runs against Anthropic's
+own API with its own login, so it has no 9router combo to point at.
 
 The `smol` combo lives in the 9router `combos` table, not in any harness file, so
 there is no per-harness model list to keep in sync — but a harness that names a
@@ -885,11 +887,10 @@ Two adapters ship, and they are for different jobs:
 **The Messages detail matters.** `llm-deepseek` is not a chat-completions
 client: its default root is `https://api.deepseek.com/anthropic` and model
 requests append `/v1/messages`. That is exactly the shape 9router already
-serves — see the Claude Code section below, where
-`ANTHROPIC_BASE_URL=https://ai.workofekajaya.com` is paired with 9router's
-`/v1/messages` endpoint. So the adapter fits the gateway without a translation
-layer, and the adapter's rule that "an exact final `/v1` segment is reused"
-lines up with that base URL.
+serves — `https://ai.workofekajaya.com/v1/messages` — so the adapter fits the
+gateway without a translation layer, and the adapter's rule that "an exact final
+`/v1` segment is reused" lines up with that base URL. (Claude Code does *not*
+use this route — it stays on Anthropic's own API; see its section below.)
 
 Use the **public** gateway, not `127.0.0.1:20128`: the local endpoint only
 exists on this Mac, so a remote `headless` box would fail with a connection
@@ -1164,25 +1165,26 @@ is not tracked either — it holds the OAuth account and per-project state, so i
 
 ### Model Configuration
 
-Claude Code speaks the Anthropic Messages API. 9router serves it at
-`https://ai.workofekajaya.com/v1/messages`, so Claude Code rides the same 9router
-combos as the other harnesses — no separate provider. `settings.json` sets:
+**Claude Code stays on Anthropic's own API.** It is the one harness here that
+does *not* ride 9router: no `ANTHROPIC_BASE_URL`, no `apiKeyHelper`, no model
+aliases. Auth comes from `~/.claude/.credentials.json` (the normal `claude`
+login), and the model is whatever the user last picked in `/model`.
 
-| Setting | Value | Purpose |
-|---------|-------|---------|
-| `ANTHROPIC_BASE_URL` | `https://ai.workofekajaya.com` | 9router gateway |
-| `ANTHROPIC_MODEL` | `coder` | primary model (combo) |
-| `ANTHROPIC_DEFAULT_SONNET_MODEL` | `coder` | standard work |
-| `ANTHROPIC_DEFAULT_OPUS_MODEL` | `advisor` | hardest work |
-| `ANTHROPIC_DEFAULT_HAIKU_MODEL` | `smol` | cheap/fast jobs |
-| `ANTHROPIC_SMALL_FAST_MODEL` | `smol` | background jobs |
-| `CLAUDE_CODE_MAX_CONTEXT_TOKENS` | `500000` | combos are capped at a 500k window |
+This was tried the other way and reverted — pointing `ANTHROPIC_BASE_URL` at
+`https://ai.workofekajaya.com` with `coder`/`advisor`/`smol` as the Sonnet/Opus/
+Haiku aliases worked, but it silently replaced the user's own Claude
+subscription with gateway spend and dropped the `unrecognized_model` notice
+that `CLAUDE_CODE_MAX_CONTEXT_TOKENS` used to hide. Keep 9router out of this
+file unless the user asks for it explicitly.
 
-The 9router key is **not** in the file — a settings `env` value is not expanded,
-so a literal `$NINEROUTER_API_KEY` would be sent as-is. `apiKeyHelper` runs
-`zsh -c 'printenv NINEROUTER_API_KEY'` per request instead, reading the key from
-`~/.zshenv.local`. `CLAUDE_CODE_MAX_CONTEXT_TOKENS` also silences the
-`unrecognized_model` notice (the combo names are not in Claude's model catalog).
+`settings.json` therefore carries only non-model keys: `statusLine`,
+`enabledPlugins`, `extraKnownMarketplaces`, `skipDangerousModePermissionPrompt`,
+and `$schema`. `claude/install.sh` **deletes** the retired model keys rather
+than unioning them in, so a stale `env`/`apiKeyHelper` cannot survive a
+template that no longer defines it (see the `RETIRED_ENV` list in that script).
+
+The `jev-router` plugin below still reaches 9router — it is a routing hook, not
+the model path.
 
 ### jev-router (Jev subagent routing)
 

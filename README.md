@@ -8,14 +8,15 @@ Everything is stowed into `$HOME` with GNU Stow, except the pieces noted below.
 **Neovim includes:**
 - [rest.nvim](https://github.com/rest-nvim/rest.nvim) - HTTP client for testing APIs directly from `.http` files (see [AGENTS.md](./AGENTS.md) for usage)
 
-**AI harnesses** all ride the same **9router** gateway, so they share model
-combos and fallback chains:
+**AI harnesses** mostly ride the same **9router** gateway, so they share model
+combos and fallback chains (Claude Code is the exception — it keeps Anthropic's
+own API):
 
 - **oh-my-pi (OMP)** - AI coding agent for the terminal (`omp` CLI), with 9router model roles (see [AGENTS.md](./AGENTS.md) for details)
 - **Hermes** - gateway-capable agent with Discord/Telegram/Slack front ends, a dashboard, memory, and TTS/STT
 - **Pen (pen.dev)** - design tool whose bundled agent uses the 9router provider stowed from this repo
 - **OpenCode** - terminal coding agent
-- **Claude Code** - 9router Anthropic gateway (`ANTHROPIC_BASE_URL`) with the combo models as Claude model aliases, plus a `jev-router` plugin whose `PreToolUse` hook asks TypeSafe Jev (via 9router SystemOne) which agent and model a subagent call needs — read-only lookups are routed to the Explore agent on Haiku (see [AGENTS.md](./AGENTS.md))
+- **Claude Code** - stays on Anthropic's own API (no `ANTHROPIC_BASE_URL`), with a `jev-router` plugin whose `PreToolUse` hook asks TypeSafe Jev (via 9router SystemOne) which agent and model a subagent call needs — read-only lookups are routed to the Explore agent on Haiku (see [AGENTS.md](./AGENTS.md))
 - **GenOffice** - desktop document suite whose in-app agent and `genoffice mcp` server use the same 9router `coder` combo (machine-local settings; see [AGENTS.md](./AGENTS.md))
 
 **Pi agent extensions:**
