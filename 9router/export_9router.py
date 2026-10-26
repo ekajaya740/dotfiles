@@ -2,9 +2,10 @@
 """Export the personal 9Router config to a secrets-masked snapshot.
 
 Regenerates `9router/config-export.json` from the LIVE gateway at
-127.0.0.1:20128 so the dotfiles backup matches reality. Provider API keys are
-masked (first 5 + last 4 chars, `sk_ab…12cd` style) — real keys never leave
-the host.
+127.0.0.1:20128 so the dotfiles backup matches reality. Credential-named fields
+are dropped outright — the snapshot carries no key material at all, not even a
+masked tail — and a value-shaped gate over the finished document aborts the run
+if anything key-like survives.
 
 Reads:
   - DB   : <DATA_DIR>/db/data.sqlite   (read-only)
@@ -32,8 +33,22 @@ BASE = "http://127.0.0.1:20128"
 OUT = pathlib.Path(__file__).resolve().parent / "config-export.json"
 
 MASKED_FIELDS = {"apiKey", "api_key", "password", "token", "secret", "jwtSecret"}
+# Value-shaped gate, applied to the WHOLE document after masking. Each pattern
+# is a provider key prefix that has actually been seen in this stack; the
+# catch-all covers the bare `sk-` forms (`sk-or-v1-`, `sk-proj-`, …) that the
+# narrower prefixes would miss. A match aborts the export, so a false positive
+# costs a re-run, never a leak.
 SECRET_RE = re.compile(
-    r"(sk_live_[A-Za-z0-9]{16}|sk-ant|gho_|scrypt\$|BEGIN [A-Z ]*PRIVATE KEY)"
+    r"(sk_live_[A-Za-z0-9]{16}"
+    r"|sk-or-v1-[A-Za-z0-9]{16,}"
+    r"|sk-proj-[A-Za-z0-9_-]{16,}"
+    r"|sk-[A-Za-z0-9_-]{20,}"
+    r"|gh[pousr]_[A-Za-z0-9]{20,}"
+    r"|gho_"
+    r"|AKIA[0-9A-Z]{16}"
+    r"|scrypt\$"
+    r"|eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\."
+    r"|BEGIN [A-Z ]*PRIVATE KEY)"
 )
 
 
@@ -86,7 +101,7 @@ def build(token: str) -> dict:
         # Pop BEFORE unpacking: `{**n, **json.loads(n.pop("data"))}` evaluates
         # `**n` first, so the raw `data` blob would ride along into the output.
         extra = json.loads(n.pop("data"))
-        nodes.append({**n, **extra})
+        nodes.append(scrub({**n, **extra}))
 
     conns = from_db(
         "SELECT id, provider, authType, name, email, priority, isActive, data, createdAt, updatedAt "
@@ -103,7 +118,7 @@ def build(token: str) -> dict:
         connections.append(scrub(merged))
 
     combos = [
-        {**c, "models": json.loads(c["models"])}
+        scrub({**c, "models": json.loads(c["models"])})
         for c in from_db(
             "SELECT id, name, kind, models, createdAt, updatedAt FROM combos",
             ["id", "name", "kind", "models", "createdAt", "updatedAt"],
@@ -111,16 +126,18 @@ def build(token: str) -> dict:
     ]
 
     custom = [
-        json.loads(r["value"])
+        scrub(json.loads(r["value"]))
         for r in from_db(
             "SELECT value FROM kv WHERE scope='customModels' ORDER BY key", ["value"]
         )
     ]
 
     settings_row = list(from_db("SELECT data FROM settings", ["data"]))
-    settings = json.loads(settings_row[0]["data"]) if settings_row else {}
-    # Never ship the password hash or the server-side-only extras.
-    for drop in ("password", "oidcConfigured", "hasPassword"):
+    settings = scrub(json.loads(settings_row[0]["data"]) if settings_row else {})
+    # `scrub` already drops the credential-named fields; these two are
+    # server-side-only state that is not a credential but still has no place in
+    # a portable snapshot.
+    for drop in ("oidcConfigured", "hasPassword"):
         settings.pop(drop, None)
 
     return {
