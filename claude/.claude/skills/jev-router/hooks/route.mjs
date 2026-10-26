@@ -32,7 +32,7 @@ const AGENT_MIN = num(process.env.JEV_ROUTER_AGENT_MIN, 0.8);
 const MODEL_MIN = num(process.env.JEV_ROUTER_MODEL_MIN, 0.8);
 const DEBUG = process.env.JEV_ROUTER_DEBUG === "1";
 const BASE_URL = process.env.JEV_API_BASE_URL || "https://ai.workofekajaya.com/v1/systemone";
-const JEV_MODEL = process.env.JEV_MCP_MODEL || "openrouter/typesafe/jev-1.13";
+const JEV_MODEL = process.env.JEV_MCP_MODEL || "judge";
 const KEY = process.env.NINEROUTER_API_KEY || "";
 const KEY_HELPER = process.env.JEV_API_KEY_HELPER || "zsh -c 'printenv NINEROUTER_API_KEY'";
 const LOG = path.join(os.homedir(), ".claude", "jev-router.jsonl");

@@ -132,6 +132,17 @@ def build(token: str) -> dict:
         )
     ]
 
+    # `judge` lives in kv scope='modelAliases' as alias -> "provider/model".
+    # Dropping it would make restore lose the name every combo's smartRouter
+    # points at, and smart routing would fail open to plain fallback order.
+    aliases = {
+        r["key"]: json.loads(r["value"])
+        for r in from_db(
+            "SELECT key, value FROM kv WHERE scope='modelAliases' ORDER BY key",
+            ["key", "value"],
+        )
+    }
+
     settings_row = list(from_db("SELECT data FROM settings", ["data"]))
     settings = scrub(json.loads(settings_row[0]["data"]) if settings_row else {})
     # `scrub` already drops the credential-named fields; these two are
@@ -145,12 +156,14 @@ def build(token: str) -> dict:
         "_note": (
             "9Router config backup. Secrets masked. Restore via API: "
             "nodes->POST /api/provider-nodes, conns->POST /api/providers, "
-            "models->POST /api/models/custom, combos->POST /api/combos (with real keys)."
+            "models->POST /api/models/custom, aliases->PUT /api/models/alias, "
+            "combos->POST /api/combos (with real keys)."
         ),
         "combos": combos,
         "connections": connections,
         "nodes": nodes,
         "customModels": custom,
+        "modelAliases": aliases,
         "settings": settings,
     }
 

@@ -1,9 +1,14 @@
 {
   "mcpServers": {
+    "codebase-memory-mcp": {
+      "command": "codebase-memory-mcp",
+      "args": [],
+      "lifecycle": "eager"
+    },
     "genoffice": {
       "command": "/Applications/GenOffice.app/Contents/Resources/cli/genoffice",
       "args": ["mcp"],
-      "lifecycle": "eager"
+      "lifecycle": "lazy"
     }
   }
 }

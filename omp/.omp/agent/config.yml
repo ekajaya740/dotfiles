@@ -12,14 +12,14 @@ modelRoles:
   default: 9router/coder
 defaultThinkingLevel: auto
 steeringMode: one-at-a-time
-followUpMode: auto
+followUpMode: one-at-a-time
 interruptMode: immediate
 hideThinkingBlock: false
 display:
   tabWidth: 4
 compaction:
   enabled: true
-  thresholdPercent: 80
+  thresholdPercent: 70
   keepRecentTokens: 30000
 retry:
   networkOnly: true
@@ -31,6 +31,13 @@ async:
   enabled: false
 skills:
   showImages: true
+  enableCodexUser: false
+  enableClaudeUser: false
+  enableClaudeProject: false
+  enablePiUser: false
+  enablePiProject: false
+  enableAgentsUser: false
+  enableAgentsProject: false
 setupVersion: 2
 extensions:
   - ~/dotfiles/pi/.pi/agent/extensions/pi-notify-pp/index.ts

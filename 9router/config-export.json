@@ -1,6 +1,6 @@
 {
-  "_exported": "2026-10-26T03:55:09Z",
-  "_note": "9Router config backup. Secrets masked. Restore via API: nodes->POST /api/provider-nodes, conns->POST /api/providers, models->POST /api/models/custom, combos->POST /api/combos (with real keys).",
+  "_exported": "2026-10-26T08:30:27Z",
+  "_note": "9Router config backup. Secrets masked. Restore via API: nodes->POST /api/provider-nodes, conns->POST /api/providers, models->POST /api/models/custom, aliases->PUT /api/models/alias, combos->POST /api/combos (with real keys).",
   "combos": [
     {
       "id": "4526c849-1a6c-4723-8345-8caf2fc00743",
@@ -8,12 +8,11 @@
       "kind": "llm",
       "models": [
         "ollama-cloud/deepseek-v4.1-flash:1017-cloud",
-        "ollama-cloud/minimax-m3.1-flash:cloud",
         "shiteru-deepseek-v4.1-flash",
         "refuseless/deepseek-v4.1-flash-fast"
       ],
       "createdAt": "2026-09-01T05:53:28.026Z",
-      "updatedAt": "2026-10-26T03:20:41.589Z"
+      "updatedAt": "2026-10-26T05:44:57.979Z"
     },
     {
       "id": "031b0d15-335c-4e29-99bc-e4d17b822bb1",
@@ -21,12 +20,11 @@
       "kind": "llm",
       "models": [
         "ollama-cloud/deepseek-v4.1-flash:1017-cloud",
-        "ollama-cloud/minimax-m3.1-flash:cloud",
         "shiteru-deepseek-v4.1-flash",
         "refuseless/deepseek-v4.1-flash-fast"
       ],
       "createdAt": "2026-09-01T05:53:28.033Z",
-      "updatedAt": "2026-10-26T03:20:41.607Z"
+      "updatedAt": "2026-10-26T05:44:57.999Z"
     },
     {
       "id": "5c83ba54-1708-4214-8787-f8b96c8dbf94",
@@ -496,22 +494,20 @@
       "name": "sfw-coder",
       "kind": "llm",
       "models": [
-        "ollama-cloud/deepseek-v4.1-flash:1017-cloud",
-        "ollama-cloud/minimax-m3.1-flash:cloud"
+        "ollama-cloud/deepseek-v4.1-flash:1017-cloud"
       ],
       "createdAt": "2026-09-07T02:29:29.468Z",
-      "updatedAt": "2026-10-26T03:20:47.043Z"
+      "updatedAt": "2026-10-26T05:44:58.017Z"
     },
     {
       "id": "0467e95d-eea7-40f2-94e2-69298bf79a48",
       "name": "sfw-advisor",
       "kind": "llm",
       "models": [
-        "ollama-cloud/deepseek-v4.1-flash:1017-cloud",
-        "ollama-cloud/minimax-m3.1-flash:cloud"
+        "ollama-cloud/deepseek-v4.1-flash:1017-cloud"
       ],
       "createdAt": "2026-09-07T02:29:49.983Z",
-      "updatedAt": "2026-10-26T03:20:47.068Z"
+      "updatedAt": "2026-10-26T05:44:58.035Z"
     },
     {
       "id": "34a9aa3d-2c7e-41c1-8e62-bc7687567a0d",
@@ -623,42 +619,43 @@
       "priority": 1,
       "isActive": true,
       "createdAt": "2026-08-27T05:35:34.813Z",
-      "updatedAt": "2026-10-26T03:39:13.844Z",
-      "testStatus": "unavailable",
+      "updatedAt": "2026-10-26T05:38:43.062Z",
+      "testStatus": "active",
       "providerSpecificData": {
         "connectionProxyEnabled": false,
         "connectionProxyUrl": "",
         "connectionNoProxy": ""
       },
       "modelLock_nemotron-3-embed-1b-20260716:free": null,
-      "errorCode": 429,
-      "backoffLevel": 9,
+      "errorCode": null,
+      "backoffLevel": 0,
       "modelLock_deepseek-v4-flash:0731": null,
-      "modelLock_typesafe/jev-router": "2026-10-26T02:59:43.895Z",
-      "lastError": "[429]: {\"error\":{\"message\":\"Provider returned error\",\"code\":429,\"metadata\":{\"raw\":\"google/gemma-4-31b-it:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumul",
-      "lastErrorAt": "2026-10-26T03:39:13.844Z",
+      "modelLock_typesafe/jev-router": null,
+      "lastError": null,
+      "lastErrorAt": null,
       "modelLock_deepseek-flash": null,
       "modelLock_deepseek-chat": null,
       "modelLock_deepseek-v4.1-flash": null,
       "modelLock_typesafe/jev-1.13": null,
       "modelLock_anthropic/claude-sonnet-4": null,
       "modelLock_deepseek-v3": null,
-      "modelLock_deepseek/deepseek-chat": "2026-10-26T03:26:28.969Z",
+      "modelLock_deepseek/deepseek-chat": null,
       "modelLock_glm-5.3": null,
       "modelLock_deepseek-v4.1-flash:1017-cloud": null,
       "modelLock_deepseek/deepseek-v4.1-flash-1017": null,
       "modelLock_deepseek/deepseek-v4.1-flash": null,
-      "modelLock_google/gemma-4-31b-it:free": "2026-10-26T03:44:13.844Z",
-      "modelLock_google/gemma-4-26b-a4b-it:free": "2026-10-26T03:31:56.070Z",
-      "modelLock_liquid/lfm-2.5-2.6b:free": "2026-10-26T03:31:56.228Z",
-      "modelLock_nvidia/nemotron-3.5-lightning:free": "2026-10-26T03:31:56.132Z",
-      "modelLock_cohere/north-mini-code:free": "2026-10-26T02:48:01.166Z",
-      "modelLock_recursive/flint-v1.0:free": "2026-10-26T03:31:56.322Z",
-      "modelLock_poolside/laguna-xs-2.1:free": "2026-10-26T02:48:01.266Z",
-      "modelLock_xingchen-agi/xing4.0-29b-a4b:free": "2026-10-26T02:48:01.316Z",
-      "modelLock_nvidia/nemotron-3-super-120b-a12b:free": "2026-10-26T02:48:01.381Z",
-      "modelLock_deepseek/deepseek-v4-flash": "2026-10-26T02:48:42.479Z",
-      "modelLock_meta-llama/llama-3.3-70b-instruct": "2026-10-26T02:48:42.555Z"
+      "modelLock_google/gemma-4-31b-it:free": null,
+      "modelLock_google/gemma-4-26b-a4b-it:free": null,
+      "modelLock_liquid/lfm-2.5-2.6b:free": null,
+      "modelLock_nvidia/nemotron-3.5-lightning:free": null,
+      "modelLock_cohere/north-mini-code:free": null,
+      "modelLock_recursive/flint-v1.0:free": null,
+      "modelLock_poolside/laguna-xs-2.1:free": null,
+      "modelLock_xingchen-agi/xing4.0-29b-a4b:free": null,
+      "modelLock_nvidia/nemotron-3-super-120b-a12b:free": null,
+      "modelLock_deepseek/deepseek-v4-flash": null,
+      "modelLock_meta-llama/llama-3.3-70b-instruct": null,
+      "rateLimitedUntil": null
     },
     {
       "id": "fc3d2d0b-c66f-449d-bd36-753070c57771",
@@ -669,7 +666,7 @@
       "priority": 1,
       "isActive": true,
       "createdAt": "2026-08-27T05:38:04.204Z",
-      "updatedAt": "2026-10-26T03:55:09.607Z",
+      "updatedAt": "2026-10-26T07:47:54.065Z",
       "testStatus": "active",
       "providerSpecificData": {
         "prefix": "ollama-cloud",
@@ -829,7 +826,7 @@
       "priority": 1,
       "isActive": true,
       "createdAt": "2026-09-03T02:00:51.052Z",
-      "updatedAt": "2026-10-26T03:20:34.875Z",
+      "updatedAt": "2026-10-26T08:28:38.944Z",
       "defaultModel": "deepseek-v4-flash",
       "testStatus": "active",
       "providerSpecificData": {
@@ -890,8 +887,8 @@
       "priority": 1,
       "isActive": true,
       "createdAt": "2026-09-03T07:30:11.394Z",
-      "updatedAt": "2026-10-26T02:51:23.354Z",
-      "testStatus": "unavailable",
+      "updatedAt": "2026-10-26T05:09:11.312Z",
+      "testStatus": "active",
       "providerSpecificData": {
         "prefix": "shiteru-zs",
         "apiType": "chat",
@@ -902,7 +899,7 @@
         "connectionNoProxy": ""
       },
       "modelLock_claude-opus-5": null,
-      "errorCode": 403,
+      "errorCode": null,
       "backoffLevel": 0,
       "modelLock_deepseek-v4-flash": null,
       "modelLock_glm-5.3": null,
@@ -920,8 +917,8 @@
       "modelLock_gpt-6-astra": null,
       "modelLock_claude-fable-5.1": null,
       "modelLock_deepseek-v4.1-flash": null,
-      "lastError": "[403]: {\"error\":{\"message\":\"Key is not allowed to use model kimi-k3:free\",\"type\":\"permission_error\",\"code\":\"model_not_allowed\"}}",
-      "lastErrorAt": "2026-10-26T02:51:23.354Z",
+      "lastError": null,
+      "lastErrorAt": null,
       "modelLock_hy4-preview": null,
       "modelLock_gpt-5.6-sol": null,
       "modelLock_cb/claude-sonnet-4.6": null,
@@ -931,8 +928,8 @@
       "modelLock_claude-sonnet-4.6": null,
       "modelLock_claude-opus-4.8": null,
       "rateLimitedUntil": null,
-      "modelLock_claude-sonnet-5:free": "2026-10-26T02:53:17.169Z",
-      "modelLock_kimi-k3:free": "2026-10-26T02:53:23.354Z"
+      "modelLock_claude-sonnet-5:free": null,
+      "modelLock_kimi-k3:free": null
     },
     {
       "id": "6e778832-d548-416a-a8fa-5c705c9aa8b3",
@@ -1266,7 +1263,7 @@
       "priority": 1,
       "isActive": true,
       "createdAt": "2026-10-23T08:25:20.169Z",
-      "updatedAt": "2026-10-26T03:17:21.179Z",
+      "updatedAt": "2026-10-26T08:30:26.519Z",
       "defaultModel": "deepseek-v4.1-flash-fast",
       "testStatus": "active",
       "providerSpecificData": {
@@ -3578,6 +3575,12 @@
       "name": "qwen3.5:397b"
     },
     {
+      "providerAlias": "openrouter",
+      "id": "typesafe/jev-1.14",
+      "type": "llm",
+      "name": "Jev 1.14"
+    },
+    {
       "providerAlias": "shiteru-anthropic",
       "id": "claude-sonnet-4.6",
       "type": "llm",
@@ -4226,6 +4229,9 @@
       "name": "claude-opus-5"
     }
   ],
+  "modelAliases": {
+    "judge": "openrouter/typesafe/jev-1.14"
+  },
   "settings": {
     "cavemanEnabled": true,
     "ponytailEnabled": false,
@@ -4253,6 +4259,389 @@
         "fallbackStrategy": "round-robin",
         "stickyRoundRobinLimit": 1
       }
-    }
+    },
+    "comboStrategy": "smart",
+    "comboStrategies": {
+      "coder": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "advisor": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "personal-chat": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "designer": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-claude-fable-5": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-claude-opus-4.6": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-claude-opus-4.6-limited": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-claude-opus-4.7": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-claude-opus-4.7-limited": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-claude-opus-4.8": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-claude-opus-4.8-limited": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-claude-opus-5-limited": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-claude-sonnet-5": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-deepseek-v4-flash": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-deepseek-v4-flash-premium": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-deepseek-v4-pro": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-gemini-3.1-pro": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-gemini-3.7-flash": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-glm-5.2": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-glm-5.2-premium": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-glm-5.3": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-glm-5.3-flash": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-gpt-5.6-luna": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-gpt-5.6-sol": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-gpt-5.6-terra": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-grok-4.6": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-kimi-k3": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-kr-claude-opus-4.6": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-kr-claude-opus-4.7": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-kr-claude-opus-4.8": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-kr-claude-opus-5": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-kr-claude-sonnet-5": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-qwen-3.5-flash": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-qwen-3.5-plus": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-qwen-3.6-plus": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-qwen-3.8": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-qwen-3.8-flash": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-qwen-3.8-max": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-qwen-3.8-max-latest": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-qwen-flash": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-auto": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-claude-opus-5-free": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-claude-opus-5": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-kr-claude-sonnet-5-free": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "sfw-coder": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "sfw-advisor": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-gpt-6-astra": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-claude-fable-5.1": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-deepseek-v4.1-flash": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-deepseek-v4.1-flash-free": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-hy4-preview": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-claude-sonnet-4.6": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "shiteru-anthropic-claude-sonnet-4.6": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      },
+      "smol": {
+        "fallbackStrategy": "smart",
+        "routerModel": "judge",
+        "smartPolicy": "smart",
+        "sessionSticky": true,
+        "confidenceThreshold": 0.1
+      }
+    },
+    "rtkEnabled": true,
+    "comboStickyRoundRobinLimit": 1
   }
 }

@@ -142,9 +142,13 @@ install_jev_mcp_note() {
 EOF
 }
 
-# ── pi-warden (pi + omp) ─────────────────────────────────────
+# ── pi-warden (pi only) ──────────────────────────────────────
+# omp is deliberately excluded: warden installs as an omp plugin, and omp is
+# kept plugin-free on purpose so the only skills it sees are the ones shipped
+# with the binary. Adding the plugin back re-enables its skill registrations
+# and its per-turn guard calls. The pi side is unaffected.
 install_pi_warden() {
-    info "pi-warden (guardrails for Pi and omp)"
+    info "pi-warden (guardrails for Pi)"
 
     # pi: requires Pi >= 0.85 (older versions fail or misbehave).
     if has pi; then
@@ -159,19 +163,13 @@ install_pi_warden() {
         warn "  pi not installed — skipping pi side"
     fi
 
-    # omp: the same npm package, installed through omp's own plugin manager.
-    if has omp; then
-        run omp plugin install npm:pi-warden
-        ok "  omp: pi-warden installed"
-    fi
+    # omp side intentionally omitted — see the header comment above.
 
     # Judgments use OpenRouter (not TypeSafe), matching the other Jev tools.
     # Without this the plugin defaults to the typesafe backend and fails closed.
     # pi-warden resolves its config via PI_CODING_AGENT_DIR, falling back to
-    # ~/.pi/agent. omp sets that variable to its own agent dir
-    # (PI_CODING_AGENT_DIR=<omp agentDir>), so write BOTH locations rather than
-    # assuming which one a given host picks up.
-    local cfg_dirs=("$HOME/.pi/agent/pi-warden" "$HOME/.omp/agent/pi-warden")
+    # ~/.pi/agent. Only the pi location is written now that omp is out of scope.
+    local cfg_dirs=("$HOME/.pi/agent/pi-warden")
     if $CHECK; then
         echo "  [dry-run] set typesafeBackend=openrouter in: ${cfg_dirs[*]}"
     else
