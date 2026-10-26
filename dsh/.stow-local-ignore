@@ -5,3 +5,14 @@
 # belongs in $HOME: stow would otherwise create ~/install.sh and ~/plugins.txt.
 install.sh
 plugins.txt
+
+# profiles/ is NOT stowed. dsh writes these files with writeFileAtomic, which
+# renames a temp file over the target — rename() replaces a symlink rather than
+# writing through it, so a stowed link would be silently severed on the first
+# config-editor save or `dsh plugin add`. install.sh copies them instead.
+#
+# The leading "^/" is required: stow matches these patterns against the path
+# relative to the package root with a "/" prefix, so an unanchored
+# "\.dsh/profiles/" matches nothing. Verify with:
+#   stow -t "$(mktemp -d)" --simulate -v dsh 2>&1 >/dev/null | grep profiles
+^/\.dsh/profiles(/|$)

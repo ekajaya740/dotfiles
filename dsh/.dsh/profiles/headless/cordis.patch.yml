@@ -1,0 +1,27 @@
+# Your patch layer for this dsh profile, applied after every bundle layer:
+# a top-level YAML array of loader patch entries (id-targeted config
+# overrides, disables, and insert lists; `!!js` expressions allowed).
+#
+# ── 9router routing (machine-local, dsh-host) ───────────────────────
+# TWO ROWS ARE REQUIRED. llm-deepseek registers the provider route;
+# agent-default-model selects it. The shipped default points at
+# model: deepseek-flash, which 9router does not serve, so a turn would
+# fail with "deepseek-flash is not a valid model ID". The route name
+# deepseek-official is a fixed constant in the adapter; only the model
+# id changes. The gateway runs on this host, so loopback is the same
+# endpoint without nginx/TLS in the path.
+- id: llm-deepseek
+  config:
+    apiKeyEnv: NINEROUTER_API_KEY
+    baseURL: http://127.0.0.1:20128
+    models:
+      - id: coder
+        name: coder
+      - id: advisor
+        name: advisor
+      - id: personal-chat
+        name: personal-chat
+- id: agent-default-model
+  config:
+    provider: deepseek-official
+    model: coder

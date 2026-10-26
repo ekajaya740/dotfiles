@@ -1,0 +1,155 @@
+# Your patch layer for this dsh profile, applied after every bundle layer:
+# a top-level YAML array of loader patch entries (id-targeted config
+# overrides, disables, and insert lists; `!!js` expressions allowed).
+#
+# ── Why `hmr` is enabled here ────────────────────────────────────────
+# The WaifuDSH installer writes `patchReload: "live"` into this profile's
+# package.json, and `@deepseek-ai/dsh-base` ships the `hmr` row with
+# `disabled: true` (its own comment claims "patchReload: live ... does not
+# require this row", but that is stale — see below).
+#
+# In `dsh/lib/profile-boot-*.js`, live reload requires the Cordis HMR
+# service:
+#
+#   if (ctx.get("hmr") === void 0) {
+#     if (ctx.get("timer") === void 0) await ctx.loader.create({...timer})
+#     await ctx.loader.create({ name: "@deepseek-ai/cordis-plugin-hmr", ... })
+#   }
+#   await watchUserPatches(ctx, {...})   // throws if ctx.get("hmr") is still undefined
+#
+# That fallback does not work: `loader.create` returns before the service is
+# activated, so `watchUserPatches` still reads `ctx.get("hmr") === undefined`
+# and throws "user patch-layer watching requires the Cordis HMR service".
+# `suppressShutdownError` re-throws it because the context is active, so the
+# process exits with status 1 and the Web UI never comes up.
+#
+# Enabling the row makes the service available at boot, which is what
+# `patchReload: "live"` actually needs.
+- id: hmr
+  disabled: false
+# ── UI language: English ─────────────────────────────────────────────
+# `@deepseek-ai/dsh-client-locale` stores the user's locale preference in
+# the Host user-settings document (VOLATILE field, namespace/entry id
+# `locale`), which is this profile patch layer. Setting `preference: en`
+# overrides the browser-language guess, so the shell and every plugin that
+# registers an `en` dictionary render in English.
+- id: locale
+  name: "@deepseek-ai/dsh-client-locale"
+  config:
+    preference: en
+- id: ui-settings-general
+  name: "@deepseek-ai/dsh-client-ui-settings-general"
+  config:
+    welcomeNoticeVersion: 2026-09-28.1
+- id: better-sidebar
+  name: dsh-better-sidebar
+  config:
+    tabsEnabled:
+      sidechat: true
+    agentOpenTools: false
+# ── MCP console: English output ───────────────────────────────────────
+# dsh-mcp-panel's Config defaults `outputLanguage` to "en" already; stated
+# explicitly so the /mcp command's language is pinned rather than inherited.
+# An id-targeted config row REPLACES the bundle row's config, so the bundle's
+# own two keys are restated here (every other key keeps its schema default).
+- id: mcp-panel
+  name: dsh-mcp-panel
+  config:
+    probeEnabled: true
+    probeTimeoutMs: 10000
+    outputLanguage: en
+# ── MCP: Hevy (workout tracking) ──────────────────────────────────────
+# Local stdio server from npm package `hevy-mcp` (chrisdoc/hevy-mcp, MIT,
+# https://github.com/chrisdoc/hevy-mcp). 23 tools over workouts, routines,
+# exercise templates, routine folders and body measurements; some are
+# write operations (create/update workout, routine, measurement).
+# HEVY_API_KEY comes from EnvironmentFile ~/.config/dsh/env (Hevy PRO
+# required for API access); the mcp-client scrubs ambient env, so it must
+# be re-declared here explicitly.
+- insert:
+    - id: mcp-hevy
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: hevy
+        transport: stdio
+        command: npx
+        args: [ '-y', 'hevy-mcp@6.2.1' ]
+        env:
+          HEVY_API_KEY: !!js process.env.HEVY_API_KEY
+        toolCallTimeoutMs: 90000
+# ── MCP: arXiv (paper search / full-text / LaTeX) ─────────────────────
+# Local stdio server, blazickjp/arxiv-mcp-server (Apache-2.0,
+# https://github.com/blazickjp/arxiv-mcp-server), PyPI `arxiv-mcp-server`
+# 0.8.2 installed as a persistent uv tool with the [pdf] extra (PDF
+# fallback for papers with no usable arXiv HTML). 19 tools: search_papers,
+# get_abstract, download_paper/read_paper (+ section outline/read/text
+# search), get_paper_latex (+ section reads), citation_graph,
+# export_citations, watch_topic/check_alerts/list_watches/unwatch_topic,
+# and semantic_search/reindex (the last two need the [pro] extra, so they
+# will report a missing-dependency error as installed here).
+#
+# Absolute path, not `uvx`: the daemon's PATH is not guaranteed to carry
+# ~/.local/bin, and uvx would re-resolve the package on every start.
+# No credentials are needed. Two optional env vars are deliberately NOT
+# set: SEMANTIC_SCHOLAR_API_KEY (unauthenticated citation_graph works until
+# its quota runs out) and the ARXIV_* timeout knobs (defaults: 30s read /
+# 10s connect / 50s per-call budget).
+# Storage defaults to ~/.arxiv-mcp-server/papers (markdown + LaTeX cache,
+# topic watches, semantic index); pass `--storage-path` in args to move it.
+# download_paper converts full PDFs, so the call timeout is above the 60s
+# default; reconnect is left at its default (10 attempts, exp. backoff).
+- insert:
+    - id: mcp-arxiv
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: arxiv
+        transport: stdio
+        command: /home/user/.local/bin/arxiv-mcp-server
+        args: [ ]
+        toolCallTimeoutMs: 120000
+
+# ── Auto-archive: scheduled cleanup of idle sessions ──────────────────
+# Local plugin at /home/user/dsh-auto-archive (linked dependency). Neither
+# DSH core nor @michengai/dsh-archive-manager schedules archiving — the manager
+# documents "There is no scheduled or automatic background cleanup", and the
+# sandbox has no usable cron/systemd. This row supplies the clock: it archives
+# sessions whose last activity is older than `idleDays`, skipping archived,
+# pinned, favourite, unknown-activity and ACTIVE sessions (archiveSession is
+# called without stopActivity, so DSH refuses a running turn instead of
+# killing it). `cron` is written against `timeZone` (the host runs on Etc/UTC,
+# so naming the zone keeps "04:00" meaning 04:00 local); runs are appended to
+# $DSH_HOME/auto-archive.log.
+- insert:
+    - id: dsh-auto-archive
+      name: dsh-auto-archive
+      config:
+        cron: "0 4 * * *"
+        timeZone: Asia/Makassar
+        idleDays: 30
+        dryRun: false
+- id: dsh-hevy-training
+  disabled: false
+
+# ── 9router routing (machine-local, dsh-host) ───────────────────────
+# TWO ROWS ARE REQUIRED. The llm-deepseek row registers the provider
+# route; agent-default-model selects it. The shipped default points at
+# model: deepseek-flash, which 9router does not serve, so a turn would
+# fail with "deepseek-flash is not a valid model ID". The route name
+# deepseek-official is a fixed constant in the adapter; only the model
+# id changes. The gateway runs on this host, so 127.0.0.1:20128 is the
+# same endpoint as the public URL; use loopback to skip nginx/TLS.
+- id: llm-deepseek
+  config:
+    apiKeyEnv: NINEROUTER_API_KEY
+    baseURL: http://127.0.0.1:20128
+    models:
+      - id: coder
+        name: coder
+      - id: advisor
+        name: advisor
+      - id: personal-chat
+        name: personal-chat
+- id: agent-default-model
+  config:
+    provider: deepseek-official
+    model: coder

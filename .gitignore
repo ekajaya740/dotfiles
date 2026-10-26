@@ -66,17 +66,36 @@ pen/.pencil/*
 
 # dsh (DeepSeek Harness). Stowed from dsh/: the home-level cordis.patch.yml,
 # the systemd unit, and the env template. Everything else under ~/.dsh is
-# machine state or secrets: profiles/ is pnpm-managed, logs/ holds startup
-# diagnostics that can echo credential values, and .credentials.yaml holds
-# provider keys. Guards against folding ~/.dsh into the repo and against a
-# stray `git add`. The live service env is deployed by dsh/install.sh.
+# machine state or secrets: logs/ holds startup diagnostics that can echo
+# credential values, and .credentials.yaml holds provider keys. Guards against
+# folding ~/.dsh into the repo and against a stray `git add`. The live service
+# env is deployed by dsh/install.sh.
 dsh/.dsh/*
 !dsh/.dsh/cordis.patch.yml
 dsh/.dsh/.credentials.yaml
 dsh/.dsh/.env
 dsh/.dsh/logs/
-dsh/.dsh/**/node_modules/
-dsh/.dsh/**/pnpm-lock.yaml
+
+# dsh profiles: the harness config itself, tracked as a SEED rather than a
+# symlink. dsh commits config writes with writeFileAtomic, which renames a temp
+# file over the target — rename() replaces a symlink instead of writing through
+# it, so stowing these would silently sever the link on the first settings save
+# or `dsh plugin add`. install.sh copies them in; `install.sh --capture` pulls
+# live edits back. Only intent files are tracked: pnpm-lock.yaml is derived from
+# package.json + plugins.txt and churns on every install.
+!dsh/.dsh/profiles/
+dsh/.dsh/profiles/*
+!dsh/.dsh/profiles/*/
+!dsh/.dsh/profiles/*/cordis.patch.yml
+!dsh/.dsh/profiles/*/package.json
+!dsh/.dsh/profiles/*/pnpm-workspace.yaml
+!dsh/.dsh/profiles/*/compatibility.json
+dsh/.dsh/profiles/**/node_modules/
+dsh/.dsh/profiles/**/pnpm-lock.yaml
+dsh/.dsh/profiles/**/*.bak-*
+dsh/.dsh/profiles/**/package.json.lock
+dsh/.dsh/profiles/**/.plugin-manager/
+dsh/.dsh/profiles/**/.srprobe
 
 # Hyprland Lua port: only the live overrides under hypr-lua/ are versioned
 hypr-lua/standalone/

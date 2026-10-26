@@ -490,161 +490,13 @@ jq empty pen/.pencil/models.json
 
 ## GenOffice
 
-[GenOffice](https://genoffice.ai) — a desktop document suite (docx, xlsx, pptx,
-pdf) with an in-app AI agent and a CLI (`genoffice`) that exposes the same
-engines, including a 32-tool MCP server. Installed from the vendor DMG at
-`/Applications/GenOffice.app`; `genoffice` is symlinked into `/usr/local/bin` by
-the app's own `install-cli`.
-
-### Install
-
-The app is the only source of the CLI — `genoffice mcp` and the skill both run
-the copy inside the bundle, so nothing works without it installed first.
-
-```bash
-# 1. App (macOS; Windows/Linux installers on the same Releases page)
-#    The cask is the same build as the .dmg, but requires macOS >= 12;
-#    the DMG itself supports macOS 11+.
-brew install --cask genoffice        # or: download the .dmg from
-                                     # https://github.com/genspark-ai/genoffice/releases/latest
-open -a GenOffice                    # first launch clears Gatekeeper, creates
-                                     # ~/Library/Application Support/GenOffice/
-
-# 2. CLI on PATH — the app writes the symlink itself
-genoffice install-cli                # -> /usr/local/bin/genoffice (or ~/.local/bin)
-genoffice --version
-```
-
-The CLI lives at `/Applications/GenOffice.app/Contents/Resources/cli/genoffice`
-and is a self-contained bundle (no Node runtime needed). Every MCP config here
-points at that absolute path rather than the PATH name, because an agent
-launched from a GUI or a fresh shell may not have `/usr/local/bin` in scope.
-
-### MCP Registration
-
-```bash
-genoffice mcp list                   # which agents have it registered
-genoffice mcp install <agent|all>    # writes the stdio entry for you
-genoffice skill install <agent|all>  # optional: the docx/pptx op reference
-```
-
-`mcp install` knows Claude Code, Codex, Cursor, Gemini CLI, Copilot CLI,
-OpenCode and Windsurf. This repo registers the same server by hand for omp,
-Pi and dsh, which the command does not cover — see the MCP Servers
-table in the OMP section.
-
-`status: "stale"` in `mcp list --json` does **not** mean broken: it fires when
-the entry's `command`/`args` differ from the launcher the CLI would write
-(here, `~/.claude.json` omits the `type: "stdio"` key that `mcp install`
-adds). It still counts as registered.
-
-### Linux / Headless Caveat
-
-`render`, `convert` to PDF and `create_pdf` start a hidden Electron process, so
-a server without a display needs `xvfb-run` and the app installed. Everything
-else (`docs_*`, `sheet_*`, `slides_*`, `pdf_read`, `merge`) runs without a
-window.
-
-### Nothing Is Synced — Deliberately
-
-GenOffice has no stow package and no tracked config. Its settings live under
-`~/Library/Application Support/GenOffice/` (`ai-settings.json`, `app-settings.json`,
-`control.json`, Chromium caches) and `ai-settings.json` holds a **plaintext API
-key**, so it stays machine-local exactly like `~/.pencil/agent-auth`.
-
-### AI Provider
-
-The in-app agent rides the same 9router gateway as every other harness, on the
-`coder` combo. `ai-settings.json`:
-
-```json
-{
-  "provider": "custom",
-  "providers": {
-    "custom": {
-      "apiKey": "<NINEROUTER_API_KEY value>",
-      "model": "coder",
-      "baseUrl": "https://ai.workofekajaya.com/v1",
-      "profile": { "api": "openai-compatible" }
-    }
-  },
-  "gskToolsEnabled": true,
-  "maxOutputTokens": 32768
-}
-```
-
-Two details make this work and are easy to get wrong:
-
-- **`provider` must be `"custom"`**, not `"genspark"`. `activeProvider()` falls
-  back to Genspark whenever the selected provider is missing a model, a base
-  URL, or a key — so a half-filled entry silently reverts to the signed-out
-  default.
-- **The key must be written into the file.** GenOffice resolves
-  `profile.apiKeyEnv` from the app's own `process.env`, and an app launched from
-  Finder/Dock inherits none of your shell environment. There is no
-  `!command` form here (unlike Pen), so the literal key is the only option —
-  which is why this file is machine-local.
-
-`maxOutputTokens` is clamped to 1024–131072 on read; 32768 matches the default.
-
-**Any 9router model works, not just `coder`** — the custom provider is a plain
-OpenAI-compatible client and the model string goes onto the wire unvalidated.
-Verified in-app on `coder`, `advisor` and `designer` (all returned text).
-
-**The model dropdown can come back empty — that is not a wiring failure.**
-GenOffice populates Settings → Model from `GET /v1/models` through
-`listCustomModels`, which caps the call at 5 s (`REQUEST_TIMEOUT_MS$1`) and
-swallows the abort into `emptyCatalog()`. 9router generates its 453-entry
-catalog per request and answers in 2.7–6.6 s, so the call times out roughly
-half the time (measured 2 of 4 probes returning 0 at 5002/5004 ms). Consequences:
-
-- The saved `model` is unaffected — turns keep working while the picker is blank.
-- With an empty list the UI renders a free-text `input` instead of the
-  `Dropdown`, so you can type any model id by hand.
-- A previously selected model is never dropped from a successful list; the UI
-  prepends it when it is missing.
-
-Diagnose an empty picker by timing the endpoint, not by re-checking the key:
-
-```bash
-curl -sS -o /dev/null -w '%{time_total}s\n' \
-  https://ai.workofekajaya.com/v1/models \
-  -H "Authorization: Bearer $NINEROUTER_API_KEY"
-```
-
-Over ~5 s means the picker will be flaky; caching the catalog gateway-side is
-the real fix.
-
-**Cloud features are separate.** Search (Serper, Serply, Tavily, Parallel, Exa,
-Firecrawl, Keenable — 9router is not one), image generation and media analysis
-each need their own key in the `media`/`search` blocks and stay `false` in
-`genoffice capabilities --json` until configured.
-
-### MCP
-
-`genoffice mcp` is a stdio MCP server over all 32 CLI commands (`docs_read`,
-`docs_apply`, `sheet_read`, `slides_*`, `pdf_read`, `render`, `merge`, …). It is
-registered in omp, OpenCode, Claude Code, Pi and dsh — see the MCP
-Servers table in the OMP section. Pi needs the `pi-mcp-extension` package
-(`pi install npm:pi-mcp-extension`) because Pi 0.87 has no built-in MCP. Its
-entry uses `"lifecycle": "lazy"` (the schema's default), so the server only
-starts on `/mcp:start` — the right posture for a macOS-only binary that does not
-exist on most hosts.
-
-### Validation
-
-```bash
-genoffice capabilities --json          # provider plumbing; "app" is always available
-genoffice mcp list --json              # which agents have genoffice registered
-claude mcp list | grep genoffice       # ✔ Connected
-opencode mcp list | grep -A1 genoffice # ✓ connected
-pi mcp list                            # pi 1.x; the 0.87 build has no such command
-```
-
-The `capabilities` command reports only the **cloud** features (search, image
-search/generation, media analysis) — all of which need a separate provider key
-and are unconfigured here. It does not report the chat provider, so "configured:
-app" is the expected output even when `coder` is wired correctly.
+[GenOffice](https://genoffice.ai) is a macOS desktop document suite whose
+bundled CLI exposes a 32-tool MCP server (docx, xlsx, pptx, pdf). It is
+registered but **disabled by default** here, because the binary lives inside a
+macOS app bundle that most hosts do not have — see the MCP Servers table in the
+OMP section. Install steps, the `ai-settings.json` provider recipe (including
+the `provider: "custom"` trap) and the empty-model-dropdown diagnosis are in
+[docs/genoffice.md](./docs/genoffice.md).
 
 ## DeepSeek Harness (dsh)
 
@@ -656,7 +508,24 @@ rather than added as an ad-hoc install.
 
 ### Config Files Managed in This Repo
 
+Stowed (symlinked, `--no-folding`):
+
 - `dsh/.dsh/cordis.patch.yml` → `~/.dsh/cordis.patch.yml` (home-level patch)
+- `dsh/.config/systemd/user/dsh-web.service` → `~/.config/systemd/user/` (the web
+  profile as a user unit, loopback `127.0.0.1:3080`)
+- `dsh/.config/systemd/user/dsh-web-cookie.{service,timer}` → `~/.config/systemd/user/`
+  (daily re-mint of the nginx cookie snippet; see *Web UI Access* below)
+- `dsh/bin/dsh-web-cookie-refresh` → `~/bin/` (the script those units run)
+- `dsh/etc/nginx/sites-available/dsh.workofekajaya.com` → `~/etc/nginx/...`
+  (tracked copy; `/etc/nginx` is root-owned, so installing it is a manual `cp`)
+
+Seeded, not stowed (copied by `dsh/install.sh --profiles`):
+
+- `dsh/.dsh/profiles/{web,headless,tui}/{cordis.patch.yml,package.json,pnpm-workspace.yaml,compatibility.json}`
+  → `~/.dsh/profiles/<name>/`
+
+Never tracked: `.credentials.yaml`, `logs/`, `profiles/*/node_modules/`,
+`profiles/*/pnpm-lock.yaml`.
 
 ### Layer Order
 
@@ -672,15 +541,31 @@ lowest-priority first. Later layers win per row:
 **A patch replaces the targeted row's complete `config` value — it does not
 deep-merge keys.** A partial patch silently drops every key it does not restate.
 
-### Why Only the Home Patch Is Synced
+### Profile Config Is Seeded, Never Symlinked
 
-`dsh` auto-initializes the shipped profiles (`web`, `headless`, `sdk`,
-`sdk-minimal`, `acp`) from templates on first use, and the launcher claims the
-profile directory **exclusively** — it rejects a target whose directory already
-exists. Pre-creating `profiles/web/` in this repo would therefore make
-`dsh web` fail on a fresh machine, so this package deliberately ships only the
-home-level patch. Profile-specific overlays are machine-local; add one with
-`dsh plugin --profile <name> add <package>`.
+The profile's own `cordis.patch.yml` and manifest *are* versioned — they carry
+the MCP rows (Hevy, arXiv), the auto-archive schedule and the 9router route, and
+losing them means rebuilding by hand. But three constraints shape how they land:
+
+1. **`dsh` claims a profile directory exclusively** — the launcher rejects a
+   target whose directory already exists. So the seeds cannot be stowed; a
+   stowed `~/.dsh/profiles/web/` would make `dsh web` fail on a fresh machine.
+2. **`dsh` writes config with `writeFileAtomic`**, which writes a temp sibling
+   and `rename()`s it over the target. `rename()` *replaces* a symlink instead
+   of writing through it, so a stowed link is silently severed on the first
+   settings save or `dsh plugin add`. This is the same reason the service env is
+   copied. `dsh/.stow-local-ignore` excludes `^/\.dsh/profiles(/|$)` — note the
+   leading `"/"`, because stow matches patterns against a `/`-prefixed
+   package-relative path.
+3. **pnpm owns `package.json` and the lockfile.** It rewrites the manifest in
+   place and preserves symlinks, but `pnpm-lock.yaml` churns on every install and
+   is derived, so it stays machine-local.
+
+`dsh/install.sh` therefore seeds the repo copies into `~/.dsh/profiles/` and
+never overwrites a file that already exists with different content — it reports
+the drift instead, because the live copy may hold a settings change made in the
+UI. `./install.sh --capture` copies live edits back into the repo, which is the
+step to run after changing settings in the dashboard.
 
 ### Not Synced (machine-local state and secrets)
 
@@ -688,10 +573,13 @@ home-level patch. Profile-specific overlays are machine-local; add one with
 |------|--------------------|
 | `.credentials.yaml` | **Provider API keys** |
 | `logs/` | Startup diagnostics that can echo credential values |
-| `profiles/` | pnpm-managed; holds `node_modules/` and lockfiles |
+| `profiles/*/node_modules/` | pnpm-managed dependency tree |
+| `profiles/*/pnpm-lock.yaml` | Derived from the manifest; churns on every install |
 
-The root `.gitignore` ignores everything under `dsh/.dsh/` except
-`cordis.patch.yml`, so a fold or a stray `git add` cannot leak these.
+The root `.gitignore` ignores everything under `dsh/.dsh/` and re-admits only
+`cordis.patch.yml` at the home level and, per profile, `cordis.patch.yml`,
+`package.json`, `pnpm-workspace.yaml` and `compatibility.json` — so a fold or a
+stray `git add` cannot leak secrets or vendored packages.
 
 ### Stowing
 
@@ -870,15 +758,7 @@ pointing at `provider: deepseek-official` / `model: deepseek-flash`. Against
 2026-10-23. Both rows are required:
 
 ```yaml
-- id: llm-deepseek
-  config:
-    apiKeyEnv: NINEROUTER_API_KEY
-    baseURL: https://ai.workofekajaya.com
-    models:
-      - id: coder
-        name: coder
-      - id: advisor
-        name: advisor
+# ...the llm-deepseek row above, plus:
 - id: agent-default-model
   config:
     provider: deepseek-official   # the route name is a fixed constant
@@ -939,8 +819,9 @@ dsh --profile mine --from-default-profile web
 ```
 
 Profiles live at `$DSH_HOME/profiles/<name>/` and are pnpm projects holding
-`node_modules/`. **They are machine-local and never synced** — which is why only
-the home patch is tracked. Reproduce a profile on a new machine with
+`node_modules/`. Their **config** is versioned as a seed and copied in by
+`dsh/install.sh --profiles`; their `node_modules/` and lockfiles stay
+machine-local. Reproduce the plugins themselves on a new machine with
 `dsh plugin --profile <name> add ...`.
 
 ### Telemetry: Three Egresses, Two Levers
@@ -1007,6 +888,32 @@ that Tailscale Serve injects and keeps the upstream on loopback — no public
 port. Alternatives seen in the catalog (`dsh-pocket`, `dsh-web-remote`) expose a
 LAN or Cloudflare tunnel with token auth; prefer Tailscale where possible. A
 plain SSH port-forward to loopback is the zero-plugin option.
+
+### Web UI Access (this host: nginx on the tailnet IP)
+
+This machine uses neither plugin. nginx terminates TLS for
+`dsh.workofekajaya.com` on the **Tailscale IP** (`listen 100.64.0.10:443`)
+and proxies to `127.0.0.1:3080`, so tailnet membership is the authentication
+boundary and the agent's shell is never exposed publicly. The vhost lives in
+`dsh/etc/nginx/sites-available/dsh.workofekajaya.com` as a tracked copy —
+`/etc/nginx` is root-owned, so it is installed by hand, not stowed.
+
+dsh still requires its own signed browser-session cookie, which would otherwise
+mean opening a fresh `?token=` URL after every restart. Two pieces remove that:
+
+| Piece | What it does |
+|-------|--------------|
+| `dsh/bin/dsh-web-cookie-refresh` | Re-mints a cookie for the public authority and writes it as `/etc/nginx/snippets/dsh-web-cookie.conf`, which the vhost `include`s as a `proxy_set_header Cookie`. |
+| `dsh-web-cookie.timer` | Runs the script `OnBootSec=2min` and daily, well inside the cookie's own 25-day window. |
+
+The signing secret is durable (the `client-connection/browser-session` record in
+`~/.dsh/.credentials.yaml`); only the issue/expiry window ages out, which is why
+a re-mint is enough. The script needs root only to write the snippet and reload
+nginx (`sudo -n` for a user run), and it reads no secret from the repo.
+
+**Consequence to keep in mind:** every device on the tailnet gets full operator
+access to a shell-capable harness with no prompt. Narrow it with `allow`/`deny`
+or Tailscale ACLs if that is ever too broad.
 
 ### Installing and Pinning
 
@@ -1239,112 +1146,10 @@ state into this repo. `pi` is in `STOW_NO_FOLDING`.
 
 ## rest.nvim HTTP Client
 
-This dotfiles includes [rest.nvim](https://github.com/rest-nvim/rest.nvim) - a powerful HTTP client for Neovim. It allows you to run HTTP requests from within the editor using `.http` files.
-
-### Basic Usage
-
-1. **Create an HTTP file**: Create a file with `.http` extension (e.g., `api_test.http`)
-2. **Write requests**: Use the Intellij HTTP client spec format
-3. **Run requests**: Place cursor on a request and run `:Rest run` or press `<leader>rr`
-
-### HTTP File Syntax Example
-
-```http
-### GET request
-GET https://api.example.com/users
-
-### POST request with body
-POST https://api.example.com/users
-Content-Type: application/json
-
-{
-  "name": "John Doe",
-  "email": "john@example.com"
-}
-
-### Request with query parameters
-GET https://api.example.com/search?q=query&page=1
-
-### Request with custom headers
-GET https://api.example.com/protected
-Authorization: Bearer your-token-here
-```
-
-### Available Commands
-
-| Command | Description |
-|---------|-------------|
-| `:Rest run` | Run request under cursor |
-| `:Rest run {name}` | Run request by name (e.g., `### name`) |
-| `:Rest last` | Run last request |
-| `:Rest open` | Open result pane |
-| `:Rest env select` | Select `.env` file for variables |
-| `:Rest env show` | Show current env file |
-| `:Telescope rest select_env` | Pick env file via Telescope |
-
-### Keybindings
-
-| Key | Action |
-|-----|--------|
-| `<leader>rr` | Run request under cursor |
-| `<leader>rl` | Run last request |
-| `<leader>ro` | Open result pane |
-
-### Environment Variables
-
-rest.nvim supports `.env` files for storing variables:
-
-1. Create a `.env` file in your project root
-2. Define variables: `API_BASE_URL=https://api.example.com`
-3. Use in requests: `GET {{API_BASE_URL}}/users`
-4. Run `:Rest env select` to choose the env file
-
-### Lua Scripting in Requests
-
-```http
-GET http://localhost:8000/api
-
-# @lang=lua
-> {%
-local json = vim.json.decode(response.body)
-print(json.message)
-%}
-```
-
-### Dependencies
-
-- `curl` (system package)
-- `jq` and `tidy` (for response formatting)
-
-### Language Servers (auto-installed via Mason)
-
-| Language | LSP | Formatters/Linters |
-|----------|-----|-------------------|
-| TypeScript/JavaScript | `vtsls`, `typescript-language-server` | `prettierd`, `eslint_d` |
-| Vue | `vue-language-server` (volar) | `prettierd` |
-| Svelte | `svelte-language-server` | `prettierd` |
-| Astro | `astro-language-server` | `prettierd` |
-| React/JSX | Built-in via TS LSP | `prettierd`, `eslint_d` |
-| Tailwind CSS | `tailwindcss-language-server` | - |
-| Java | `jdtls` (via nvim-java) | - |
-| Python | `pyright` | `ruff` |
-| Go | `gopls` | `goimports`, `gofumpt` |
-| Rust | `rust-analyzer` | `rustfmt` |
-| C/C++ | `clangd` | `clang-format` |
-| C# | `omnisharp` | - |
-| PHP (Laravel/WordPress) | `intelephense` | `php-cs-fixer`, `phpcs` |
-| Ruby | `ruby-lsp` | `rubocop` |
-| Dart/Flutter | `dartls` | - |
-| Zig | `zls` | `zigfmt` |
-| Lua | `lua-language-server` | `stylua` |
-| Bash/Shell | `bash-language-server` | `shfmt`, `shellcheck` |
-| Docker | `dockerfile-language-server`, `docker-compose-language-service` | - |
-| Prisma | `prisma-language-server` | - |
-| GraphQL | `graphql-language-service-cli` | - |
-| JSON/YAML | `json-lsp`, `yaml-language-server` | `prettierd` |
-| HTML/CSS | `html-lsp`, `css-lsp` | `prettierd` |
-
-@RTK.md
+[rest.nvim](https://github.com/rest-nvim/rest.nvim) runs `.http` requests from
+inside Neovim: `<leader>rr` on a request, `<leader>rl` for the last one. The
+config lives in `nvim/.config/nvim/`; the full syntax guide, command table and
+env-file workflow are in [docs/rest-nvim.md](./docs/rest-nvim.md).
 
 ## Ponytail — Lazy Senior Dev Mode
 

@@ -1,0 +1,15 @@
+# dsh-web-cookie.timer — keep the nginx-injected dsh cookie fresh.
+#
+# Runs daily and shortly after boot, well inside the cookie's own window
+# (DSH_WEB_COOKIE_DAYS, default 25 days), so the UI is never left holding an
+# expired cookie.
+[Unit]
+Description=Daily refresh of the dsh Web UI nginx cookie snippet
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=1d
+Persistent=true
+
+[Install]
+WantedBy=timers.target

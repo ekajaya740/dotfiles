@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+# dsh-web-cookie-refresh — keep the nginx-injected dsh browser-session cookie fresh.
+#
+# The dsh Web UI authenticates every /api call and WebSocket stream with an
+# authority-bound signed cookie. Its *signing secret* is durable (the
+# `client-connection/browser-session` record in $DSH_HOME/.credentials.yaml),
+# but the cookie's own issue/expiry window is absolute, so a cookie eventually
+# ages out even though the secret never changes.
+#
+# This re-mints a cookie for the public authority and installs it as an nginx
+# snippet that nginx sends as the request `Cookie` header. Combined with the
+# HTTP Basic password on the site, the UI then needs no per-boot `?token=` URL
+# printed by `dsh web` — opening the plain hostname and typing the password is
+# enough, and that survives every dsh restart.
+#
+# Run by dsh-web-cookie.timer; safe to run by hand at any time.
+set -euo pipefail
+
+AUTHORITY="${DSH_WEB_AUTHORITY:-dsh.workofekajaya.com}"
+DAYS="${DSH_WEB_COOKIE_DAYS:-25}"
+CREDS="${DSH_HOME:-/home/user/.dsh}/.credentials.yaml"
+SNIPPET="/etc/nginx/snippets/dsh-web-cookie.conf"
+
+# Root (the timer) installs directly; a normal user goes through sudo.
+if [ "$(id -u)" -eq 0 ]; then SUDO=""; else SUDO="sudo -n"; fi
+
+tmp="$(mktemp)"
+trap 'rm -f "$tmp"' EXIT
+
+python3 - "$AUTHORITY" "$DAYS" "$CREDS" >"$tmp" <<'PY'
+import base64, hashlib, hmac, json, sys, time
+
+authority, days, creds = sys.argv[1], int(sys.argv[2]), sys.argv[3]
+
+# Pull the durable signing secret out of the browser-session grant record.
+secret_b64 = None
+in_record = False
+with open(creds, encoding="utf-8") as handle:
+    for line in handle:
+        stripped = line.strip()
+        if stripped.endswith("client-connection/browser-session:"):
+            in_record = True
+            continue
+        if in_record:
+            if stripped.startswith("secret:"):
+                secret_b64 = stripped.split(":", 1)[1].strip()
+                break
+            if stripped and not line.startswith((" ", "\t")):
+                in_record = False
+if not secret_b64:
+    sys.exit("dsh-web-cookie-refresh: no browser-session secret in %s" % creds)
+
+b64e = lambda raw: base64.urlsafe_b64encode(raw).decode().rstrip("=")
+secret = base64.urlsafe_b64decode(secret_b64 + "=" * (-len(secret_b64) % 4))
+
+now = int(time.time() * 1000)
+payload = {
+    "version": 1,
+    "authority": authority,
+    "issuedAt": now,
+    "expiresAt": now + days * 86400 * 1000,
+}
+body = b64e(json.dumps(payload, separators=(",", ":")).encode())
+sig = b64e(hmac.new(secret, body.encode(), hashlib.sha256).digest())
+name = "dsh-auth-" + b64e(hashlib.sha256(authority.encode()).digest())
+
+print('proxy_set_header Cookie "%s=v1.%s.%s";' % (name, body, sig))
+PY
+
+$SUDO install -o root -g root -m 600 "$tmp" "$SNIPPET"
+$SUDO nginx -t
+$SUDO nginx -s reload

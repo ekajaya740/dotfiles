@@ -64,10 +64,28 @@ done < <(git ls-files '*.json' '*.json.template')
 # ── 3. YAML ──────────────────────────────────────────────────
 note "YAML configs"
 if python3 -c 'import yaml' 2>/dev/null; then
+    # dsh patch layers may carry `!!js` expressions (dsh evaluates them, PyYAML
+    # does not know the tag). Register a permissive loader for the non-standard
+    # tags so the shape checks below can still parse the document. Anything
+    # else stays strict: safe_load still rejects unknown plain tags.
+    yaml_py='
+import sys, yaml
+class DshLoader(yaml.SafeLoader):
+    pass
+def _passthrough(loader, node):
+    return loader.construct_scalar(node) if isinstance(node, yaml.ScalarNode) else None
+DshLoader.add_constructor("tag:yaml.org,2002:js", _passthrough)
+DshLoader.add_constructor("!js", _passthrough)
+def load(path):
+    with open(path) as fh:
+        return yaml.load(fh, Loader=DshLoader)
+'
     yaml_ok=0
     yaml_bad=0
     while IFS= read -r f; do
-        if python3 -c "import sys, yaml; yaml.safe_load(open(sys.argv[1]))" "$f" 2>/dev/null; then
+        if python3 -c "$yaml_py"'
+load(sys.argv[1])
+' "$f" 2>/dev/null; then
             yaml_ok=$((yaml_ok + 1))
         else
             fail "invalid YAML: $f"
@@ -80,11 +98,10 @@ if python3 -c 'import yaml' 2>/dev/null; then
     # comments-only file parses as null, which is not an empty list — dsh would
     # fail to compose the layer. Checking "it parses" is not enough.
     for patch in $(git ls-files '**/cordis.patch.yml'); do
-        shape="$(python3 -c "
-import sys, yaml
-doc = yaml.safe_load(open(sys.argv[1]))
-print('list' if isinstance(doc, list) else type(doc).__name__)
-" "$patch" 2>/dev/null)"
+        shape="$(python3 -c "$yaml_py"'
+doc = load(sys.argv[1])
+print("list" if isinstance(doc, list) else type(doc).__name__)
+' "$patch" 2>/dev/null)"
         if [ "$shape" = "list" ]; then
             pass "$patch is a patch list"
         else
@@ -95,17 +112,19 @@ print('list' if isinstance(doc, list) else type(doc).__name__)
     # The dsh patch's telemetry opt-outs are load-bearing: both egresses default
     # to enabled, so dropping a row silently re-enables an upload that carries
     # message text. Shape alone would not catch that, so assert the rows.
-    dsh_patch="$(git ls-files 'dsh/**/cordis.patch.yml' | head -1)"
-    if [ -n "$dsh_patch" ]; then
-        if missing="$(python3 -c "
-import sys, yaml
-rows = yaml.safe_load(open(sys.argv[1]))
-off = {r['id'] for r in rows
-       if isinstance(r, dict) and isinstance(r.get('config'), dict)
-       and r['config'].get('enabled') is False}
-required = {'session-log-deepseek', 'plugin-package-inventory-deepseek'}
-print(','.join(sorted(required - off)))
-" "$dsh_patch" 2>/dev/null)" && [ -z "$missing" ]; then
+    # Pinned to the HOME-LEVEL patch: dsh/.dsh/profiles/*/cordis.patch.yml are
+    # per-profile seeds and carry their own config rows, so a glob with head -1
+    # would pick an arbitrary one.
+    dsh_patch="dsh/.dsh/cordis.patch.yml"
+    if [ -f "$dsh_patch" ]; then
+        if missing="$(python3 -c "$yaml_py"'
+rows = load(sys.argv[1])
+off = {r["id"] for r in rows
+       if isinstance(r, dict) and isinstance(r.get("config"), dict)
+       and r["config"].get("enabled") is False}
+required = {"session-log-deepseek", "plugin-package-inventory-deepseek"}
+print(",".join(sorted(required - off)))
+' "$dsh_patch" 2>/dev/null)" && [ -z "$missing" ]; then
             pass "dsh telemetry opt-out rows present"
         else
             fail "dsh patch is missing enabled:false for: ${missing:-unparseable}"
@@ -244,6 +263,23 @@ if command -v stow >/dev/null 2>&1; then
         fi
     done
     [ "$stow_bad" -eq 0 ] && pass "${#STOW_PACKAGES[@]} packages simulate clean"
+
+    # dsh profile configs must NOT be stowed: dsh writes them with
+    # writeFileAtomic, which renames a temp file over the target, so a symlink
+    # would be replaced by a regular file on the first settings save and the
+    # link silently lost. install.sh seeds them instead. The exclude lives in
+    # dsh/.stow-local-ignore, whose patterns are matched against a "/"-prefixed
+    # package-relative path — get that wrong and the pattern silently matches
+    # nothing, so assert the outcome rather than trusting the file.
+    if out="$(stow --simulate -t "$scratch" --no-folding -v dsh 2>&1)"; then
+        if printf '%s\n' "$out" | grep -q 'LINK: \.dsh/profiles'; then
+            fail "stow dsh links .dsh/profiles — it must be seeded, not linked"
+        else
+            pass "dsh profiles are excluded from stow"
+        fi
+    else
+        fail "stow dsh simulation failed: $out"
+    fi
 else
     fail "stow not installed"
 fi
