@@ -21,8 +21,13 @@
 # apiKeyHelper, statusLine, mcpServers); the plugin maps are unioned with the
 # live values winning, so plugins installed on this machine survive.
 #
-# Idempotent. Writes no secrets: the 9router key is read from the environment at
-# request time via apiKeyHelper / ${NINEROUTOUT_API_KEY} interpolation.
+# Managed keys the template no longer defines are DELETED from the live file, so
+# removing a setting here actually removes it. Without that, a straight union
+# would keep a dropped `env`/`apiKeyHelper` alive forever — which is how an
+# ANTHROPIC_BASE_URL pointing at 9router would survive its own removal.
+#
+# Idempotent, and writes no secrets: any credential the template needs is read
+# from the environment at request time, never stored here.
 #
 #   ./install.sh            apply
 #   ./install.sh --check    show what would change, change nothing
@@ -78,6 +83,35 @@ template = load(settings_path, {})
 live = load(live_settings_path, {})
 if not isinstance(live, dict):
     live = {}
+
+# Undo the managed keys this template no longer defines, or a union would keep a
+# dropped setting alive forever (that is how an ANTHROPIC_BASE_URL pointing at
+# 9router would outlive its own removal). `env` is narrowed to the specific vars
+# this package used to set, so a hand-added variable in the same block survives.
+RETIRED_ENV = (
+    "ANTHROPIC_BASE_URL",
+    "ANTHROPIC_MODEL",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL",
+    "ANTHROPIC_SMALL_FAST_MODEL",
+    "CLAUDE_CODE_MAX_CONTEXT_TOKENS",
+)
+if "env" not in template:
+    env = live.get("env")
+    if isinstance(env, dict):
+        for name in RETIRED_ENV:
+            env.pop(name, None)
+        if env:
+            live["env"] = env
+        else:
+            live.pop("env", None)
+    else:
+        live.pop("env", None)
+for key in ("apiKeyHelper", "statusLine"):
+    if key not in template:
+        live.pop(key, None)
+
 merged = {**live, **template}            # managed keys win
 for key in ("enabledPlugins", "extraKnownMarketplaces"):
     merged[key] = {**(template.get(key) or {}), **(live.get(key) or {})}
