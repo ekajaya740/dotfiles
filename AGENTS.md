@@ -99,8 +99,9 @@ It runs, fail-closed:
 3. **YAML** parse of every tracked `*.yml` / `*.yaml` (workflows excluded).
 4. **Harness invariants** — the settings that make the cheap path cheap, asserted
    by value rather than by shape: `rtkEnabled: true` and
-   `comboStrategy: "smart"` in `9router/config-export.json`, no
-   `comboStrategies` entry naming a combo that does not exist, omp's seven
+   `comboStrategy: "fallback"` in `9router/config-export.json`, no
+   `comboStrategies` entry naming a combo that does not exist and none still on
+   the smart router, omp's seven
    `skills.enable*` flags all `false`, `modelRoles.smol`/`tiny` on the `smol`
    combo, `compaction.thresholdPercent <= 70`, and every `9router` entry in
    `models.yml` carrying `contextWindow: 200000` plus a `cost` block. Each of
@@ -964,14 +965,20 @@ consumer reaches it at `POST https://ai.workofekajaya.com/v1/systemone` with
 
 OpenRouter direct was abandoned: the account's allowed-providers guardrail
 permits only `typesafe`, so every other OpenRouter model 404s. Routing through
-9router sidesteps that, and 9router also uses `judge` as the **smart-router
-model** (`routerModel`) for its combos.
+9router sidesteps that. It was briefly wired in as the **smart-router
+`routerModel`** for every combo, then removed: `buildChoiceCriteria()` maps each
+member to a bare `null`, so the judge ranks on vendor names with no price or
+latency input, its confidence sits at 0.07–0.58 (p50 ≈ 0.13) against a 0.8
+default, and a below-threshold answer writes no sticky entry — so it cost a
+~500 ms round trip per turn to reproduce an order that member sequencing already
+encodes. `judge` remains an alias and an MCP tool; it is not in the request path.
 
 **Jev is a decisions model — it cannot write prose.** On `/v1/chat/completions`
 it returns `typesafe/jev-1.14 is a decisions model and cannot be used with the
 chat/completions endpoint`. It answers typed questions (`noul | choice | score |
 box`) on `/v1/systemone` only. So it can never be a combo member or a fusion
-`judgeModel` — only `routerModel` (smart strategy) or an MCP/decision tool.
+`judgeModel`, and it no longer serves as a `routerModel` either — its place is
+the MCP/decision tools.
 
 ### What Is Synced vs Machine-Local
 
@@ -1000,7 +1007,7 @@ to reproduce the machine-local half on a new device.
 Pen launches with `PATH=/usr/bin:/bin:/usr/sbin:/sbin`, so it cannot resolve
 `npx` (the same reason `spawn npm ENOENT` appears in `~/Library/Logs/Pen/main.log`).
 Jev MCP is registered in **opencode and Claude Code (via the jev-router
-plugin) only** — not omp, which reaches Jev through `routerModel` instead. Pen
+plugin) only** — not omp, which no longer routes through Jev at all. Pen
 gets Jev only if a compiled binary ships.
 
 ### Consent and Defaults
