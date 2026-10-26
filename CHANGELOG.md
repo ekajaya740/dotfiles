@@ -8,6 +8,43 @@ section's notes — see [AGENTS.md](./AGENTS.md#releases).
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0] - 2026-10-26
+
+### Changed
+
+- **9Router combo strategy back to `fallback`**, and the smart router retired
+  from all 54 combo rows. The judge was being asked to rank combo members via
+  `buildChoiceCriteria()`, which maps every model to a bare `null` — it saw no
+  price, latency, or cache rate, only vendor names. Measured confidence across
+  20 recorded calls was 0.07–0.58 (p50 ≈ 0.13), so the 0.8 default rejected the
+  answer and the request fell through to the cheapest-first order anyway, after
+  paying a ~500 ms round trip on every first turn. A rejection also never writes
+  a sticky entry, so the `strict` lock could never engage and the judge was
+  re-consulted on every turn rather than once per session.
+
+  None of the four heterogeneous combos could be improved by a router: `coder`,
+  `advisor` and `personal-chat` differ only by which provider serves the same
+  `deepseek-v4.1-flash`, and `smol`'s members are a free 31B and a paid flash.
+  Member order already encodes the policy, so the router only added latency and
+  a failover-into-`minimax` class of failure mode.
+- **`refuseless/deepseek-v4.1-flash-fast` dropped** from `coder`, `advisor` and
+  `personal-chat`. It answers `HTTP 503` wrapping `402 insufficient_credits`,
+  so it was a third fallback that could only ever fail.
+- `9router/ensure-settings.py` now enforces `comboStrategy: "fallback"`,
+  downgrades any leftover `smart` combo row (dropping its dead `smartPolicy`,
+  `routerModel`, `confidenceThreshold`, `judgeModel` keys), and fails the
+  read-back check if a smart row survives.
+- `scripts/validate.sh` asserts the new policy and rejects any combo row still
+  on `fallbackStrategy: "smart"`.
+
+### Fixed
+
+- **`/dashboard/combos` rendered `This page couldn't load`.** The page chunk
+  used `<Link href=...>` for the *Configure* link to `/dashboard/media-providers`
+  without importing it — `next/link` appears nowhere in the original bundle — so
+  the route threw on first render and hit the error boundary. Added
+  `import Link from "next/link";` and rebuilt the served chunk.
+
 ## [1.6.0] - 2026-10-26
 
 ### Added

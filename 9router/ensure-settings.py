@@ -5,13 +5,24 @@
 `!!chatSettings.rtkEnabled` off the *stored* blob, and `mergeWithDefaults` only
 fills defaults on read — it never writes them back. So a gateway whose settings
 row predates RTK starts up with RTK silently OFF, and the only symptom is a
-larger bill. Same story for `comboStrategy`: absent means `fallback`, which
-gives up the sticky session and re-pays the prompt cache on every failover.
+larger bill.
 
-This script PATCHes those two values (plus a threshold that actually trips for
-a decisions-only router model) and verifies the read-back. It is idempotent and
-safe to run against a live gateway: `PATCH /api/settings` merges, so nothing
-else in the blob is disturbed.
+`comboStrategy` is pinned to `fallback` on purpose. The smart router asks Jev to
+choose between combo members and passes `buildChoiceCriteria()`, which maps
+every model to a bare `null` — the judge sees no price, no latency, no cache
+rate, only vendor names. Its confidence sits at 0.07-0.58 (p50 ~0.13), so at the
+0.8 default it rejects and the request falls through to the cheapest-first order
+anyway, after paying a ~500 ms round trip on every first turn. Worse, a rejection
+never writes a sticky entry, so the `strict` lock can never engage and the judge
+is re-consulted on every turn. Two of the four heterogeneous combos cannot be
+improved by a router at all: coder/advisor/personal-chat differ only by provider
+of the same model, and smol's members are a free 31B and a paid flash. Ordering
+already encodes the policy, so the router only adds latency and a failure mode.
+
+This script PATCHes the two settings, downgrades any leftover `smart` combo row
+to `fallback`, and verifies the read-back. It is idempotent and safe to run
+against a live gateway: `PATCH /api/settings` merges, so nothing else in the
+blob is disturbed.
 
 Reads:
   - DB   : <DATA_DIR>/db/data.sqlite   (read-only, for the CLI token)
@@ -31,13 +42,15 @@ import urllib.request
 DATA_DIR = pathlib.Path("/home/user/9router/data")
 BASE = "http://127.0.0.1:20128"
 
-# The values this stack depends on. `confidenceThreshold` is deliberately low:
-# Jev reports 0.10-0.25 in practice, so the 0.8 default never clears the bar and
-# smart routing silently degrades to plain fallback order.
+# The values this stack depends on.
 REQUIRED = {
     "rtkEnabled": True,
-    "comboStrategy": "smart",
+    "comboStrategy": "fallback",
 }
+
+# Keys that only exist to configure the smart router. Left behind they look
+# live in the dashboard and cost a round trip on every turn.
+SMART_KEYS = ("smartPolicy", "routerModel", "confidenceThreshold", "judgeModel")
 
 
 def cli_token() -> str:
@@ -77,13 +90,31 @@ def main() -> int:
         return 1
 
     drift = {k: v for k, v in REQUIRED.items() if live.get(k) != v}
+
+    # Downgrade any combo still routed by the judge, and drop its now-dead keys.
+    strategies = live.get("comboStrategies") or {}
+    smart = sorted(name for name, cfg in strategies.items()
+                   if (cfg or {}).get("fallbackStrategy") == "smart")
+    if smart:
+        for name in smart:
+            cfg = dict(strategies[name])
+            cfg["fallbackStrategy"] = "fallback"
+            for key in SMART_KEYS:
+                cfg.pop(key, None)
+            strategies[name] = cfg
+        drift["comboStrategies"] = strategies
+
     if not drift:
         print("9router settings already correct "
-              f"({', '.join(f'{k}={v!r}' for k, v in REQUIRED.items())})")
+              f"({', '.join(f'{k}={v!r}' for k, v in REQUIRED.items())}, "
+              "no smart-routed combos)")
         return 0
 
+    shown = dict(drift)
+    if "comboStrategies" in shown:
+        shown["comboStrategies"] = f"{len(smart)} combo(s) downgraded to fallback"
     print("9router settings drift: "
-          + ", ".join(f"{k} is {live.get(k)!r}, want {v!r}" for k, v in drift.items()))
+          + ", ".join(f"{k} is {live.get(k)!r}, want {shown[k]!r}" for k in shown))
     if args.dry_run:
         print("--dry-run: not writing")
         return 0
@@ -92,10 +123,15 @@ def main() -> int:
 
     after = current(token)
     bad = {k: after.get(k) for k, v in REQUIRED.items() if after.get(k) != v}
+    leftover = [name for name, cfg in (after.get("comboStrategies") or {}).items()
+                if (cfg or {}).get("fallbackStrategy") == "smart"]
+    if leftover:
+        bad["comboStrategies"] = f"{len(leftover)} still smart: {leftover[:3]}"
     if bad:
         print(f"write did not stick: {bad}", file=sys.stderr)
         return 1
-    print("fixed: " + ", ".join(f"{k}={v!r}" for k, v in REQUIRED.items()))
+    print("fixed: " + ", ".join(f"{k}={v!r}" for k, v in REQUIRED.items())
+          + (f", {len(smart)} combo(s) downgraded" if smart else ""))
     return 0
 
 

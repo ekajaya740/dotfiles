@@ -9,7 +9,7 @@
 #   1. ShellCheck on every shell script (severity: warning)
 #   2. JSON parses
 #   3. YAML parses (harness configs)
-#  3b. harness invariants (RTK, smart combo, smol roles, catalog, windows)
+#  3b. harness invariants (RTK, combo order, smol roles, catalog, windows)
 #   4. stow --simulate for every package, into a scratch target
 #   5. release script can parse CHANGELOG.md
 # ─────────────────────────────────────────────────────────────
@@ -137,10 +137,11 @@ fi
 # ── 3b. Harness invariants ───────────────────────────────────
 # These are the settings that make the cheap path actually cheap. Each one has
 # already been found off-by-default at least once, and each one is silent when
-# wrong: RTK off just re-sends tool output, `fallback` instead of `smart` just
-# stops retaining the cache, and omp re-injecting a 66-skill catalog costs
-# prefix tokens on every single request. Shape checks do not catch any of that,
-# so assert the values.
+# wrong: RTK off just re-sends tool output, `smart` instead of `fallback` just
+# spends a judge round trip per turn to re-derive an order that already encodes
+# the policy, and omp re-injecting a 66-skill catalog costs prefix tokens on
+# every single request. Shape checks do not catch any of that, so assert the
+# values.
 note "Harness invariants"
 if python3 -c 'import yaml' 2>/dev/null; then
     if inv="$(python3 -c "
@@ -159,16 +160,26 @@ else:
         problems.append('9router settings.rtkEnabled must be true (got %r) '
                         '- RTK tool-output compression is the growth lever'
                         % (s.get('rtkEnabled'),))
-    if s.get('comboStrategy') != 'smart':
-        problems.append('9router settings.comboStrategy must be \"smart\" '
-                        '(got %r) - fallback gives up the prompt cache'
-                        % (s.get('comboStrategy'),))
+    if s.get('comboStrategy') != 'fallback':
+        problems.append('9router settings.comboStrategy must be \"fallback\" '
+                        '(got %r) - the smart router picks on vendor names '
+                        'alone, adds a round trip per turn, and cannot be '
+                        'locked by strict because a rejection never writes '
+                        'a sticky entry' % (s.get('comboStrategy'),))
     strategies = s.get('comboStrategies') or {}
     combos = {c.get('name') for c in export.get('combos') or []}
     orphan = sorted(set(strategies) - combos)
     if orphan:
         problems.append('comboStrategies names combos that do not exist: %s'
                         % ', '.join(orphan))
+    smart = sorted(n for n, c in strategies.items()
+                   if (c or {}).get('fallbackStrategy') == 'smart')
+    if smart:
+        problems.append('%d combo(s) still use the smart router (%s) - the '
+                        'judge sees only vendor names, so its order cannot '
+                        'beat cheapest-first, and a below-threshold answer '
+                        'never writes a sticky entry'
+                        % (len(smart), ', '.join(smart[:3])))
 
 # omp: catalog pruning + the compaction ceiling.
 try:
@@ -225,7 +236,7 @@ except Exception as e:
 
 print('; '.join(problems))
 " 2>/dev/null)" && [ -z "$inv" ]; then
-        pass "harness invariants hold (RTK, smart combo, smol roles, catalog, windows)"
+        pass "harness invariants hold (RTK, combo order, smol roles, catalog, windows)"
     else
         fail "harness invariants: ${inv:-unparseable}"
     fi
