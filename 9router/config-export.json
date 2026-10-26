@@ -1,5 +1,5 @@
 {
-  "_exported": "2026-10-23T10:35:26Z",
+  "_exported": "2026-10-26T03:55:09Z",
   "_note": "9Router config backup. Secrets masked. Restore via API: nodes->POST /api/provider-nodes, conns->POST /api/providers, models->POST /api/models/custom, combos->POST /api/combos (with real keys).",
   "combos": [
     {
@@ -7,76 +7,49 @@
       "name": "coder",
       "kind": "llm",
       "models": [
-        "refuseless/deepseek-v4.1-flash-fast",
-        "ollama-cloud/minimax-m3.1-flash:cloud",
         "ollama-cloud/deepseek-v4.1-flash:1017-cloud",
-        "shiteru-deepseek-v4.1-flash"
+        "ollama-cloud/minimax-m3.1-flash:cloud",
+        "shiteru-deepseek-v4.1-flash",
+        "refuseless/deepseek-v4.1-flash-fast"
       ],
       "createdAt": "2026-09-01T05:53:28.026Z",
-      "updatedAt": "2026-10-23T09:00:34.093Z"
+      "updatedAt": "2026-10-26T03:20:41.589Z"
     },
     {
       "id": "031b0d15-335c-4e29-99bc-e4d17b822bb1",
       "name": "advisor",
       "kind": "llm",
       "models": [
-        "refuseless/deepseek-v4.1-flash-fast",
-        "ollama-cloud/minimax-m3.1-flash:cloud",
         "ollama-cloud/deepseek-v4.1-flash:1017-cloud",
+        "ollama-cloud/minimax-m3.1-flash:cloud",
         "shiteru-deepseek-v4.1-flash",
-        "openrouter/typesafe/jev-router"
+        "refuseless/deepseek-v4.1-flash-fast"
       ],
       "createdAt": "2026-09-01T05:53:28.033Z",
-      "updatedAt": "2026-10-23T09:01:05.061Z"
+      "updatedAt": "2026-10-26T03:20:41.607Z"
     },
     {
       "id": "5c83ba54-1708-4214-8787-f8b96c8dbf94",
       "name": "personal-chat",
       "kind": "llm",
       "models": [
-        "ollama-cloud/minimax-m3.1-flash:cloud",
         "ollama-cloud/deepseek-v4.1-flash:1017-cloud",
-        "shiteru-deepseek-v4.1-flash"
+        "shiteru-deepseek-v4.1-flash",
+        "refuseless/deepseek-v4.1-flash-fast"
       ],
       "createdAt": "2026-09-01T05:53:28.039Z",
-      "updatedAt": "2026-10-21T02:11:50.671Z"
-    },
-    {
-      "id": "933a77bd-27c2-4df1-92a1-2e19a2b0919b",
-      "name": "trade-agent-fast",
-      "kind": "llm",
-      "models": [
-        "shiteru-qwen-3.8-max-latest",
-        "shiteru-qwen-3.8-flash",
-        "shiteru-glm-5.3-flash",
-        "shiteru-deepseek-v4-flash"
-      ],
-      "createdAt": "2026-09-02T06:41:21.424Z",
-      "updatedAt": "2026-09-03T09:58:15.117Z"
-    },
-    {
-      "id": "1c7d0e1e-8a74-473a-bb4f-e6324522189b",
-      "name": "trade-agent-deep",
-      "kind": "llm",
-      "models": [
-        "shiteru-qwen-3.8-max-latest",
-        "shiteru-deepseek-v4-pro",
-        "shiteru-glm-5.3",
-        "shiteru-kimi-k3"
-      ],
-      "createdAt": "2026-09-02T06:41:31.700Z",
-      "updatedAt": "2026-09-03T09:58:15.110Z"
+      "updatedAt": "2026-10-26T03:20:41.626Z"
     },
     {
       "id": "38b97421-ed2c-4925-9748-410a02ea1d29",
       "name": "designer",
-      "kind": null,
+      "kind": "llm",
       "models": [
-        "shiteru-glm-5.3-flash",
-        "ollama-cloud/glm-5.3-flash"
+        "ollama-cloud/glm-5.3-flash",
+        "shiteru-glm-5.3-flash"
       ],
       "createdAt": "2026-09-03T01:36:00.241Z",
-      "updatedAt": "2026-10-17T12:14:29.355Z"
+      "updatedAt": "2026-10-26T03:20:47.020Z"
     },
     {
       "id": "f84fb5a8-fa46-49f4-8787-9c23b8784fe5",
@@ -521,24 +494,24 @@
     {
       "id": "7ab6a274-b54f-4acf-934b-6fe13c010664",
       "name": "sfw-coder",
-      "kind": null,
+      "kind": "llm",
       "models": [
-        "ollama-cloud/minimax-m3.1-flash:cloud",
-        "ollama-cloud/deepseek-v4.1-flash:1017-cloud"
+        "ollama-cloud/deepseek-v4.1-flash:1017-cloud",
+        "ollama-cloud/minimax-m3.1-flash:cloud"
       ],
       "createdAt": "2026-09-07T02:29:29.468Z",
-      "updatedAt": "2026-10-21T02:24:13.463Z"
+      "updatedAt": "2026-10-26T03:20:47.043Z"
     },
     {
       "id": "0467e95d-eea7-40f2-94e2-69298bf79a48",
       "name": "sfw-advisor",
-      "kind": null,
+      "kind": "llm",
       "models": [
-        "ollama-cloud/minimax-m3.1-flash:cloud",
-        "ollama-cloud/deepseek-v4.1-flash:1017-cloud"
+        "ollama-cloud/deepseek-v4.1-flash:1017-cloud",
+        "ollama-cloud/minimax-m3.1-flash:cloud"
       ],
       "createdAt": "2026-09-07T02:29:49.983Z",
-      "updatedAt": "2026-10-21T02:24:27.507Z"
+      "updatedAt": "2026-10-26T03:20:47.068Z"
     },
     {
       "id": "34a9aa3d-2c7e-41c1-8e62-bc7687567a0d",
@@ -627,6 +600,17 @@
       ],
       "createdAt": "2026-10-12T03:15:10.043Z",
       "updatedAt": "2026-10-12T03:15:10.043Z"
+    },
+    {
+      "id": "e37069a8-8cfe-4d48-ab82-2841f5e79c05",
+      "name": "smol",
+      "kind": "llm",
+      "models": [
+        "ollama-cloud/gemma4:31b",
+        "ollama-cloud/deepseek-v4.1-flash:1017-cloud"
+      ],
+      "createdAt": "2026-10-26T03:20:41.521Z",
+      "updatedAt": "2026-10-26T03:54:55.036Z"
     }
   ],
   "connections": [
@@ -639,7 +623,7 @@
       "priority": 1,
       "isActive": true,
       "createdAt": "2026-08-27T05:35:34.813Z",
-      "updatedAt": "2026-10-23T10:18:37.223Z",
+      "updatedAt": "2026-10-26T03:39:13.844Z",
       "testStatus": "unavailable",
       "providerSpecificData": {
         "connectionProxyEnabled": false,
@@ -647,23 +631,34 @@
         "connectionNoProxy": ""
       },
       "modelLock_nemotron-3-embed-1b-20260716:free": null,
-      "errorCode": 404,
-      "backoffLevel": 0,
+      "errorCode": 429,
+      "backoffLevel": 9,
       "modelLock_deepseek-v4-flash:0731": null,
-      "modelLock_typesafe/jev-router": "2026-10-23T10:20:37.223Z",
-      "lastError": "[404]: {\"error\":{\"message\":\"No jev-router pool model has an endpoint allowed by your guardrails (https://openrouter.ai/workspaces/default/guardrails), account provider and privacy settings (https://op",
-      "lastErrorAt": "2026-10-23T10:18:37.223Z",
+      "modelLock_typesafe/jev-router": "2026-10-26T02:59:43.895Z",
+      "lastError": "[429]: {\"error\":{\"message\":\"Provider returned error\",\"code\":429,\"metadata\":{\"raw\":\"google/gemma-4-31b-it:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumul",
+      "lastErrorAt": "2026-10-26T03:39:13.844Z",
       "modelLock_deepseek-flash": null,
       "modelLock_deepseek-chat": null,
-      "modelLock_deepseek-v4.1-flash": "2026-10-19T19:04:07.049Z",
+      "modelLock_deepseek-v4.1-flash": null,
       "modelLock_typesafe/jev-1.13": null,
       "modelLock_anthropic/claude-sonnet-4": null,
       "modelLock_deepseek-v3": null,
-      "modelLock_deepseek/deepseek-chat": null,
-      "modelLock_glm-5.3": "2026-10-17T12:30:45.200Z",
-      "modelLock_deepseek-v4.1-flash:1017-cloud": "2026-10-19T02:43:34.693Z",
-      "modelLock_deepseek/deepseek-v4.1-flash-1017": "2026-10-19T05:39:17.992Z",
-      "modelLock_deepseek/deepseek-v4.1-flash": "2026-10-19T05:39:18.058Z"
+      "modelLock_deepseek/deepseek-chat": "2026-10-26T03:26:28.969Z",
+      "modelLock_glm-5.3": null,
+      "modelLock_deepseek-v4.1-flash:1017-cloud": null,
+      "modelLock_deepseek/deepseek-v4.1-flash-1017": null,
+      "modelLock_deepseek/deepseek-v4.1-flash": null,
+      "modelLock_google/gemma-4-31b-it:free": "2026-10-26T03:44:13.844Z",
+      "modelLock_google/gemma-4-26b-a4b-it:free": "2026-10-26T03:31:56.070Z",
+      "modelLock_liquid/lfm-2.5-2.6b:free": "2026-10-26T03:31:56.228Z",
+      "modelLock_nvidia/nemotron-3.5-lightning:free": "2026-10-26T03:31:56.132Z",
+      "modelLock_cohere/north-mini-code:free": "2026-10-26T02:48:01.166Z",
+      "modelLock_recursive/flint-v1.0:free": "2026-10-26T03:31:56.322Z",
+      "modelLock_poolside/laguna-xs-2.1:free": "2026-10-26T02:48:01.266Z",
+      "modelLock_xingchen-agi/xing4.0-29b-a4b:free": "2026-10-26T02:48:01.316Z",
+      "modelLock_nvidia/nemotron-3-super-120b-a12b:free": "2026-10-26T02:48:01.381Z",
+      "modelLock_deepseek/deepseek-v4-flash": "2026-10-26T02:48:42.479Z",
+      "modelLock_meta-llama/llama-3.3-70b-instruct": "2026-10-26T02:48:42.555Z"
     },
     {
       "id": "fc3d2d0b-c66f-449d-bd36-753070c57771",
@@ -674,8 +669,8 @@
       "priority": 1,
       "isActive": true,
       "createdAt": "2026-08-27T05:38:04.204Z",
-      "updatedAt": "2026-10-23T10:34:58.031Z",
-      "testStatus": "unavailable",
+      "updatedAt": "2026-10-26T03:55:09.607Z",
+      "testStatus": "active",
       "providerSpecificData": {
         "prefix": "ollama-cloud",
         "apiType": "chat",
@@ -686,8 +681,8 @@
         "connectionNoProxy": ""
       },
       "modelLock_llama3.3-70b": null,
-      "errorCode": 429,
-      "backoffLevel": 15,
+      "errorCode": null,
+      "backoffLevel": 0,
       "modelLock_glm-5.3-flash": null,
       "modelLock_kimi-k3": null,
       "modelLock_glm-5.2": null,
@@ -702,10 +697,10 @@
       "modelLock_glm-5.3:cloud": null,
       "modelLock_gpt-oss:cloud": null,
       "modelLock_DeepSeek-V4.1-Flash-1017": null,
-      "modelLock_minimax-m3.1-flash:cloud": "2026-10-23T10:39:56.716Z",
-      "modelLock_deepseek-v4.1-flash:1017-cloud": "2026-10-23T10:39:58.031Z",
-      "lastError": "[429]: {\"error\":{\"message\":\"you (ekajaya740) have reached your weekly usage limit, upgrade for higher limits: https://ollama.com/upgrade or add usage credits: https://ollama.com/settings (ref: ae10a01",
-      "lastErrorAt": "2026-10-23T10:34:58.031Z",
+      "modelLock_minimax-m3.1-flash:cloud": null,
+      "modelLock_deepseek-v4.1-flash:1017-cloud": null,
+      "lastError": null,
+      "lastErrorAt": null,
       "rateLimitedUntil": null
     },
     {
@@ -717,7 +712,7 @@
       "priority": 1,
       "isActive": true,
       "createdAt": "2026-08-27T05:38:04.220Z",
-      "updatedAt": "2026-10-17T12:31:47.462Z",
+      "updatedAt": "2026-10-26T02:20:29.570Z",
       "testStatus": "unavailable",
       "providerSpecificData": {
         "prefix": "deepseek-api",
@@ -731,9 +726,9 @@
       "modelLock_deepseek-chat": "2026-10-17T12:29:24.856Z",
       "errorCode": 402,
       "backoffLevel": 0,
-      "modelLock_deepseek-v4-flash": "2026-10-17T12:33:47.272Z",
-      "lastError": "[402]: {\"error\":{\"message\":\"Insufficient Balance (request_id: e6ff9693-1370-405e-aee6-2723b9ad88c6)\",\"type\":\"unknown_error\",\"param\":null,\"code\":\"invalid_request_error\"}}",
-      "lastErrorAt": "2026-10-17T12:31:47.462Z",
+      "modelLock_deepseek-v4-flash": "2026-10-26T02:22:29.570Z",
+      "lastError": "[402]: {\"error\":{\"message\":\"Insufficient Balance (request_id: ac1f8b34-dd0c-4384-a3de-58dc436995a5)\",\"type\":\"insufficient_balance_error\",\"param\":null,\"code\":\"invalid_request_error\"}}",
+      "lastErrorAt": "2026-10-26T02:20:29.570Z",
       "modelLock_deepseek-v4-flash-vision-exp": "2026-10-05T09:14:28.433Z",
       "modelLock_deepseek-v4.1-flash-expires-on-0910": "2026-10-17T12:33:47.345Z",
       "modelLock_deepseek-flash": "2026-10-17T12:33:47.462Z"
@@ -834,9 +829,9 @@
       "priority": 1,
       "isActive": true,
       "createdAt": "2026-09-03T02:00:51.052Z",
-      "updatedAt": "2026-10-23T10:34:58.253Z",
+      "updatedAt": "2026-10-26T03:20:34.875Z",
       "defaultModel": "deepseek-v4-flash",
-      "testStatus": "unavailable",
+      "testStatus": "active",
       "providerSpecificData": {
         "prefix": "shiteru",
         "apiType": "chat",
@@ -847,7 +842,7 @@
         "connectionNoProxy": ""
       },
       "modelLock_qwen-3.8-max:latest": null,
-      "errorCode": 402,
+      "errorCode": null,
       "backoffLevel": 0,
       "modelLock_kimi-k3": null,
       "modelLock_deepseek-v4-flash": null,
@@ -871,18 +866,20 @@
       "modelLock_deepseek-v4.1-flash": null,
       "modelLock_hy4-preview": null,
       "modelLock_gpt-5.6-sol": null,
-      "modelLock_deepseek-v4.1-flash(high)": "2026-10-23T10:36:58.252Z",
+      "modelLock_deepseek-v4.1-flash(high)": null,
       "modelLock_cb/claude-sonnet-4.6": null,
       "modelLock_claude-opus-4.6": null,
       "modelLock_claude-opus-4.7": null,
-      "modelLock_claude-opus-4.8": "2026-10-23T07:04:40.632Z",
+      "modelLock_claude-opus-4.8": null,
       "modelLock_claude-fable-5": null,
       "modelLock_gpt-4o-mini": null,
       "modelLock_gpt-5.6-terra": null,
       "modelLock_kr/claude-opus-4.8": null,
-      "lastError": "[402]: {\"error\":{\"message\":\"Token balance exhausted\",\"type\":\"insufficient_balance\",\"code\":\"insufficient_balance\"}}",
-      "lastErrorAt": "2026-10-23T10:34:58.252Z",
-      "modelLock_claude-sonnet-4.6": "2026-10-23T07:04:33.844Z"
+      "modelLock_claude-sonnet-4.6": null,
+      "lastError": null,
+      "lastErrorAt": null,
+      "rateLimitedUntil": null,
+      "modelLock_claude-sonnet-5:free": null
     },
     {
       "id": "b7675e72-6a89-428d-81d9-cc7b44b65d30",
@@ -893,7 +890,7 @@
       "priority": 1,
       "isActive": true,
       "createdAt": "2026-09-03T07:30:11.394Z",
-      "updatedAt": "2026-10-23T10:34:58.532Z",
+      "updatedAt": "2026-10-26T02:51:23.354Z",
       "testStatus": "unavailable",
       "providerSpecificData": {
         "prefix": "shiteru-zs",
@@ -905,10 +902,10 @@
         "connectionNoProxy": ""
       },
       "modelLock_claude-opus-5": null,
-      "errorCode": 402,
+      "errorCode": 403,
       "backoffLevel": 0,
       "modelLock_deepseek-v4-flash": null,
-      "modelLock_glm-5.3": "2026-10-14T20:40:36.138Z",
+      "modelLock_glm-5.3": null,
       "modelLock_qwen-3.8-max:latest": null,
       "modelLock_gemini-3.7-flash": null,
       "modelLock_claude-opus-5:free": null,
@@ -918,21 +915,24 @@
       "modelLock_deepseek-v4-pro": null,
       "modelLock_kimi-k3": null,
       "modelLock_gemini-3.1-pro": null,
-      "modelLock_claude-sonnet-5": "2026-10-17T12:33:51.257Z",
+      "modelLock_claude-sonnet-5": null,
       "modelLock_muse-spark-1.3": null,
       "modelLock_gpt-6-astra": null,
-      "modelLock_claude-fable-5.1": "2026-10-17T12:33:51.301Z",
+      "modelLock_claude-fable-5.1": null,
       "modelLock_deepseek-v4.1-flash": null,
-      "lastError": "[402]: {\"error\":{\"message\":\"Token balance exhausted\",\"type\":\"insufficient_balance\",\"code\":\"insufficient_balance\"}}",
-      "lastErrorAt": "2026-10-23T10:34:58.532Z",
-      "modelLock_hy4-preview": "2026-10-14T20:43:57.193Z",
-      "modelLock_gpt-5.6-sol": "2026-10-17T12:33:53.080Z",
-      "modelLock_cb/claude-sonnet-4.6": "2026-10-12T03:09:23.701Z",
-      "modelLock_deepseek-v4.1-flash(high)": "2026-10-23T10:36:58.532Z",
-      "modelLock_glm-5.2-premium": "2026-10-17T12:33:51.231Z",
-      "modelLock_claude-opus-4.7": "2026-10-17T12:33:52.865Z",
-      "modelLock_claude-sonnet-4.6": "2026-10-23T07:04:36.964Z",
-      "modelLock_claude-opus-4.8": "2026-10-23T07:04:43.738Z"
+      "lastError": "[403]: {\"error\":{\"message\":\"Key is not allowed to use model kimi-k3:free\",\"type\":\"permission_error\",\"code\":\"model_not_allowed\"}}",
+      "lastErrorAt": "2026-10-26T02:51:23.354Z",
+      "modelLock_hy4-preview": null,
+      "modelLock_gpt-5.6-sol": null,
+      "modelLock_cb/claude-sonnet-4.6": null,
+      "modelLock_deepseek-v4.1-flash(high)": null,
+      "modelLock_glm-5.2-premium": null,
+      "modelLock_claude-opus-4.7": null,
+      "modelLock_claude-sonnet-4.6": null,
+      "modelLock_claude-opus-4.8": null,
+      "rateLimitedUntil": null,
+      "modelLock_claude-sonnet-5:free": "2026-10-26T02:53:17.169Z",
+      "modelLock_kimi-k3:free": "2026-10-26T02:53:23.354Z"
     },
     {
       "id": "6e778832-d548-416a-a8fa-5c705c9aa8b3",
@@ -964,8 +964,8 @@
       "priority": 1,
       "isActive": true,
       "createdAt": "2026-09-03T08:01:10.350Z",
-      "updatedAt": "2026-10-17T12:32:03.724Z",
-      "testStatus": "unavailable",
+      "updatedAt": "2026-10-26T02:21:00.142Z",
+      "testStatus": "active",
       "providerSpecificData": {
         "prefix": "hcnsec",
         "apiType": "chat",
@@ -976,13 +976,14 @@
         "connectionNoProxy": ""
       },
       "modelLock_DeepSeek-V4-Flash": null,
-      "errorCode": 502,
+      "errorCode": null,
       "backoffLevel": 0,
-      "lastError": "[502]: fetch connect timeout",
-      "lastErrorAt": "2026-10-17T12:32:03.724Z",
-      "modelLock_step-3.5-flash-2603": "2026-10-17T12:32:31.489Z",
-      "modelLock_qwen3.8-max": "2026-10-17T12:32:31.709Z",
-      "modelLock_glm-5.3": "2026-10-17T12:32:33.724Z"
+      "lastError": null,
+      "lastErrorAt": null,
+      "modelLock_step-3.5-flash-2603": null,
+      "modelLock_qwen3.8-max": null,
+      "modelLock_glm-5.3": null,
+      "rateLimitedUntil": null
     },
     {
       "id": "8bdda4c6-37ba-4f2e-b5a6-265734650a89",
@@ -1021,7 +1022,7 @@
       "priority": 1,
       "isActive": true,
       "createdAt": "2026-09-04T08:41:58.718Z",
-      "updatedAt": "2026-10-17T12:32:00.761Z",
+      "updatedAt": "2026-10-26T02:20:52.441Z",
       "testStatus": "unavailable",
       "providerSpecificData": {
         "prefix": "modelrouter",
@@ -1032,8 +1033,8 @@
         "connectionProxyUrl": "",
         "connectionNoProxy": ""
       },
-      "lastError": "[502]: fetch failed (cause: ERR_SSL_TLSV1_ALERT_INTERNAL_ERROR: 00DDCBBA927E0000:error:0A000438:SSL routines:ssl3_read_bytes:tlsv1 alert internal error:../deps/openssl/openssl/ssl/record/rec_layer_s3.",
-      "lastErrorAt": "2026-10-17T12:32:00.761Z",
+      "lastError": "[502]: fetch failed (cause: ERR_SSL_TLSV1_ALERT_INTERNAL_ERROR: 008DB0C0A07D0000:error:0A000438:SSL routines:ssl3_read_bytes:tlsv1 alert internal error:../deps/openssl/openssl/ssl/record/rec_layer_s3.",
+      "lastErrorAt": "2026-10-26T02:20:52.441Z",
       "modelLock_deepseek-v4-flash-free": "2026-09-06T06:55:16.374Z",
       "errorCode": 502,
       "backoffLevel": 0,
@@ -1050,7 +1051,11 @@
       "modelLock_claude-sonnet-4.6": "2026-10-12T03:26:39.313Z",
       "modelLock_glm-5.3": "2026-10-17T12:27:49.030Z",
       "modelLock_gemini-3.5-flash": "2026-10-17T12:32:30.735Z",
-      "modelLock_hy3-free": "2026-10-17T12:32:30.761Z"
+      "modelLock_hy3-free": "2026-10-17T12:32:30.761Z",
+      "modelLock_qwen3.8-flash-free": "2026-10-26T02:19:17.004Z",
+      "modelLock_mimo-v2.5-free": "2026-10-26T02:19:26.573Z",
+      "modelLock_glm-5.3-free": "2026-10-26T02:20:20.604Z",
+      "modelLock_gemini-3.1-flash-lite": "2026-10-26T02:21:22.441Z"
     },
     {
       "id": "2bb654f2-2eb9-4ff4-98e0-4f8c7875396c",
@@ -1061,7 +1066,7 @@
       "priority": 1,
       "isActive": true,
       "createdAt": "2026-09-06T07:17:28.298Z",
-      "updatedAt": "2026-10-17T12:31:55.522Z",
+      "updatedAt": "2026-10-26T02:51:11.011Z",
       "testStatus": "unavailable",
       "providerSpecificData": {
         "prefix": "shiteru-shared",
@@ -1075,12 +1080,12 @@
       "modelLock_kr/claude-sonnet-5:free": "2026-09-13T02:46:57.234Z",
       "lastError": "[401]: {\"error\":{\"message\":\"Invalid API key\",\"type\":\"authentication_error\",\"code\":\"invalid_api_key\"}}",
       "errorCode": 401,
-      "lastErrorAt": "2026-10-17T12:31:55.522Z",
+      "lastErrorAt": "2026-10-26T02:51:11.011Z",
       "backoffLevel": 0,
       "modelLock_claude-opus-5": "2026-09-13T08:57:45.437Z",
       "modelLock_kimi-k3:free": "2026-10-17T12:33:55.522Z",
-      "modelLock_glm-5.3:free": "2026-10-17T12:33:54.361Z",
-      "modelLock_deepseek-v4.1-flash:free": "2026-10-17T12:33:54.376Z"
+      "modelLock_glm-5.3:free": "2026-10-26T02:53:11.011Z",
+      "modelLock_deepseek-v4.1-flash:free": "2026-10-26T02:53:04.914Z"
     },
     {
       "id": "60aca733-2474-48cd-8d37-7c98a21a48a8",
@@ -1091,7 +1096,7 @@
       "priority": 1,
       "isActive": true,
       "createdAt": "2026-09-06T07:17:28.307Z",
-      "updatedAt": "2026-10-17T12:31:56.206Z",
+      "updatedAt": "2026-10-26T02:51:01.814Z",
       "testStatus": "unavailable",
       "providerSpecificData": {
         "prefix": "shiteru-shared-zs",
@@ -1105,10 +1110,10 @@
       "modelLock_kr/claude-sonnet-5:free": "2026-10-17T12:33:56.010Z",
       "lastError": "[401]: {\"error\":{\"message\":\"Invalid API key\",\"type\":\"authentication_error\",\"code\":\"invalid_api_key\"}}",
       "errorCode": 401,
-      "lastErrorAt": "2026-10-17T12:31:56.206Z",
+      "lastErrorAt": "2026-10-26T02:51:01.814Z",
       "backoffLevel": 0,
       "modelLock_claude-opus-5": "2026-09-13T08:57:45.531Z",
-      "modelLock_deepseek-v4.1-flash:free": "2026-10-17T12:33:56.206Z"
+      "modelLock_deepseek-v4.1-flash:free": "2026-10-26T02:53:01.814Z"
     },
     {
       "id": "7e17aa35-2f1c-4b33-ba34-8f561ea90db1",
@@ -1119,26 +1124,28 @@
       "priority": 1,
       "isActive": true,
       "createdAt": "2026-09-07T01:46:21.577Z",
-      "updatedAt": "2026-10-17T12:31:57.160Z",
-      "testStatus": "unavailable",
+      "updatedAt": "2026-10-26T02:55:27.683Z",
+      "testStatus": "active",
       "providerSpecificData": {
         "connectionProxyEnabled": false,
         "connectionProxyUrl": "",
         "connectionNoProxy": ""
       },
       "modelLock_deepseek-v4-flash": null,
-      "lastError": "[402]: {\"error\":{\"message\":\"Insufficient credits. Please top up to continue.\",\"type\":\"invalid_request_error\",\"code\":402}}",
-      "errorCode": 402,
-      "lastErrorAt": "2026-10-17T12:31:57.160Z",
-      "backoffLevel": 11,
-      "modelLock_auto:free": "2026-09-12T17:50:07.429Z",
+      "lastError": null,
+      "errorCode": null,
+      "lastErrorAt": null,
+      "backoffLevel": 0,
+      "modelLock_auto:free": null,
       "modelLock_gemini-3.1-pro-preview": null,
-      "modelLock_claude-sonnet-4.6": "2026-10-12T03:27:59.854Z",
-      "modelLock_glm-5.3": "2026-10-17T12:26:54.488Z",
-      "modelLock_minimax-m3": "2026-10-17T12:29:23.812Z",
-      "modelLock_grok-4.20": "2026-10-17T12:33:56.702Z",
-      "modelLock_mimo-v2.5": "2026-10-17T12:33:56.706Z",
-      "modelLock_mimo-v2.5-pro": "2026-10-17T12:33:57.160Z"
+      "modelLock_claude-sonnet-4.6": null,
+      "modelLock_glm-5.3": null,
+      "modelLock_minimax-m3": null,
+      "modelLock_grok-4.20": null,
+      "modelLock_mimo-v2.5": null,
+      "modelLock_mimo-v2.5-pro": null,
+      "modelLock_gpt-5.4-nano": null,
+      "rateLimitedUntil": null
     },
     {
       "id": "79536301-4260-4e7b-b59e-9d888bdc0789",
@@ -1149,7 +1156,7 @@
       "priority": 1,
       "isActive": true,
       "createdAt": "2026-10-11T06:32:10.791Z",
-      "updatedAt": "2026-10-17T12:31:59.812Z",
+      "updatedAt": "2026-10-26T02:50:58.688Z",
       "testStatus": "unavailable",
       "providerSpecificData": {
         "prefix": "shiteru-free",
@@ -1161,11 +1168,11 @@
         "connectionNoProxy": ""
       },
       "lastError": "[401]: {\"error\":{\"message\":\"Invalid API key\",\"type\":\"authentication_error\",\"code\":\"invalid_api_key\"}}",
-      "lastErrorAt": "2026-10-17T12:31:59.812Z",
+      "lastErrorAt": "2026-10-26T02:50:58.687Z",
       "errorCode": 401,
       "backoffLevel": 0,
-      "modelLock_kimi-k3:free": "2026-10-17T12:33:59.812Z",
-      "modelLock_glm-5.3:free": "2026-10-17T12:33:59.808Z"
+      "modelLock_kimi-k3:free": "2026-10-26T02:52:58.687Z",
+      "modelLock_glm-5.3:free": "2026-10-26T02:52:55.661Z"
     },
     {
       "id": "54472ece-ffb5-4b29-a76f-886a2503f5e2",
@@ -1176,7 +1183,7 @@
       "priority": 1,
       "isActive": true,
       "createdAt": "2026-10-11T06:57:55.248Z",
-      "updatedAt": "2026-10-17T12:31:58.534Z",
+      "updatedAt": "2026-10-26T02:51:14.036Z",
       "testStatus": "unavailable",
       "providerSpecificData": {
         "prefix": "shiteru-shared",
@@ -1188,12 +1195,12 @@
         "connectionNoProxy": ""
       },
       "lastError": "[401]: {\"error\":{\"message\":\"Invalid API key\",\"type\":\"authentication_error\",\"code\":\"invalid_api_key\"}}",
-      "lastErrorAt": "2026-10-17T12:31:58.534Z",
+      "lastErrorAt": "2026-10-26T02:51:14.036Z",
       "errorCode": 401,
       "backoffLevel": 15,
       "modelLock_kimi-k3:free": "2026-10-17T12:33:58.534Z",
-      "modelLock_glm-5.3:free": "2026-10-17T12:33:57.395Z",
-      "modelLock_deepseek-v4.1-flash:free": "2026-10-17T12:33:57.400Z"
+      "modelLock_glm-5.3:free": "2026-10-26T02:53:14.036Z",
+      "modelLock_deepseek-v4.1-flash:free": "2026-10-26T02:53:07.941Z"
     },
     {
       "id": "f755012d-15dd-4e3a-af7e-77b8ff4bb009",
@@ -1204,7 +1211,7 @@
       "priority": 1,
       "isActive": true,
       "createdAt": "2026-10-12T03:15:09.991Z",
-      "updatedAt": "2026-10-17T12:32:00.479Z",
+      "updatedAt": "2026-10-25T09:26:17.092Z",
       "testStatus": "unavailable",
       "providerSpecificData": {
         "prefix": "shiteru-anthropic",
@@ -1214,10 +1221,10 @@
         "connectionProxyUrl": "",
         "connectionNoProxy": ""
       },
-      "modelLock_claude-sonnet-4.6": "2026-10-17T12:29:09.595Z",
-      "lastError": "[403]: {\"error\":{\"message\":\"Your current subscription is not eligible for model gpt-6.1-sol\",\"type\":\"permission_error\",\"code\":\"subscription_not_eligible\"}}",
+      "modelLock_claude-sonnet-4.6": "2026-10-25T09:28:17.092Z",
+      "lastError": "[403]: {\"error\":{\"message\":\"Key is not allowed to use model claude-sonnet-4.6\",\"type\":\"permission_error\",\"code\":\"model_not_allowed\"}}",
       "errorCode": 403,
-      "lastErrorAt": "2026-10-17T12:32:00.479Z",
+      "lastErrorAt": "2026-10-25T09:26:17.092Z",
       "backoffLevel": 0,
       "modelLock_gpt-6-sol": "2026-10-17T12:34:00.229Z",
       "modelLock_gpt-5.6-luna": "2026-10-17T12:34:00.470Z",
@@ -1232,7 +1239,7 @@
       "priority": 1,
       "isActive": true,
       "createdAt": "2026-10-12T03:15:10.013Z",
-      "updatedAt": "2026-10-17T12:32:01.611Z",
+      "updatedAt": "2026-10-25T09:26:20.228Z",
       "testStatus": "unavailable",
       "providerSpecificData": {
         "prefix": "shiteru-zs-anthropic",
@@ -1243,11 +1250,12 @@
         "connectionNoProxy": ""
       },
       "modelLock_gemini-3.7-flash": "2026-10-17T12:34:01.531Z",
-      "lastError": "[403]: {\"error\":{\"message\":\"Your current subscription is not eligible for model claude-sonnet-5\",\"type\":\"permission_error\",\"code\":\"subscription_not_eligible\"}}",
+      "lastError": "[403]: {\"error\":{\"message\":\"Key is not allowed to use model claude-sonnet-4.6\",\"type\":\"permission_error\",\"code\":\"model_not_allowed\"}}",
       "errorCode": 403,
-      "lastErrorAt": "2026-10-17T12:32:01.611Z",
+      "lastErrorAt": "2026-10-25T09:26:20.228Z",
       "backoffLevel": 0,
-      "modelLock_claude-sonnet-5": "2026-10-17T12:34:01.610Z"
+      "modelLock_claude-sonnet-5": "2026-10-17T12:34:01.610Z",
+      "modelLock_claude-sonnet-4.6": "2026-10-25T09:28:20.228Z"
     },
     {
       "id": "a4395358-55d9-4b93-8a00-0ea552aa1329",
@@ -1258,7 +1266,7 @@
       "priority": 1,
       "isActive": true,
       "createdAt": "2026-10-23T08:25:20.169Z",
-      "updatedAt": "2026-10-23T10:35:21.964Z",
+      "updatedAt": "2026-10-26T03:17:21.179Z",
       "defaultModel": "deepseek-v4.1-flash-fast",
       "testStatus": "active",
       "providerSpecificData": {
@@ -1275,8 +1283,9 @@
       "errorCode": null,
       "lastErrorAt": null,
       "backoffLevel": 0,
+      "modelLock_deepseek-v4.1-flash-abliterated(max)": null,
       "rateLimitedUntil": null,
-      "modelLock_deepseek-v4.1-flash-abliterated(max)": null
+      "modelLock_deepseek-v4.1-flash-free": null
     }
   ],
   "nodes": [

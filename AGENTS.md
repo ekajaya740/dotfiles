@@ -292,8 +292,8 @@ recipe. Every other harness (omp, opencode, hermes, pen) rides 9router.
 | Role | Model | Purpose |
 |------|-------|---------|
 | default | `9router/coder` | Primary agent |
-| smol | `9router/coder` | Quick/light tasks |
-| tiny | `9router/coder` | Smallest/cheapest jobs |
+| smol | `9router/smol` | Quick/light tasks |
+| tiny | `9router/smol` | Smallest/cheapest jobs |
 | plan | `9router/coder` | Planning & architecture |
 | commit | `9router/coder` | Commit generation |
 | slow | `9router/coder` | Deep reasoning |
@@ -307,6 +307,22 @@ change, or it drifts (it previously listed `cost-efficient` and a `designer` rol
 that no longer exist).
 
 Set `NINEROUTER_API_KEY` in your shell environment (`~/.zshenv.local`) to authenticate against the gateway.
+
+**Cheap/auxiliary slots in every other harness point at the same `smol` combo.**
+
+| Harness | Setting | Value |
+|---------|---------|-------|
+| OpenCode | `model` / `small_model` | `9router/coder` / `9router/smol` |
+| Claude Code | `ANTHROPIC_DEFAULT_HAIKU_MODEL`, `ANTHROPIC_SMALL_FAST_MODEL` | `smol` |
+| Hermes | `auxiliary.{skills_hub,approval,mcp,title_generation}.model` | `smol` |
+| Hermes | `auxiliary.vision.model` | `ollama-cloud/gemma4:31b` (free, text+image) |
+| Pen | `models[].id` = `smol` (last entry) | `smol` |
+
+The `smol` combo lives in the 9router `combos` table, not in any harness file, so
+there is no per-harness model list to keep in sync — but a harness that names a
+combo 9router does not have fails at request time with `No active credentials
+for provider: openai`, which is why the dead `cost-efficient` /
+`combo-profill-*` entries are gone from `models.yml` and `opencode.json`.
 
 ### Update OMP config
 
@@ -478,6 +494,7 @@ declared for the other harnesses:
 | 4 | `personal-chat` | General conversation |
 | 5 | `sfw-coder` | Text-only safe coder |
 | 6 | `sfw-advisor` | Text-only safe advisor |
+| 7 | `smol` | Cheapest jobs — last entry so `designer` stays the default |
 
 Select them in Pen's agent model picker (they appear under the **9Router**
 provider). Pen's own `config.json` has no model fields — this provider is
@@ -1157,8 +1174,8 @@ combos as the other harnesses — no separate provider. `settings.json` sets:
 | `ANTHROPIC_MODEL` | `coder` | primary model (combo) |
 | `ANTHROPIC_DEFAULT_SONNET_MODEL` | `coder` | standard work |
 | `ANTHROPIC_DEFAULT_OPUS_MODEL` | `advisor` | hardest work |
-| `ANTHROPIC_DEFAULT_HAIKU_MODEL` | `ollama-cloud/glm-5.3-flash` | cheap/fast jobs |
-| `ANTHROPIC_SMALL_FAST_MODEL` | `ollama-cloud/glm-5.3-flash` | background jobs |
+| `ANTHROPIC_DEFAULT_HAIKU_MODEL` | `smol` | cheap/fast jobs |
+| `ANTHROPIC_SMALL_FAST_MODEL` | `smol` | background jobs |
 | `CLAUDE_CODE_MAX_CONTEXT_TOKENS` | `500000` | combos are capped at a 500k window |
 
 The 9router key is **not** in the file — a settings `env` value is not expanded,

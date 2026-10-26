@@ -45,8 +45,8 @@ providers:
         input: [text, image]
         contextWindow: 500000
         maxTokens: 32000
-      - id: cost-efficient
-        name: Cost Efficient (combo)
+      - id: smol
+        name: Smol (combo)
         reasoning: true
         input: [text]
         contextWindow: 500000
@@ -71,18 +71,6 @@ providers:
         maxTokens: 32000
       - id: sfw-advisor
         name: Safe Advisor (combo)
-        reasoning: true
-        input: [text]
-        contextWindow: 500000
-        maxTokens: 32000
-      - id: combo-profill-fast
-        name: Profill Fast (combo)
-        reasoning: true
-        input: [text]
-        contextWindow: 500000
-        maxTokens: 32000
-      - id: combo-profill-smart
-        name: Profill Smart (combo)
         reasoning: true
         input: [text]
         contextWindow: 500000
