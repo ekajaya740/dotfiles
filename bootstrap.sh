@@ -412,7 +412,7 @@ setup_machine_specific() {
     # is needed. Running `omp config set extensions` here would clobber it with a
     # machine-absolute path (writes through the stow symlink into the repo file).
 
-    # Jev toolchain (omp-jev, omp-jev-compaction, pi-warden).
+    # Jev toolchain (omp-jev, omp-jev-compaction).
     # These install into app-owned dirs (~/.omp/plugins, …),
     # so they cannot be stowed — this script reproduces them per machine.
     if [[ -f "$DOTFILES_REPO/jev/install.sh" ]]; then

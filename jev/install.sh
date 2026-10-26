@@ -122,62 +122,11 @@ install_jev_mcp_note() {
 EOF
 }
 
-# ── pi-warden (pi only) ──────────────────────────────────────
-# omp is deliberately excluded: warden installs as an omp plugin, and omp is
-# kept plugin-free on purpose so the only skills it sees are the ones shipped
-# with the binary. Adding the plugin back re-enables its skill registrations
-# and its per-turn guard calls. The pi side is unaffected.
-install_pi_warden() {
-    info "pi-warden (guardrails for Pi)"
-
-    # pi: requires Pi >= 0.85 (older versions fail or misbehave).
-    if has pi; then
-        local ver; ver="$(pi --version 2>&1 | head -1 | tr -d '[:space:]')"
-        if [[ -z "$ver" || "$(printf '%s\n0.85\n' "$ver" | sort -V | head -1)" != "0.85" ]]; then
-            warn "  pi ${ver:-unknown} < 0.85 required — upgrade: brew upgrade pi-coding-agent"
-        else
-            run pi install npm:pi-warden
-            ok "  pi: pi-warden installed"
-        fi
-    else
-        warn "  pi not installed — skipping pi side"
-    fi
-
-    # omp side intentionally omitted — see the header comment above.
-
-    # Judgments use OpenRouter (not TypeSafe), matching the other Jev tools.
-    # Without this the plugin defaults to the typesafe backend and fails closed.
-    # pi-warden resolves its config via PI_CODING_AGENT_DIR, falling back to
-    # ~/.pi/agent. Only the pi location is written now that omp is out of scope.
-    local cfg_dirs=("$HOME/.pi/agent/pi-warden")
-    if $CHECK; then
-        echo "  [dry-run] set typesafeBackend=openrouter in: ${cfg_dirs[*]}"
-    else
-        python3 - "${cfg_dirs[@]}" <<'PY'
-import json, sys, pathlib
-for raw in sys.argv[1:]:
-    p = pathlib.Path(raw) / "config.json"
-    p.parent.mkdir(parents=True, exist_ok=True)
-    cfg = {}
-    if p.exists():
-        try:
-            cfg = json.loads(p.read_text())
-        except Exception:
-            cfg = {}
-    cfg["typesafeBackend"] = "openrouter"
-    p.write_text(json.dumps(cfg, indent=2) + "\n")
-    print("    wrote", p)
-PY
-    fi
-    info "  enable in-session with /warden enable (judgments are off until then)"
-}
-
 # ── main ─────────────────────────────────────────────────────
 info "Jev toolchain install ($([[ $CHECK == true ]] && echo 'check' || echo 'apply'))"
 check_backend
 install_omp_jev
 install_omp_compaction
-install_pi_warden
 install_jev_mcp_note
 
 echo

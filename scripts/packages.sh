@@ -23,7 +23,7 @@ ALL_PACKAGES=(nvim tmux zsh vim opencode omp pi pen dsh)
 #   dsh:  ~/.dsh holds profiles/ (pnpm-managed), logs/, and .credentials.yaml;
 #         the package also targets ~/.config/dsh and ~/.config/systemd/user,
 #         both of which hold app-managed state beside the stowed files.
-#   pi:   ~/.pi/agent holds auth.json, sessions/, npm/ (packages) and pi-warden/
+#   pi:   ~/.pi/agent holds auth.json, sessions/ and npm/ (packages)
 STOW_NO_FOLDING=(omp pen dsh pi)
 
 # Named groups for the --harness / --editor / --shell shortcuts.
