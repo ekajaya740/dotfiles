@@ -98,9 +98,19 @@ It runs, fail-closed:
 1. **ShellCheck** on every tracked `*.sh` (`--severity=warning`).
 2. **JSON** parse of every tracked `*.json` / `*.json.template`.
 3. **YAML** parse of every tracked `*.yml` / `*.yaml` (workflows excluded).
-4. **`stow --simulate`** of all ten packages into a scratch target — proves
+4. **Harness invariants** — the settings that make the cheap path cheap, asserted
+   by value rather than by shape: `rtkEnabled: true` and
+   `comboStrategy: "smart"` in `9router/config-export.json`, no
+   `comboStrategies` entry naming a combo that does not exist, omp's seven
+   `skills.enable*` flags all `false`, `modelRoles.smol`/`tiny` on the `smol`
+   combo, `compaction.thresholdPercent <= 70`, and every `9router` entry in
+   `models.yml` carrying `contextWindow: 200000` plus a `cost` block. Each of
+   these has been off-by-default at least once and each fails silently, so a
+   regression has to break the build rather than quietly re-add tokens to every
+   request.
+5. **`stow --simulate`** of all ten packages into a scratch target — proves
    every tracked file still maps to a real destination, without touching `$HOME`.
-5. **`release_dotfiles.py --check`**, which also validates `CHANGELOG.md`.
+6. **`release_dotfiles.py --check`**, which also validates `CHANGELOG.md`.
 
 The severity is passed explicitly because older ShellCheck builds ignore
 `severity` in `.shellcheckrc`, and a gate that silently reports nothing is worse
@@ -358,11 +368,12 @@ Configured in `omp/.omp/agent/mcp.json` (oMP), `opencode/.config/opencode/openco
 |--------|------|---------|---------|
 | lightpanda | stdio | `lightpanda mcp` | Native headless browser MCP — markdown, semantic tree, structured data, JS eval |
 | grep_app | stdio | `bunx -y @modelcontextprotocol/server-github` | GitHub API access |
-| pencil | stdio | `/Applications/Pen.app/Contents/Resources/app.asar.unpacked/out/mcp-server-darwin-arm64 --app desktop --agent <name>` | pen.dev design files — read/modify `.pen` via MCP |
-| codebase-memory-mcp | stdio | `~/.local/bin/codebase-memory-mcp` | Code intelligence knowledge graph — search, trace, architecture, impact analysis |
+| codebase-memory-mcp | stdio | `codebase-memory-mcp` (PATH; `mise use -g npm:codebase-memory-mcp`) | Code intelligence knowledge graph — search, trace, architecture, impact analysis |
 | genoffice | stdio | `/Applications/GenOffice.app/Contents/Resources/cli/genoffice mcp` | GenOffice documents — 32 tools to read/write docx, xlsx, pptx and pdf, render pages, merge templates |
 
-**codebase-memory-mcp** is a high-performance code intelligence MCP server. It indexes codebases into a persistent knowledge graph for fast structural queries. Installed at `~/.local/bin/codebase-memory-mcp`. Configured with the native binary path (not `npx -y`) in omp/opencode/hermes MCP configs and `~/.claude.json`. The `npx -y codebase-memory-mcp` fallback is intentionally replaced because the native binary must match the shared coordination daemon version.
+**codebase-memory-mcp** is a high-performance code intelligence MCP server. It indexes codebases into a persistent knowledge graph for fast structural queries. It is a plain npm package, so `bootstrap.sh` installs it with `mise use -g npm:codebase-memory-mcp@latest` and every harness calls it by bare name off PATH — no absolute path, no `npx -y` wrapper. Hard-coding a path (the old `~/.local/bin/...` / `/Users/...` forms) was the bug: the binary lives wherever mise's node install puts it, so a pinned path silently became a spawn failure.
+
+**Enabled by default, opt-in per machine.** `codebase-memory-mcp` is `enabled: true` everywhere because `bootstrap.sh` guarantees the binary exists. `genoffice` is `enabled: false` (omp, OpenCode, Hermes) or `lifecycle: "lazy"` (Pi) because it lives inside a macOS app bundle — flip it on after `genoffice install-cli` on a machine that actually has GenOffice. `pencil` is **not** configured anywhere: it is a macOS-only app-bundle binary (`/Applications/Pen.app/...`), so every non-macOS host paid a failed spawn per launch for a tool it could never run. Pen still gets its model list from `~/.pencil/models.json`; only its MCP server is gone.
 
 
 ### Orchestrator Mode (default agent routing)
@@ -422,9 +433,11 @@ A second provider, `shiteru` (`SHITERU_API_KEY`), is declared alongside it.
 ### MCP Servers
 
 Configured under `mcp_servers:` in `config.yaml`: `hevy` (`${HEVY_API_KEY}`),
-`arxiv`, `pencil`, `codebase-memory-mcp` (native binary), `jev`
-(`JEV_PROVIDER=openrouter`), and `genoffice` (document engine).
-`investment_vault` is present but `enabled: false`.
+`arxiv`, `codebase-memory-mcp` (bare name off PATH), `jev`
+(`JEV_PROVIDER=compatible` → 9router SystemOne), and `genoffice`
+(document engine, `enabled: false`). `investment_vault` is present but
+`enabled: false`, and `pencil` is gone for the same macOS-only reason as
+everywhere else.
 
 ### Gateway and Platforms
 
@@ -674,9 +687,10 @@ each need their own key in the `media`/`search` blocks and stay `false` in
 `docs_apply`, `sheet_read`, `slides_*`, `pdf_read`, `render`, `merge`, …). It is
 registered in omp, OpenCode, Hermes, Claude Code, Pi and dsh — see the MCP
 Servers table in the OMP section. Pi needs the `pi-mcp-extension` package
-(`pi install npm:pi-mcp-extension`) because Pi 0.87 has no built-in MCP, and its
-entry sets `"lifecycle": "eager"` so the server starts with the session instead
-of waiting for `/mcp:start`.
+(`pi install npm:pi-mcp-extension`) because Pi 0.87 has no built-in MCP. Its
+entry uses `"lifecycle": "lazy"` (the schema's default), so the server only
+starts on `/mcp:start` — the right posture for a macOS-only binary that does not
+exist on most hosts.
 
 ### Validation
 
@@ -1095,18 +1109,35 @@ typed questions (pick one, score, yes/no) and never writes prose. Several tools
 use it to make cheap per-turn judgments: model routing, context compaction,
 guardrails. It is *not* a chat model, so nothing here goes in `models.yml`.
 
-**Backend: OpenRouter, not TypeSafe.** `TYPESAFE_API_KEY` is not set on this
-machine; every Jev tool is configured to use `OPENROUTER_API_KEY` instead
-(`typesafe/jev-1.13` via `openrouter.ai/api/alpha/decisions`). Set that key in
-`~/.zshenv.local`. A tool left on its default backend fails closed without a
-TypeSafe key.
+**Backend: 9router SystemOne, not OpenRouter and not TypeSafe.** 9router exposes
+Jev 1.14 as the model alias `judge` in its `modelAliases` kv scope, backed by
+`openrouter/typesafe/jev-1.14` through the `openrouter` provider. Every Jev
+consumer reaches it at `POST https://ai.workofekajaya.com/v1/systemone` with
+`model: judge` and `JEV_PROVIDER=compatible`, authenticated with
+`NINEROUTER_API_KEY` — so there is no separate `OPENROUTER_API_KEY` or
+`TYPESAFE_API_KEY` to manage, and the key never has to leave the gateway.
+
+OpenRouter direct was abandoned: the account's allowed-providers guardrail
+permits only `typesafe`, so every other OpenRouter model 404s. Routing through
+9router sidesteps that, and 9router also uses `judge` as the **smart-router
+model** (`routerModel`) for its combos.
+
+**Jev is a decisions model — it cannot write prose.** On `/v1/chat/completions`
+it returns `typesafe/jev-1.14 is a decisions model and cannot be used with the
+chat/completions endpoint`. It answers typed questions (`noul | choice | score |
+box`) on `/v1/systemone` only. So it can never be a combo member or a fusion
+`judgeModel` — only `routerModel` (smart strategy) or an MCP/decision tool.
 
 ### What Is Synced vs Machine-Local
 
 | Part | Location | Synced? |
 |------|----------|---------|
-| MCP server entry (`jev-mcp`) | `omp/.omp/agent/mcp.json`, `opencode/.config/opencode/opencode.json`, `hermes/.hermes/config.yaml` | ✅ stowed |
+| MCP server entry (`jev-mcp`) | `opencode/.config/opencode/opencode.json`, `hermes/.hermes/config.yaml`, `claude/.claude/skills/jev-router/.claude-plugin/plugin.json` | ✅ stowed |
 | Everything else — CLI, plugins, node_modules | `~/.omp/plugins`, `~/.hermes/plugins`, `~/.local/bin/jev`, `~/.pi/agent/npm` | ❌ machine-local |
+
+`jev-mcp` is deliberately **not** in `omp/.omp/agent/mcp.json`: omp carries its
+own Jev integration instead, and a second MCP entry would duplicate the same
+decision endpoint.
 
 `bootstrap.sh` runs **`jev/install.sh`** (idempotent, `--check` for a dry run)
 to reproduce the machine-local half on a new device.
@@ -1116,16 +1147,17 @@ to reproduce the machine-local half on a new device.
 | Component | Harnesses | Notes |
 |-----------|-----------|-------|
 | `hermes-jev-skills` | hermes | Routing, memory, skill selection, browser/computer use. Installs a `jev` CLI + `~/.hermes/plugins/hermes-{jev,handoff}`. |
-| `omp-jev` | omp | Jev routing; config at `~/.config/omp-jev/config.json` (pointed at OpenRouter). |
+| `omp-jev` | omp | Jev routing; config at `~/.config/omp-jev/config.json` (pointed at 9router SystemOne, model `judge`). |
 | `omp-jev-compaction` | omp | Jev-scored context reduction. Built from source into `~/.omp/plugins-local/`, linked with `omp plugin install <path>`. |
-| `pi-warden` | pi, omp | Guardrails. `typesafeBackend: openrouter` in `~/.pi/agent/pi-warden/config.json` — one file covers both, since pi-warden's `userConfigPath()` hardcodes `~/.pi/agent`. |
+| `pi-warden` | pi only | Guardrails. `typesafeBackend: openrouter` in `~/.pi/agent/pi-warden/config.json`. **Not installed for omp**: omp is kept plugin-free so its only skills are the binary's own, and warden would re-add plugin skill registrations plus per-turn guard calls. |
 
 ### Pen Cannot Run jev-mcp
 
 Pen launches with `PATH=/usr/bin:/bin:/usr/sbin:/sbin`, so it cannot resolve
 `npx` (the same reason `spawn npm ENOENT` appears in `~/Library/Logs/Pen/main.log`).
-Jev MCP is registered in **omp, opencode and hermes only**. Pen gets Jev only if
-a compiled binary ships.
+Jev MCP is registered in **opencode, hermes and Claude Code (via the jev-router
+plugin) only** — not omp, which reaches Jev through `routerModel` instead. Pen
+gets Jev only if a compiled binary ships.
 
 ### Consent and Defaults
 
@@ -1192,7 +1224,7 @@ the model path.
 skills dir as `jev-router@skills-dir`). It carries:
 
 - a `PreToolUse` hook on `Task|Agent` that asks TypeSafe Jev — through 9router
-  SystemOne (`POST /v1/systemone`, model `openrouter/typesafe/jev-1.13`) — which
+  SystemOne (`POST /v1/systemone`, model `judge`) — which
   agent type and model a subagent needs;
 - the `jev` MCP server (`@jkudish/jev-mcp`, `JEV_PROVIDER=compatible`) at the
   same SystemOne endpoint, so `/jev` tools work without native routing.

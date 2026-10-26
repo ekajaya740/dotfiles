@@ -31,10 +31,11 @@ that `haiku` can do it, the call is rewritten to the `Explore` agent on the
 | `JEV_ROUTER_MODEL_MIN` | `0.8` | model confidence gate |
 | `JEV_ROUTER_DEBUG` | off | log to stderr |
 | `JEV_API_BASE_URL` | 9router `/v1/systemone` | Jev endpoint |
-| `JEV_MCP_MODEL` | `openrouter/typesafe/jev-1.13` | Jev model id |
+| `JEV_MCP_MODEL` | `judge` | Jev model id (the 9router `judge` alias → TypeSafe `jev-1.14`) |
 
 The router reads `NINEROUTER_API_KEY` from the environment; the bundled `jev`
-MCP server uses the same key via `${NINEROUTER_API_KEY}` interpolation.
+MCP server uses the same key via `${NINEROUTER_API_KEY}` interpolation. Both
+reach Jev through 9router (`/v1/systemone`), never OpenRouter directly.
 
 ## Commands
 

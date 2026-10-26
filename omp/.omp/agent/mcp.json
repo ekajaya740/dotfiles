@@ -6,34 +6,20 @@
       "args": ["-y", "@upstash/context7-mcp"],
       "enabled": true
     },
+    "codebase-memory-mcp": {
+      "command": "codebase-memory-mcp",
+      "args": [],
+      "enabled": true
+    },
     "firecrawl": {
       "type": "http",
       "url": "https://mcp.firecrawl.dev/v2/mcp",
       "enabled": false
     },
-    "codebase-memory-mcp": {
-      "command": "/Users/ekajaya740/.local/bin/codebase-memory-mcp",
-      "args": [],
-      "enabled": true
-    },
-    "pencil": {
-      "command": "/Applications/Pen.app/Contents/Resources/app.asar.unpacked/out/mcp-server-darwin-arm64",
-      "args": ["--app", "desktop", "--agent", "omhCLI"],
-      "enabled": true
-    },
-    "jev": {
-      "command": "npx",
-      "args": ["-y", "@jkudish/jev-mcp"],
-      "env": {
-        "JEV_PROVIDER": "openrouter",
-        "OPENROUTER_API_KEY": "${OPENROUTER_API_KEY}"
-      },
-      "enabled": true
-    },
     "genoffice": {
       "command": "/Applications/GenOffice.app/Contents/Resources/cli/genoffice",
       "args": ["mcp"],
-      "enabled": true
+      "enabled": false
     }
   }
 }

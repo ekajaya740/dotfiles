@@ -317,7 +317,7 @@
       "enabled": true,
       "type": "local",
       "command": [
-        "/Users/ekajaya740/.local/bin/codebase-memory-mcp"
+        "codebase-memory-mcp"
       ]
     },
     "expect": {
@@ -339,20 +339,11 @@
       ],
       "enabled": true,
       "environment": {
-        "JEV_PROVIDER": "openrouter",
-        "OPENROUTER_API_KEY": "{env:OPENROUTER_API_KEY}"
+        "JEV_PROVIDER": "compatible",
+        "JEV_API_BASE_URL": "https://ai.workofekajaya.com/v1/systemone",
+        "JEV_API_KEY": "{env:NINEROUTER_API_KEY}",
+        "JEV_MCP_MODEL": "judge"
       }
-    },
-    "pencil": {
-      "command": [
-        "/Applications/Pen.app/Contents/Resources/app.asar.unpacked/out/mcp-server-darwin-arm64",
-        "--app",
-        "desktop",
-        "--agent",
-        "openCodeCLI"
-      ],
-      "enabled": true,
-      "type": "local"
     },
     "genoffice": {
       "type": "local",
@@ -360,7 +351,7 @@
         "/Applications/GenOffice.app/Contents/Resources/cli/genoffice",
         "mcp"
       ],
-      "enabled": true
+      "enabled": false
     }
   },
   "small_model": "9router/smol"

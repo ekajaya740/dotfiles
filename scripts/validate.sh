@@ -9,6 +9,7 @@
 #   1. ShellCheck on every shell script (severity: warning)
 #   2. JSON parses
 #   3. YAML parses (harness configs)
+#  3b. harness invariants (RTK, smart combo, smol roles, catalog, windows)
 #   4. stow --simulate for every package, into a scratch target
 #   5. release script can parse CHANGELOG.md
 # ─────────────────────────────────────────────────────────────
@@ -112,6 +113,92 @@ print(','.join(sorted(required - off)))
     fi
 else
     fail "pyyaml not installed"
+fi
+
+# ── 3b. Harness invariants ───────────────────────────────────
+# These are the settings that make the cheap path actually cheap. Each one has
+# already been found off-by-default at least once, and each one is silent when
+# wrong: RTK off just re-sends tool output, `fallback` instead of `smart` just
+# stops retaining the cache, and omp re-injecting a 66-skill catalog costs
+# prefix tokens on every single request. Shape checks do not catch any of that,
+# so assert the values.
+note "Harness invariants"
+if python3 -c 'import yaml' 2>/dev/null; then
+    if inv="$(python3 -c "
+import json, sys, yaml
+
+problems = []
+
+# 9router: the exported snapshot is the only tracked copy of live settings.
+try:
+    export = json.load(open('9router/config-export.json'))
+except Exception as e:
+    problems.append('config-export.json unreadable: %s' % e)
+else:
+    s = export.get('settings') or {}
+    if s.get('rtkEnabled') is not True:
+        problems.append('9router settings.rtkEnabled must be true (got %r) '
+                        '- RTK tool-output compression is the growth lever'
+                        % (s.get('rtkEnabled'),))
+    if s.get('comboStrategy') != 'smart':
+        problems.append('9router settings.comboStrategy must be \"smart\" '
+                        '(got %r) - fallback gives up the prompt cache'
+                        % (s.get('comboStrategy'),))
+    strategies = s.get('comboStrategies') or {}
+    combos = {c.get('name') for c in export.get('combos') or []}
+    orphan = sorted(set(strategies) - combos)
+    if orphan:
+        problems.append('comboStrategies names combos that do not exist: %s'
+                        % ', '.join(orphan))
+
+# omp: catalog pruning + the compaction ceiling.
+try:
+    cfg = yaml.safe_load(open('omp/.omp/agent/config.yml')) or {}
+except Exception as e:
+    problems.append('omp config.yml unreadable: %s' % e)
+else:
+    skills = cfg.get('skills') or {}
+    for key in ('enableCodexUser', 'enableClaudeUser', 'enableClaudeProject',
+                'enablePiUser', 'enablePiProject', 'enableAgentsUser',
+                'enableAgentsProject'):
+        if skills.get(key) is not False:
+            problems.append('omp skills.%s must be false - omp is kept '
+                            'plugin-only, and every enabled source injects its '
+                            'catalog into every request' % key)
+    roles = cfg.get('modelRoles') or {}
+    for role in ('smol', 'tiny'):
+        if not str(roles.get(role, '')).endswith('/smol'):
+            problems.append('omp modelRoles.%s must point at the smol combo '
+                            '(got %r)' % (role, roles.get(role)))
+    threshold = (cfg.get('compaction') or {}).get('thresholdPercent')
+    if not isinstance(threshold, int) or threshold > 70:
+        problems.append('omp compaction.thresholdPercent must be <= 70 '
+                        '(got %r) - models declare contextWindow 200000, so '
+                        'a higher percentage compacts far too late'
+                        % (threshold,))
+
+# omp models.yml: every 9router entry needs a real window and a cost block, or
+# omp cannot reason about price and compacts on a fictional ceiling.
+try:
+    models = yaml.safe_load(open('omp/.omp/agent/models.yml')) or {}
+    entries = ((models.get('providers') or {}).get('9router') or {}).get('models') or []
+    bad_window = [m.get('id') for m in entries if m.get('contextWindow') != 200000]
+    bad_cost = [m.get('id') for m in entries if not m.get('cost')]
+    if bad_window:
+        problems.append('models.yml 9router entries with contextWindow != 200000: %s'
+                        % ', '.join(map(str, bad_window)))
+    if bad_cost:
+        problems.append('models.yml 9router entries without a cost block: %s'
+                        % ', '.join(map(str, bad_cost)))
+except Exception as e:
+    problems.append('omp models.yml unreadable: %s' % e)
+
+print('; '.join(problems))
+" 2>/dev/null)" && [ -z "$inv" ]; then
+        pass "harness invariants hold (RTK, smart combo, smol roles, catalog, windows)"
+    else
+        fail "harness invariants: ${inv:-unparseable}"
+    fi
 fi
 
 # ── 4. stow dry run ──────────────────────────────────────────

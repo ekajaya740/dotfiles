@@ -383,6 +383,17 @@ setup_mise() {
     else
         ok "omp already installed"
     fi
+
+    # codebase-memory-mcp is enabled by default in every harness's MCP config
+    # (omp, opencode, hermes, pi, Claude Code), so it must exist or each one logs
+    # a spawn failure on startup. It is a plain npm package, installed globally
+    # through mise's node so the binary lands on PATH as `codebase-memory-mcp`.
+    if ! has_cmd codebase-memory-mcp; then
+        info "installing codebase-memory-mcp"
+        mise use -g npm:codebase-memory-mcp@latest
+    else
+        ok "codebase-memory-mcp already installed"
+    fi
 }
 
 # ── neovim post-install ──────────────────────────────────────
