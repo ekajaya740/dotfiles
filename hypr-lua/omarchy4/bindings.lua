@@ -41,14 +41,6 @@ o.bind("ALT + SPACE", "Cycle input method", "ime-cycle")
 -- Rebound here so the key you already know keeps working.
 o.bind("SUPER + M", "Exit Hyprland", "omarchy-menu toggle system")
 
--- Hermes agent.
--- SUPER+SHIFT+H is free in Omarchy 4 (SUPER+CTRL+H is the hardware menu, and
--- the agent picker lives on SUPER+SHIFT+CTRL+A). Launched through
--- omarchy-launch-tui so it inherits Omarchy's terminal styling, and with the
--- shared org.omarchy.agent app-id that omarchy-agent uses, so one window rule
--- covers every agent. --yolo matches how omarchy-agent starts Hermes.
-o.bind("SUPER + SHIFT + H", "Hermes", "omarchy-launch-tui --app-id=org.omarchy.agent hermes --yolo")
-
 -- Two binds from the old config are intentionally NOT ported:
 --
 --   SUPER+SHIFT+W -> Typora

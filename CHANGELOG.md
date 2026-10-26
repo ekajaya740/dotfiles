@@ -8,6 +8,44 @@ section's notes — see [AGENTS.md](./AGENTS.md#releases).
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-10-26
+
+### Changed
+
+- **The skill catalogue is trimmed to what this host can actually run.** omp
+  was injecting all 66 skill blocks into the system prefix of every request —
+  23,449 bytes ≈ 5,862 tokens, measured against omp's own template. 25 of those
+  skills cannot work here: the 10 `jev-*` ones shell out to a `jev` CLI that is
+  not on PATH, the 8 `loopx*` ones need a `loopx` binary that is not on this
+  filesystem at all, and `apple-apps`/`gws-*`/`gif-search`/`linear`/`spotify`/
+  `kanban-operations` are macOS-only or need absent tooling. They are now listed
+  under `skills.ignoredSkills`, which drops them by glob so new skills in those
+  families are covered without editing the list. The catalogue is 41 skills /
+  14,233 bytes ≈ 3,558 tokens — **39% smaller, ~2,304 tokens saved per request**.
+  `skills.enableAgentsUser` goes back to `true`: 1.4.0's blanket "disable every
+  source" dropped the utility skills too, which was further than intended.
+
+- **`bootstrap.sh` now enforces the 9router settings instead of assuming them.**
+  `settingsRepo.js` defaults `rtkEnabled` to true, but `chat.js` reads the
+  *stored* blob and `mergeWithDefaults` never writes defaults back — so a
+  settings row older than RTK runs with tool-output compression silently OFF,
+  and the only symptom is a larger bill. `comboStrategy` is the same shape of
+  bug: absent means `fallback`, which gives up the sticky session and re-pays
+  the prompt cache on every failover. The new `9router/ensure-settings.py`
+  PATCHes `rtkEnabled: true` and `comboStrategy: "smart"`, reads them back, and
+  is idempotent; `bootstrap.sh` runs it and warns (never aborts) when the
+  gateway is not up yet. This closes the gap where `validate.sh` could assert
+  the values in the snapshot while a fresh machine still booted without them.
+
+### Fixed
+
+- **`validate.sh` asserted a skill policy nobody wanted.** Its invariants gate
+  required all seven `enable*` flags to be false, which is exactly the
+  over-prune described above. It now requires `enableAgentsUser: true`, the
+  remaining sources false, and `jev-*`/`loopx*` present in `ignoredSkills`.
+  Negative-tested: clearing `ignoredSkills` or flipping `enableAgentsUser` both
+  fail the gate.
+
 ## [1.4.0] - 2026-10-26
 
 ### Changed

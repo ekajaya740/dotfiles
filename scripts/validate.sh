@@ -158,13 +158,24 @@ except Exception as e:
     problems.append('omp config.yml unreadable: %s' % e)
 else:
     skills = cfg.get('skills') or {}
+    # Only the agents catalogue is wanted: it holds the user's own utility
+    # skills. Every other source would add a second copy of somebody else's
+    # catalogue to the prefix.
     for key in ('enableCodexUser', 'enableClaudeUser', 'enableClaudeProject',
-                'enablePiUser', 'enablePiProject', 'enableAgentsUser',
-                'enableAgentsProject'):
+                'enablePiUser', 'enablePiProject', 'enableAgentsProject'):
         if skills.get(key) is not False:
-            problems.append('omp skills.%s must be false - omp is kept '
-                            'plugin-only, and every enabled source injects its '
-                            'catalog into every request' % key)
+            problems.append('omp skills.%s must be false - only the agents '
+                            'catalogue is wanted; every other enabled source '
+                            'injects a second catalogue into every request' % key)
+    if skills.get('enableAgentsUser') is not True:
+        problems.append('omp skills.enableAgentsUser must be true - it is the '
+                        'catalogue that carries the utility skills')
+    ignored = skills.get('ignoredSkills') or []
+    for pattern in ('jev-*', 'loopx*'):
+        if pattern not in ignored:
+            problems.append('omp skills.ignoredSkills must ignore %r - every '
+                            'skill under it needs a CLI that is not on this '
+                            'host, so it is pure prefix cost' % pattern)
     roles = cfg.get('modelRoles') or {}
     for role in ('smol', 'tiny'):
         if not str(roles.get(role, '')).endswith('/smol'):

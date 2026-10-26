@@ -3,7 +3,7 @@
 # jev/install.sh — reproducible install of the Jev toolchain
 #
 # Jev tooling is installed by each app into its own machine-local dirs
-# (~/.omp/plugins, ~/.hermes/plugins, ~/.config/omp-jev, …), so none of it
+# (~/.omp/plugins, ~/.config/omp-jev, …), so none of it
 # can be stowed. This script reproduces the installs on a new device.
 #
 # Idempotent: safe to re-run. Everything is reversible (see --uninstall notes).
@@ -104,27 +104,8 @@ install_omp_compaction() {
     ok "  compaction installed, provider=openrouter"
 }
 
-# ── hermes: hermes-jev-skills ────────────────────────────────
-install_hermes_jev() {
-    local home="${HERMES_HOME:-$HOME/.hermes}"
-    [[ -d "$home" ]] || { warn "no Hermes at $home — skipping"; return 0; }
-    info "hermes-jev-skills (routing, memory, skills, browser/computer use)"
-    local src="$HOME/.cache/hermes-jev-skills"
-    if [[ ! -d "$src/.git" ]]; then
-        run git clone --depth 1 https://github.com/kerpopule/hermes-jev-skills "$src"
-    fi
-    # install.py detects Hermes/Claude Code/Codex and installs for each.
-    # It never asks for or prints an API key; `jev setup-key` is separate.
-    if $CHECK; then
-        (cd "$src" 2>/dev/null && python3 install.py --check 2>&1 | sed 's/^/  /') || echo "  [dry-run] python3 install.py"
-    else
-        (cd "$src" && python3 install.py 2>&1 | tail -3 | sed 's/^/  /')
-        ok "  installed (restart the Hermes gateway to load it)"
-    fi
-}
-
 # ── MCP server: jev-mcp ──────────────────────────────────────
-# Registered per-harness (omp mcp.json, opencode.json, hermes config.yaml).
+# Registered per-harness (omp mcp.json, opencode.json).
 # Needs a Node-capable PATH; the Pen app (PATH=/usr/bin:/bin) cannot spawn npx.
 install_jev_mcp_note() {
     info "jev-mcp (MCP tools) — register per harness"
@@ -132,7 +113,6 @@ install_jev_mcp_note() {
   Add to each MCP config:
     omp      ~/.omp/agent/mcp.json        (mcpServers)
     opencode ~/.config/opencode/opencode.json (mcp)
-    hermes   ~/.hermes/config.yaml        (mcp_servers)
     pen      ~/.pencil/models.json        — NOT applicable (MCP is separate;
              and Pen's PATH cannot resolve npx)
   Server entry:
@@ -197,7 +177,6 @@ info "Jev toolchain install ($([[ $CHECK == true ]] && echo 'check' || echo 'app
 check_backend
 install_omp_jev
 install_omp_compaction
-install_hermes_jev
 install_pi_warden
 install_jev_mcp_note
 

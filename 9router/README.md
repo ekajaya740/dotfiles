@@ -30,7 +30,7 @@ Regenerate from the live gateway whenever provider/model/combo topology changes:
 
 ```bash
 bash /home/personal/dotfiles/9router/export.sh   # or: python3 .../export_9router.py
-cd /home/personal/dotfiles && git add 9router hermes && git commit -m "backup 9router config" && git push
+cd /home/personal/dotfiles && git add 9router && git commit -m "backup 9router config" && git push
 ```
 
 ## nginx answers the CORS preflight for `/v1/*` (fixed 2026-10-16)
@@ -132,7 +132,7 @@ A row under the node id is harmless: `/v1/models` dedupes on the prefix, and
 
 - Shared-key (rotating) models: keys change often. Always re-export after a key rotation so
   the masked tails in the backup stay meaningful for cross-checking.
-- Combos referenced by name from Hermes profile configs (`shiteru-*`, etc.).
+- Combos referenced by name from each harness config (`shiteru-*`, etc.).
   Keep combo names stable — renaming breaks profile `model.default` references.
 
 ## Claude models cannot run agent turns on this key (verified 2026-10-12)
