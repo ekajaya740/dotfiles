@@ -1,8 +1,8 @@
 # dotfiles
 
 Personal configuration for Neovim (LazyVim + coc.nvim), Vim, tmux, zsh,
-OpenCode, [oh-my-pi](https://github.com/can1357/oh-my-pi), [Hermes](https://github.com/earendil-works/hermes),
-[Pen](https://pen.dev), [Pi](https://github.com/earendil-works/pi), and Claude Code.
+OpenCode, [oh-my-pi](https://github.com/can1357/oh-my-pi), [Pen](https://pen.dev),
+[Pi](https://github.com/earendil-works/pi), and Claude Code.
 Everything is stowed into `$HOME` with GNU Stow, except the pieces noted below.
 
 **Neovim includes:**
@@ -13,7 +13,6 @@ combos and fallback chains (Claude Code is the exception — it keeps Anthropic'
 own API):
 
 - **oh-my-pi (OMP)** - AI coding agent for the terminal (`omp` CLI), with 9router model roles (see [AGENTS.md](./AGENTS.md) for details)
-- **Hermes** - gateway-capable agent with Discord/Telegram/Slack front ends, a dashboard, memory, and TTS/STT
 - **Pen (pen.dev)** - design tool whose bundled agent uses the 9router provider stowed from this repo
 - **OpenCode** - terminal coding agent
 - **Claude Code** - stays on Anthropic's own API (no `ANTHROPIC_BASE_URL`), with a `jev-router` plugin whose `PreToolUse` hook asks TypeSafe Jev (via 9router SystemOne) which agent and model a subagent call needs — read-only lookups are routed to the Explore agent on Haiku (see [AGENTS.md](./AGENTS.md))
@@ -42,9 +41,6 @@ top-level directory.
 - `omp/.omp/agent/config.yml` -> `~/.omp/agent/config.yml` (settings, model roles)
 - `omp/.omp/agent/models.yml` -> `~/.omp/agent/models.yml` (custom providers & models)
 - `omp/.omp/agent/mcp.json` -> `~/.omp/agent/mcp.json` (MCP servers)
-- `hermes/.hermes/config.yaml` -> `~/.hermes/config.yaml` (v49 schema: models, toolsets, MCP servers, platforms)
-- `hermes/.hermes/AGENTS.md`, `SOUL.md`, `CLAUDE.md` -> `~/.hermes/` (instructions, persona, Claude interop)
-- `hermes/.hermes/memories/` -> `~/.hermes/memories/` (curated memory)
 - `pi/.pi/agent/mcp.json` -> `~/.pi/agent/mcp.json` (MCP servers for the `pi-mcp-extension`)
 - `pi/.pi/agent/extensions/pi-notify-pp/` -> `~/.pi/agent/extensions/pi-notify-pp/` (Pi Notify++ extension)
 - `pen/.pencil/models.json` -> `~/.pencil/models.json` (9router provider for Pen; stow with `--no-folding`)
@@ -56,7 +52,7 @@ top-level directory.
 (handled by `bootstrap.sh` and `sync-dotfiles.sh` via `STOW_NO_FOLDING`).
 
 **DeepSeek Harness (`dsh`)** is pinned by `bootstrap.sh` and set up as the
-long-term replacement for `hermes` and `omp`. Only the home-level patch is
+long-term replacement for `omp`. Only the home-level patch is
 synced; the swarm and kanban are first-party/native and the rest is per-profile:
 
 - **In-process multi-agent swarm** — `subagent` / `subagent-spawn-in-process` /
@@ -72,7 +68,7 @@ synced; the swarm and kanban are first-party/native and the rest is per-profile:
   are owned by the agent preset, so a profile plugin that registers on the host
   plane may not be visible to the agent.
 - **Profiles** — `web` (browser UI) and `headless` (one-shot CLI). Native
-  multi-profile, stronger than hermes': plugins are per-profile. Profile trees
+  multi-profile: plugins are per-profile. Profile trees
   are machine-local and never synced.
 - **Telemetry** — three egresses. `session-log-deepseek` (message text) and
   `plugin-package-inventory-deepseek` are switched off with `enabled: false` in
@@ -91,7 +87,7 @@ fresh machine can take just the harness configs:
 
 ```bash
 ./bootstrap.sh --harness --skip-deps --sync-only   # harness configs only
-./bootstrap.sh --only omp,hermes                   # arbitrary subset
+./bootstrap.sh --only omp,dsh                      # arbitrary subset
 ./sync-dotfiles.sh --sync-only --harness           # daily sync, harness only
 ```
 
@@ -274,7 +270,7 @@ mkdir -p ~/.config/opencode
 
 ```bash
 cd ~/dotfiles
-stow nvim tmux zsh vim opencode hermes
+stow nvim tmux zsh vim opencode
 
 # omp, pen, dsh and pi share their target directory with app state, so they
 # must not be folded (see STOW_NO_FOLDING in scripts/packages.sh).

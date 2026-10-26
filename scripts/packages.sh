@@ -13,7 +13,7 @@
 
 # Every package the scripts may stow, in a stable order. resolve_selection()
 # emits in this order so output is deterministic.
-ALL_PACKAGES=(nvim tmux zsh vim opencode omp pi hermes pen dsh)
+ALL_PACKAGES=(nvim tmux zsh vim opencode omp pi pen dsh)
 
 # Packages whose target directory also holds app-managed state. These must be
 # stowed with --no-folding, or stow folds the whole directory into a single
@@ -31,7 +31,7 @@ PACKAGE_GROUPS=(harness editor shell)
 
 group_packages() {
     case "$1" in
-        harness) printf '%s\n' omp opencode hermes pen pi dsh ;;
+        harness) printf '%s\n' omp opencode pen pi dsh ;;
         editor)  printf '%s\n' nvim vim ;;
         shell)   printf '%s\n' zsh tmux ;;
         *) return 1 ;;

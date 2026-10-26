@@ -18,7 +18,6 @@ This document provides guidelines for AI agents and automation tools working wit
 ├── opencode/.config/opencode/  → ~/.config/opencode/
 ├── omp/.omp/agent/             → ~/.omp/agent (config + models only; --no-folding)
 ├── pi/.pi/agent/               → ~/.pi/agent (mcp.json + extensions/pi-notify-pp)
-├── hermes/.hermes/             → ~/.hermes (config + memories)
 ├── pen/.pencil/models.json     → ~/.pencil/models.json (--no-folding)
 ├── dsh/.dsh/                   → ~/.dsh (DeepSeek Harness home patch; --no-folding)
 ├── omarchy/.config/hypr/       → ~/.config/hypr (Hyprland/Omarchy; Arch-only, stow manually)
@@ -39,7 +38,7 @@ different sync rules and different failure modes.
 
 | Category | Packages | What it is | Sync rule |
 |----------|----------|------------|-----------|
-| **Agent harness** (stowed) | `omp`, `opencode`, `hermes`, `pen`, `pi`, `dsh` | Config for an AI coding/chat harness | Stow the *config only*. The harness's own state (sessions, DBs, plugins, caches) stays machine-local — see each section below. |
+| **Agent harness** (stowed) | `omp`, `opencode`, `pen`, `pi`, `dsh` | Config for an AI coding/chat harness | Stow the *config only*. The harness's own state (sessions, DBs, plugins, caches) stays machine-local — see each section below. |
 | **Other** (stowed) | `nvim`, `tmux`, `zsh`, `vim`, `omarchy` | Editor, multiplexer, shell, WM | Straight stow; these own their whole config dir. |
 | **Deployed / not stowed** | `claude`, `jev`, `9router`, `hypr-lua` | Installer scripts, config backups, unshipped ports | Never stowed. Run the package's own script (`claude/install.sh`, `jev/install.sh`) or refresh tooling (`9router/export.sh`). |
 
@@ -58,8 +57,8 @@ Harness packages that share a directory with app state must be stowed with
 claude CLI rewrites `settings.json`), but deployed by `claude/install.sh`.
 
 **Harness state is never synced.** Sessions, credentials, plugin installs and
-caches live in machine-local dirs (`~/.omp/plugins`, `~/.hermes/plugins`,
-`~/.pi/agent/npm`, `~/.claude`, …). Reproduce them with `bootstrap.sh`, which
+caches live in machine-local dirs (`~/.omp/plugins`, `~/.pi/agent/npm`,
+`~/.claude`, …). Reproduce them with `bootstrap.sh`, which
 runs `jev/install.sh`; never commit them.
 
 ## Workflow
@@ -136,14 +135,14 @@ If symlinks break or need refresh, prefer the scripts, which apply the correct
 cd ~/dotfiles
 ./sync-dotfiles.sh --sync-only              # restow every package
 ./sync-dotfiles.sh --sync-only --harness    # restow only the harness configs
-./sync-dotfiles.sh --sync-only --only omp,hermes
+./sync-dotfiles.sh --sync-only --only omp,dsh
 ```
 
 By hand, the flags are on you — `omp`, `pen`, `dsh` and `pi` must not be folded:
 
 ```bash
 cd ~/dotfiles
-stow nvim tmux zsh vim opencode hermes     # packages that fold safely
+stow nvim tmux zsh vim opencode            # packages that fold safely
 stow --no-folding omp pen dsh pi           # packages holding app state
 
 # Arch/Omarchy hosts only — ~/.config/hypr does not exist on macOS.
@@ -158,12 +157,12 @@ rather than quietly stowing nothing.
 
 ```bash
 ./bootstrap.sh --harness --skip-deps --sync-only   # relink harness configs only
-./bootstrap.sh --only omp,hermes                   # arbitrary subset
+./bootstrap.sh --only omp,dsh                      # arbitrary subset
 ./bootstrap.sh --editor --shell                    # nvim vim zsh tmux
 ./bootstrap.sh --all                               # the default
 ```
 
-Groups: `harness` (`omp opencode hermes pen pi dsh`), `editor` (`nvim vim`),
+Groups: `harness` (`omp opencode pen pi dsh`), `editor` (`nvim vim`),
 `shell` (`zsh tmux`). `--sync-only` skips toolchain setup (mise, oh-my-zsh,
 p10k, fzf) and only restows; `--skip-deps` additionally skips system packages.
 `--only` and a group flag may be combined, and duplicates are collapsed.
@@ -297,7 +296,7 @@ All AI model traffic goes through the **9router** gateway (`https://ai.workofeka
 **Exception: `dsh` is not on 9router by default.** It ships pointing at
 DeepSeek's official API with `DEEPSEEK_API_KEY`, per the "direct key first"
 choice — see the dsh *Model Routing and Gateways* section for the 9router
-recipe. Every other harness (omp, opencode, hermes, pen) rides 9router.
+recipe. Every other harness (omp, opencode, pen) rides 9router.
 
 | Role | Model | Purpose |
 |------|-------|---------|
@@ -323,8 +322,6 @@ Set `NINEROUTER_API_KEY` in your shell environment (`~/.zshenv.local`) to authen
 | Harness | Setting | Value |
 |---------|---------|-------|
 | OpenCode | `model` / `small_model` | `9router/coder` / `9router/smol` |
-| Hermes | `auxiliary.{skills_hub,approval,mcp,title_generation}.model` | `smol` |
-| Hermes | `auxiliary.vision.model` | `ollama-cloud/gemma4:31b` (free, text+image) |
 | Pen | `models[].id` = `smol` (last entry) | `smol` |
 
 Claude Code is deliberately **not** in that table: it runs against Anthropic's
@@ -362,7 +359,7 @@ stow omp
 
 ### MCP Servers
 
-Configured in `omp/.omp/agent/mcp.json` (oMP), `opencode/.config/opencode/opencode.json` (OpenCode), `hermes/.hermes/config.yaml` (`mcp_servers:`), `pi/.pi/agent/mcp.json` (Pi — read by the `pi-mcp-extension`), `dsh/.dsh/cordis.patch.yml` (dsh — an `@deepseek-ai/dsh-mcp-client` row), and `claude/.claude/mcp.json.template` (Claude Code — merged into `~/.claude.json` by `claude/install.sh`). The `jev` MCP server is registered by the `jev-router` Claude plugin instead.
+Configured in `omp/.omp/agent/mcp.json` (oMP), `opencode/.config/opencode/opencode.json` (OpenCode), `pi/.pi/agent/mcp.json` (Pi — read by the `pi-mcp-extension`), `dsh/.dsh/cordis.patch.yml` (dsh — an `@deepseek-ai/dsh-mcp-client` row), and `claude/.claude/mcp.json.template` (Claude Code — merged into `~/.claude.json` by `claude/install.sh`). The `jev` MCP server is registered by the `jev-router` Claude plugin instead.
 
 | Server | Type | Command | Purpose |
 |--------|------|---------|---------|
@@ -373,7 +370,7 @@ Configured in `omp/.omp/agent/mcp.json` (oMP), `opencode/.config/opencode/openco
 
 **codebase-memory-mcp** is a high-performance code intelligence MCP server. It indexes codebases into a persistent knowledge graph for fast structural queries. It is a plain npm package, so `bootstrap.sh` installs it with `mise use -g npm:codebase-memory-mcp@latest` and every harness calls it by bare name off PATH — no absolute path, no `npx -y` wrapper. Hard-coding a path (the old `~/.local/bin/...` / `/Users/...` forms) was the bug: the binary lives wherever mise's node install puts it, so a pinned path silently became a spawn failure.
 
-**Enabled by default, opt-in per machine.** `codebase-memory-mcp` is `enabled: true` everywhere because `bootstrap.sh` guarantees the binary exists. `genoffice` is `enabled: false` (omp, OpenCode, Hermes) or `lifecycle: "lazy"` (Pi) because it lives inside a macOS app bundle — flip it on after `genoffice install-cli` on a machine that actually has GenOffice. `pencil` is **not** configured anywhere: it is a macOS-only app-bundle binary (`/Applications/Pen.app/...`), so every non-macOS host paid a failed spawn per launch for a tool it could never run. Pen still gets its model list from `~/.pencil/models.json`; only its MCP server is gone.
+**Enabled by default, opt-in per machine.** `codebase-memory-mcp` is `enabled: true` everywhere because `bootstrap.sh` guarantees the binary exists. `genoffice` is `enabled: false` (omp, OpenCode) or `lifecycle: "lazy"` (Pi) because it lives inside a macOS app bundle — flip it on after `genoffice install-cli` on a machine that actually has GenOffice. `pencil` is **not** configured anywhere: it is a macOS-only app-bundle binary (`/Applications/Pen.app/...`), so every non-macOS host paid a failed spawn per launch for a tool it could never run. Pen still gets its model list from `~/.pencil/models.json`; only its MCP server is gone.
 
 
 ### Orchestrator Mode (default agent routing)
@@ -393,64 +390,6 @@ The default omp agent reads the orchestrator instructions and delegates:
 
 To add an agent to the routing table, enable it via `task.disabledAgents` in
 `config.yml` (omit or remove the agent from that list) and add a row above.
-
-## Hermes
-
-[Hermes](https://github.com/earendil-works/hermes) — a gateway-capable AI agent
-with Discord/Telegram/Slack front ends, a dashboard, TTS/STT, memory, and cron.
-Config lives at `~/.hermes/config.yaml`.
-
-### Config Files Managed in This Repo
-
-- `hermes/.hermes/config.yaml` → `~/.hermes/config.yaml` (v49 schema — models, toolsets, MCP servers, platforms)
-- `hermes/.hermes/AGENTS.md` → `~/.hermes/AGENTS.md` (agent instructions)
-- `hermes/.hermes/SOUL.md` → `~/.hermes/SOUL.md` (persona)
-- `hermes/.hermes/CLAUDE.md` → `~/.hermes/CLAUDE.md` (Claude Code interop)
-- `hermes/.hermes/memories/MEMORY.md`, `USER.md` → `~/.hermes/memories/` (curated memory)
-
-### NOT Managed (machine-local state)
-
-Sessions, plugin installs (`~/.hermes/plugins`), credentials, and the Jev
-toolchain are machine-local. Reproduce them with `bootstrap.sh` (which runs
-`jev/install.sh`).
-
-### Model Configuration
-
-Hermes reaches the same 9router combos through a **local** endpoint
-(`http://127.0.0.1:20128/v1`) rather than the public gateway — the key still
-comes from `NINEROUTER_API_KEY`:
-
-| Setting | Value |
-|---------|-------|
-| `model.provider` / `model.default` | `9router` / `personal-chat` |
-| `model.base_url` | `http://127.0.0.1:20128/v1` |
-| `model.key_env` | `NINEROUTER_API_KEY` |
-| `providers.9router` | same local base_url + key env |
-| `fallback_providers` | 3 entries |
-
-A second provider, `shiteru` (`SHITERU_API_KEY`), is declared alongside it.
-
-### MCP Servers
-
-Configured under `mcp_servers:` in `config.yaml`: `hevy` (`${HEVY_API_KEY}`),
-`arxiv`, `codebase-memory-mcp` (bare name off PATH), `jev`
-(`JEV_PROVIDER=compatible` → 9router SystemOne), and `genoffice`
-(document engine, `enabled: false`). `investment_vault` is present but
-`enabled: false`, and `pencil` is gone for the same macOS-only reason as
-everywhere else.
-
-### Gateway and Platforms
-
-Hermes runs a gateway with a dashboard at `https://hermes.workofekajaya.com`
-and a Discord front end enabled (`platforms.discord`, home channel
-`#ai-logs`). Cron, kanban dispatch, and TTS/STT (Edge voices by default) are
-configured in the same file.
-
-### Validation
-
-```bash
-python3 -c "import yaml; yaml.safe_load(open('hermes/.hermes/config.yaml')); print('config.yaml OK')"
-```
 
 ## Pen (pen.dev)
 
@@ -591,7 +530,7 @@ genoffice skill install <agent|all>  # optional: the docx/pptx op reference
 
 `mcp install` knows Claude Code, Codex, Cursor, Gemini CLI, Copilot CLI,
 OpenCode and Windsurf. This repo registers the same server by hand for omp,
-Hermes, Pi and dsh, which the command does not cover — see the MCP Servers
+Pi and dsh, which the command does not cover — see the MCP Servers
 table in the OMP section.
 
 `status: "stale"` in `mcp list --json` does **not** mean broken: it fires when
@@ -685,7 +624,7 @@ each need their own key in the `media`/`search` blocks and stay `false` in
 
 `genoffice mcp` is a stdio MCP server over all 32 CLI commands (`docs_read`,
 `docs_apply`, `sheet_read`, `slides_*`, `pdf_read`, `render`, `merge`, …). It is
-registered in omp, OpenCode, Hermes, Claude Code, Pi and dsh — see the MCP
+registered in omp, OpenCode, Claude Code, Pi and dsh — see the MCP
 Servers table in the OMP section. Pi needs the `pi-mcp-extension` package
 (`pi install npm:pi-mcp-extension`) because Pi 0.87 has no built-in MCP. Its
 entry uses `"lifecycle": "lazy"` (the schema's default), so the server only
@@ -699,7 +638,6 @@ genoffice capabilities --json          # provider plumbing; "app" is always avai
 genoffice mcp list --json              # which agents have genoffice registered
 claude mcp list | grep genoffice       # ✔ Connected
 opencode mcp list | grep -A1 genoffice # ✓ connected
-hermes mcp test genoffice              # prints the discovered tool list
 pi mcp list                            # pi 1.x; the 0.87 build has no such command
 ```
 
@@ -713,8 +651,8 @@ app" is the expected output even when `coder` is wired correctly.
 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) (`dsh`) is
 DeepSeek's open-source agent harness — "everything is a plugin", built on the
 [Cordis](https://github.com/cordiverse/cordis) plugin framework. It is the
-intended long-term replacement for `omp` and `hermes` here, so it is stowed
-alongside them rather than added as an ad-hoc install.
+intended long-term replacement for `omp` here, so it is stowed alongside it
+rather than added as an ad-hoc install.
 
 ### Config Files Managed in This Repo
 
@@ -848,9 +786,9 @@ static roles in `modelRoles`, dsh lets the orchestrator choose per delegation.
 
 ### Multi-Agent Kanban
 
-Hermes' kanban is a board *plus* a dispatcher: `auto_decompose`, a 60s
-`dispatch_interval_seconds` tick, and claim/assign across workers. dsh has no
-single first-party equivalent; it splits across two pieces:
+A kanban board with a dispatcher is `auto_decompose` plus a periodic
+claim/assign tick across workers. dsh has no single first-party equivalent; it
+splits across two pieces:
 
 | Concern | dsh |
 |---------|-----|
@@ -960,7 +898,7 @@ worth a rebuild. It does not affect dsh on the pinned release: the
 2026-10-23: a tool-calling turn against the gateway completes on both the
 `coder` and `advisor` combos. Do not switch adapters over the sentinel.
 
-The model ids mirror the combos already used by omp/hermes (`coder`,
+The model ids mirror the combos already used by omp (`coder`,
 `personal-chat`, `advisor`), and the adapter passes unlisted ids through
 unchanged, so a catalog entry is only needed for GUI selection.
 
@@ -981,8 +919,8 @@ such as 9router, `llm-deepseek` is the smaller change and needs no
 
 ### Multi-Profile
 
-dsh has native multi-profile support, and it is stronger than hermes' — the
-profile is a real unit, and its *plugins* are per-profile:
+dsh has native multi-profile support — the profile is a real unit, and its
+*plugins* are per-profile:
 
 ```bash
 dsh <name>                              # shorthand for: dsh --profile <name>
@@ -1132,8 +1070,8 @@ box`) on `/v1/systemone` only. So it can never be a combo member or a fusion
 
 | Part | Location | Synced? |
 |------|----------|---------|
-| MCP server entry (`jev-mcp`) | `opencode/.config/opencode/opencode.json`, `hermes/.hermes/config.yaml`, `claude/.claude/skills/jev-router/.claude-plugin/plugin.json` | ✅ stowed |
-| Everything else — CLI, plugins, node_modules | `~/.omp/plugins`, `~/.hermes/plugins`, `~/.local/bin/jev`, `~/.pi/agent/npm` | ❌ machine-local |
+| MCP server entry (`jev-mcp`) | `opencode/.config/opencode/opencode.json`, `claude/.claude/skills/jev-router/.claude-plugin/plugin.json` | ✅ stowed |
+| Everything else — CLI, plugins, node_modules | `~/.omp/plugins`, `~/.local/bin/jev`, `~/.pi/agent/npm` | ❌ machine-local |
 
 `jev-mcp` is deliberately **not** in `omp/.omp/agent/mcp.json`: omp carries its
 own Jev integration instead, and a second MCP entry would duplicate the same
@@ -1146,7 +1084,6 @@ to reproduce the machine-local half on a new device.
 
 | Component | Harnesses | Notes |
 |-----------|-----------|-------|
-| `hermes-jev-skills` | hermes | Routing, memory, skill selection, browser/computer use. Installs a `jev` CLI + `~/.hermes/plugins/hermes-{jev,handoff}`. |
 | `omp-jev` | omp | Jev routing; config at `~/.config/omp-jev/config.json` (pointed at 9router SystemOne, model `judge`). |
 | `omp-jev-compaction` | omp | Jev-scored context reduction. Built from source into `~/.omp/plugins-local/`, linked with `omp plugin install <path>`. |
 | `pi-warden` | pi only | Guardrails. `typesafeBackend: openrouter` in `~/.pi/agent/pi-warden/config.json`. **Not installed for omp**: omp is kept plugin-free so its only skills are the binary's own, and warden would re-add plugin skill registrations plus per-turn guard calls. |
@@ -1155,7 +1092,7 @@ to reproduce the machine-local half on a new device.
 
 Pen launches with `PATH=/usr/bin:/bin:/usr/sbin:/sbin`, so it cannot resolve
 `npx` (the same reason `spawn npm ENOENT` appears in `~/Library/Logs/Pen/main.log`).
-Jev MCP is registered in **opencode, hermes and Claude Code (via the jev-router
+Jev MCP is registered in **opencode and Claude Code (via the jev-router
 plugin) only** — not omp, which reaches Jev through `routerModel` instead. Pen
 gets Jev only if a compiled binary ships.
 

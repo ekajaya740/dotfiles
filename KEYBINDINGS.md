@@ -244,7 +244,6 @@ Omarchy 4 already ships most binds; these are the personal overrides.
 |-----|--------|
 | `SUPER + SHIFT + T` | Activity (btop) |
 | `SUPER + M` | Exit Hyprland |
-| `SUPER + SHIFT + H` | Hermes agent (`hermes --yolo`) |
 | `ALT + SPACE` | Toggle input method (fcitx5) |
 
 ---

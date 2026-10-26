@@ -21,7 +21,7 @@ usage() {
 Usage: sync-dotfiles.sh [options]
 
   --only LIST    Restow only these packages, comma-separated
-                 e.g. --only omp,hermes,pen
+                 e.g. --only omp,opencode,pen
   --harness      Shortcut for the agent harness configs
   --editor       Shortcut for nvim vim
   --shell        Shortcut for zsh tmux
@@ -37,7 +37,7 @@ EOF
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --only)
-            [[ -n "${2:-}" ]] || { echo "ERROR: --only needs a value, e.g. --only omp,hermes"; exit 1; }
+            [[ -n "${2:-}" ]] || { echo "ERROR: --only needs a value, e.g. --only omp,opencode"; exit 1; }
             IFS=', ' read -r -a _only <<< "$2"
             for _p in ${_only[@]+"${_only[@]}"}; do [[ -n "$_p" ]] && SELECTION+=("$_p"); done
             shift 2

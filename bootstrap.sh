@@ -35,7 +35,7 @@ while [[ $# -gt 0 ]]; do
         --sync-only) SYNC_ONLY=true; shift ;;
         --adopt|-f|--force) ADOPT=true; shift ;;
         --only)
-            [[ -n "${2:-}" ]] || { err "--only needs a value, e.g. --only omp,hermes"; exit 1; }
+            [[ -n "${2:-}" ]] || { err "--only needs a value, e.g. --only omp,opencode"; exit 1; }
             # Split on commas and whitespace so both --only a,b and --only "a b" work.
             IFS=', ' read -r -a _only <<< "$2"
             for _p in ${_only[@]+"${_only[@]}"}; do [[ -n "$_p" ]] && SELECTION+=("$_p"); done
@@ -52,9 +52,9 @@ while [[ $# -gt 0 ]]; do
             echo ""
             echo "Package selection (default: all packages):"
             echo "  --only LIST    Stow only these, comma-separated"
-            echo "                 e.g. --only omp,hermes,pen"
+            echo "                 e.g. --only omp,opencode,pen"
             echo "  --harness      Shortcut for the agent harness configs"
-            echo "                 (omp opencode hermes pen pi)"
+            echo "                 (omp opencode pen pi)"
             echo "  --editor       Shortcut for nvim vim"
             echo "  --shell        Shortcut for zsh tmux"
             echo "  --all          Stow every package (the default)"
@@ -385,7 +385,7 @@ setup_mise() {
     fi
 
     # codebase-memory-mcp is enabled by default in every harness's MCP config
-    # (omp, opencode, hermes, pi, Claude Code), so it must exist or each one logs
+    # (omp, opencode, pi, Claude Code), so it must exist or each one logs
     # a spawn failure on startup. It is a plain npm package, installed globally
     # through mise's node so the binary lands on PATH as `codebase-memory-mcp`.
     if ! has_cmd codebase-memory-mcp; then
@@ -412,8 +412,8 @@ setup_machine_specific() {
     # is needed. Running `omp config set extensions` here would clobber it with a
     # machine-absolute path (writes through the stow symlink into the repo file).
 
-    # Jev toolchain (omp-jev, omp-jev-compaction, hermes-jev-skills, pi-warden).
-    # These install into app-owned dirs (~/.omp/plugins, ~/.hermes/plugins, …),
+    # Jev toolchain (omp-jev, omp-jev-compaction, pi-warden).
+    # These install into app-owned dirs (~/.omp/plugins, …),
     # so they cannot be stowed — this script reproduces them per machine.
     if [[ -f "$DOTFILES_REPO/jev/install.sh" ]]; then
         info "installing Jev toolchain"
@@ -433,6 +433,19 @@ setup_machine_specific() {
     # and would rewrite the profile on every bootstrap, so it stays opt-in.
     if [[ -f "$DOTFILES_REPO/dsh/install.sh" ]]; then
         bash "$DOTFILES_REPO/dsh/install.sh" || warn "dsh wiring had errors (non-fatal)"
+    fi
+
+    # 9router: enforce the two settings that decide whether the gateway is
+    # cheap. `settingsRepo.js` defaults `rtkEnabled` to true, but the chat
+    # handler reads the STORED blob and `mergeWithDefaults` never writes
+    # defaults back, so a settings row older than RTK runs with it off and
+    # nothing says so. Same for `comboStrategy`: absent means `fallback`, and
+    # every failover then re-pays the prompt cache. Idempotent, and it skips
+    # cleanly when the gateway is not up yet (fresh machine, service not
+    # started), which is why a failure here is a warning, not an abort.
+    if [[ -f "$DOTFILES_REPO/9router/ensure-settings.py" ]] && has_cmd python3; then
+        python3 "$DOTFILES_REPO/9router/ensure-settings.py" \
+            || warn "9router settings not enforced (gateway down or write rejected)"
     fi
 
     ok "Machine-specific config applied"

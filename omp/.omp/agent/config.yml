@@ -31,13 +31,22 @@ async:
   enabled: false
 skills:
   showImages: true
+  enableAgentsUser: true
+  enableAgentsProject: false
   enableCodexUser: false
   enableClaudeUser: false
   enableClaudeProject: false
   enablePiUser: false
   enablePiProject: false
-  enableAgentsUser: false
-  enableAgentsProject: false
+  ignoredSkills:
+    - apple-apps
+    - gws-*
+    - gif-search
+    - linear
+    - spotify
+    - kanban-operations
+    - loopx*
+    - jev-*
 setupVersion: 2
 extensions:
   - ~/dotfiles/pi/.pi/agent/extensions/pi-notify-pp/index.ts

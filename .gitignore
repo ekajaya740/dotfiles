@@ -64,18 +64,6 @@ omarchy-legacy-backup/
 pen/.pencil/*
 !pen/.pencil/models.json
 
-# Hermes (hermes/.hermes is stowed to ~/.hermes) — the app writes runtime state
-# and a .env next to the tracked config. Keep those out of the repo in case the
-# dir is ever folded into a symlink.
-hermes/.hermes/.env
-hermes/.hermes/*.lock
-hermes/.hermes/*.db
-hermes/.hermes/*.db-*
-hermes/.hermes/.skills_prompt_snapshot.json
-hermes/.hermes/.hermes-update-*
-hermes/.hermes/.mcp-discovery.lock
-hermes/.hermes/.npm_lock_hash_*
-
 # dsh (DeepSeek Harness). Stowed from dsh/: the home-level cordis.patch.yml,
 # the systemd unit, and the env template. Everything else under ~/.dsh is
 # machine state or secrets: profiles/ is pnpm-managed, logs/ holds startup
