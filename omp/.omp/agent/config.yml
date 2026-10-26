@@ -1,14 +1,14 @@
 Models:
   - 9router/*
 modelRoles:
-  smol: 9router/coder
+  smol: 9router/smol
   plan: 9router/coder
   commit: 9router/coder
   slow: 9router/coder
   vision: 9router/coder
   task: 9router/coder
   advisor: 9router/advisor
-  tiny: 9router/coder
+  tiny: 9router/smol
   default: 9router/coder
 defaultThinkingLevel: auto
 steeringMode: one-at-a-time

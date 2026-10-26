@@ -1,5 +1,5 @@
 {
-  "model": "9router/cost-efficient",
+  "model": "9router/coder",
   "plugin": [
     "opencode-openai-codex-auth",
     "opencode-rate-limit-fallback",
@@ -18,6 +18,14 @@
         "apiKey": "{env:NINEROUTER_API_KEY}"
       },
       "models": {
+        "smol": {
+          "name": "Smol (combo)",
+          "limit": {
+            "context": 500000,
+            "input": 420000,
+            "output": 32000
+          }
+        },
         "designer": {
           "name": "Designer (combo)",
           "limit": {
@@ -39,14 +47,6 @@
               "text"
             ]
           },
-          "limit": {
-            "context": 500000,
-            "input": 420000,
-            "output": 32000
-          }
-        },
-        "cost-efficient": {
-          "name": "Cost Efficient (combo)",
           "limit": {
             "context": 500000,
             "input": 420000,
@@ -85,22 +85,6 @@
               "text"
             ]
           },
-          "limit": {
-            "context": 500000,
-            "input": 420000,
-            "output": 32000
-          }
-        },
-        "combo-profill-fast": {
-          "name": "Profill Fast (combo)",
-          "limit": {
-            "context": 500000,
-            "input": 420000,
-            "output": 32000
-          }
-        },
-        "combo-profill-smart": {
-          "name": "Profill Smart (combo)",
           "limit": {
             "context": 500000,
             "input": 420000,
@@ -378,5 +362,6 @@
       ],
       "enabled": true
     }
-  }
+  },
+  "small_model": "9router/smol"
 }

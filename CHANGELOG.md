@@ -8,6 +8,55 @@ section's notes — see [AGENTS.md](./AGENTS.md#releases).
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-10-26
+
+### Added
+
+- **Dedicated `smol` combo for the cheap roles.** omp's `smol` and `tiny` roles
+  were pointed at `9router/coder` — a 500k-context combo that reached
+  `ollama-cloud/minimax-m3.1-flash:cloud` first. The new `smol` combo is
+  `[ollama-cloud/gemma4:31b, ollama-cloud/deepseek-v4.1-flash:1017-cloud]`.
+  `ollama-cloud/gemma4:31b` is the only candidate measured to pass 66/66 skill
+  description compressions at 0.7 s p50 and $0.00. Both roles now point at
+  `9router/smol`. OpenRouter's `google/gemma-4-31b-it:free` was tried first and
+  dropped: the workspace guardrail had to be widened from `typesafe` to admit
+  Google AI Studio, and the free pool then answered 429 upstream on every probe
+  over ~4 minutes, adding a cooldown wait to each cold call.
+
+### Changed
+
+- **`ollama-cloud/*` models lead every combo.** `coder`, `advisor`,
+  `personal-chat`, `designer`, `sfw-coder` and `sfw-advisor` were reordered so
+  the `ollama-cloud` member comes first. `coder` previously opened on
+  `shiteru-deepseek-v4.1-flash` and fell through to
+  `ollama-cloud/minimax-m3.1-flash:cloud` ($0.274/M prompt tokens) whenever
+  Shiteru was down — which is what turned 2026-10-20→10-23 into $1,534 of
+  minimax spend. The new first member,
+  `ollama-cloud/deepseek-v4.1-flash:1017-cloud`, costs $0.0054/M prompt tokens
+  at a 98.6% cache rate.
+
+- **Every harness now points its cheap/auxiliary slots at `smol`.** The combo
+  was only wired into omp at first; the same traffic was still leaving
+  `coder`-class models in the other four harnesses. Now: OpenCode
+  (`small_model`), Claude Code (`ANTHROPIC_DEFAULT_HAIKU_MODEL`,
+  `ANTHROPIC_SMALL_FAST_MODEL`), Hermes (`auxiliary.{skills_hub,approval,mcp,title_generation}`)
+  and Pen (a `smol` entry in the model list). Hermes `auxiliary.vision` moved
+  to `ollama-cloud/gemma4:31b` directly — it is the one vision model that is
+  free and text+image capable.
+
+### Removed
+
+- **Dead combo entries in `omp/.omp/agent/models.yml`.** `cost-efficient`,
+  `combo-profill-fast` and `combo-profill-smart` were declared as models but
+  exist in no 9router `combos` row (and never appear once in `usageHistory`),
+  so selecting one returned `No active credentials for provider: openai`.
+  `cost-efficient` was OpenCode's *default* model, which meant a fresh OpenCode
+  session failed outright — it is now `coder`, with `smol` as `small_model`.
+
+- **`trade-agent-deep` and `trade-agent-fast` combos.** Both were unused and
+  fronted by the most expensive models in the catalog (`qwen-3.8-max`,
+  `glm-5.3`, `kimi-k3`).
+
 ## [1.2.0] - 2026-10-25
 
 ### Added
@@ -54,7 +103,6 @@ and versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   every read under `claude/.claude/skills/` (ELOOP) and turned `validate.sh`
   red on every sync. The same-directory case is now detected by canonicalised
   parents and is a no-op that also repairs an existing loop.
-
 ## [1.1.0] - 2026-10-23
 
 ### Added
