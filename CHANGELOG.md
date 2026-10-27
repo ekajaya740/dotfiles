@@ -8,6 +8,36 @@ section's notes — see [AGENTS.md](./AGENTS.md#releases).
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.0] - 2026-10-27
+
+### Added
+
+- **The dsh Web UI is reachable passwordless on the MagicDNS name**:
+  `https://magicdns.example.ts.net:8444`. A third listener on the existing
+  `dsh.workofekajaya.com` vhost binds `100.64.0.10:8444` with the tailscale
+  cert, forwards `$http_host` and includes a per-authority cookie snippet, so
+  opening the URL lands in the harness with no prompt and no `?token=` exchange.
+  `tailscale serve` cannot be used instead: dsh answers `401` to any request
+  without its authority-bound cookie and `403` to any `/api` request whose Host
+  is not in `trustedHosts`, and Tailscale's proxy injects neither (measured
+  through it: html `401`, api `403`). Port `:8444` rather than `:443` because
+  MagicDNS `:443` already selects the `nine-router-tailscale` vhost and nginx
+  matches the listen address+port before `server_name`. The port is also
+  load-bearing in two other places: `$http_host` (not `$host`) keeps `:8444` in
+  the proxied Host because the fence compares `new URL(Origin).host` verbatim,
+  and `dsh web --trusted-host magicdns.example.ts.net:8444` now declares the
+  same authority on the service.
+
+### Changed
+
+- **`dsh-web-cookie-refresh` mints one snippet per authority.** The cookie name
+  is `dsh-auth-<sha256(authority)>`, so a single shared snippet would break
+  whichever authority was minted last — and the second authority
+  (`magicdns.example.ts.net:8444`) would have overwritten the snippet the
+  working `dsh.workofekajaya.com` listener includes. Both files
+  (`dsh-web-cookie.conf`, `dsh-web-cookie-tailnet.conf`) are now written in one
+  run behind a single `nginx -t` and reload.
+
 ## [1.7.0] - 2026-10-26
 
 ### Changed

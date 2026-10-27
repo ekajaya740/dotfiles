@@ -6,13 +6,21 @@
 #
 # Binds 127.0.0.1 only: dsh-host-webserver accepts just 127.0.0.1 or 0.0.0.0,
 # and 0.0.0.0 carries no TLS/auth/origin policy of its own, so the loopback
-# posture is the supported one. nginx terminates TLS and proxies from the
-# tailscale IP (see /etc/nginx/sites-available/dsh.workofekajaya.com).
+# posture is the supported one. nginx terminates TLS and proxies from both the
+# public interface and the tailscale IP (see
+# /etc/nginx/sites-available/dsh.workofekajaya.com).
 #
 # --trusted-host is REQUIRED behind a proxy: the /api browser-trust fence
 # rejects any Host that is not loopback or listed, answering 403 before the
 # auth check. Without it the public hostname gets 403, not the 401 that the
 # ?token= exchange can satisfy.
+#
+# Two trusted authorities, both fronted by nginx:
+#   dsh.workofekajaya.com        LE cert; tailnet :443, Basic-auth public :443
+#   magicdns.example.ts.net   tailscale cert; tailnet :8444, no prompt
+# The MagicDNS entry carries :8444 because that vhost forwards `$http_host`
+# (port included) and the fence compares the authority verbatim; drop the port
+# here and every POST /api from a :8444 browser answers 403.
 #
 # Auth: dsh mints a fresh random token every boot and prints
 #   dsh web: http://127.0.0.1:3080/?token=...
@@ -32,7 +40,7 @@ WorkingDirectory=/home/user
 Environment="PATH=/home/user/.local/share/mise/shims:/home/user/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 Environment="DSH_HOME=/home/user/.dsh"
 EnvironmentFile=/home/user/.config/dsh/env
-ExecStart=/home/user/.local/share/mise/shims/dsh web --no-open --port 3080 --trusted-host dsh.workofekajaya.com
+ExecStart=/home/user/.local/share/mise/shims/dsh web --no-open --port 3080 --trusted-host dsh.workofekajaya.com --trusted-host magicdns.example.ts.net:8444
 Restart=always
 RestartSec=5
 KillMode=mixed

@@ -1,0 +1,22 @@
+[Unit]
+Description=Refuse public TCP/20128 (9Router cleartext admin port) with a redirect, not a hang
+Documentation=file:/etc/nginx/sites-available/9router.workofekajaya.com
+After=network-pre.target iptables.service tailscaled.service
+Before=9router.service
+Wants=network-pre.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+# A DROP made the port hang until the browser gave ERR_CONNECTION_TIMED_OUT,
+# which reads as "server is down" and invites pointless retries. REJECT with a
+# TCP reset is honest and instant: the client learns the port is closed and
+# that the service lives on 443 instead.
+# REJECT only, not DROP: nothing here listens on 20128 from the outside, so a
+# reset leaks no information beyond "closed".
+# Loopback and tailscale0 unaffected; public entry is
+# https://9router.workofekajaya.com (nginx -> 127.0.0.1:20128).
+ExecStart=/bin/sh -c 'iptables -C INPUT -i eth0 -p tcp --dport 20128 -j REJECT --reject-with tcp-reset 2>/dev/null || iptables -I INPUT 1 -i eth0 -p tcp --dport 20128 -j REJECT --reject-with tcp-reset'
+
+[Install]
+WantedBy=multi-user.target

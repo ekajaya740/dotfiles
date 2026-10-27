@@ -294,6 +294,26 @@ cd ~/dotfiles && stow <package>
 
 All AI model traffic goes through the **9router** gateway (`https://ai.workofekajaya.com/v1`, an OpenAI-compatible proxy). Models are declared in `omp/.omp/agent/models.yml` and referenced as `9router/<model-id>`.
 
+`ai.workofekajaya.com` must resolve to the **public** address
+`203.0.113.10`; it carried a `100.64.0.10` A record until 2026-10-26, which
+has no public route, so every off-tailnet consumer of that base URL hung until
+`ERR_CONNECTION_TIMED_OUT`. It and `9router.workofekajaya.com` serve the same
+upstream (`127.0.0.1:20128`); keep the two vhosts in sync. Note that the app
+binds `0.0.0.0:20128` despite the unit's `HOSTNAME=127.0.0.1`, so
+`9router-firewall.service` (iptables `REJECT` on eth0, enabled) is the only
+thing keeping that port off the internet. It is a system unit, so unlike the
+vhosts it is **not** stowed; its tracked copy lives at
+`9router/etc/systemd/system/9router-firewall.service` and must be re-installed
+by hand:
+
+```bash
+sudo cp 9router/etc/systemd/system/9router-firewall.service /etc/systemd/system/
+sudo systemctl daemon-reload && sudo systemctl enable --now 9router-firewall
+```
+
+A rebuild that drops this unit reopens `0.0.0.0:20128` to the internet, because
+the app ignores `HOSTNAME` and binds all interfaces.
+
 **Exception: `dsh` is not on 9router by default.** It ships pointing at
 DeepSeek's official API with `DEEPSEEK_API_KEY`, per the "direct key first"
 choice — see the dsh *Model Routing and Gateways* section for the 9router
@@ -890,21 +910,94 @@ port. Alternatives seen in the catalog (`dsh-pocket`, `dsh-web-remote`) expose a
 LAN or Cloudflare tunnel with token auth; prefer Tailscale where possible. A
 plain SSH port-forward to loopback is the zero-plugin option.
 
-### Web UI Access (this host: nginx on the tailnet IP)
+### Web UI Access (this host: tailnet-named, optional public literal)
 
 This machine uses neither plugin. nginx terminates TLS for
-`dsh.workofekajaya.com` on the **Tailscale IP** (`listen 100.64.0.10:443`)
-and proxies to `127.0.0.1:3080`, so tailnet membership is the authentication
-boundary and the agent's shell is never exposed publicly. The vhost lives in
-`dsh/etc/nginx/sites-available/dsh.workofekajaya.com` as a tracked copy —
-`/etc/nginx` is root-owned, so it is installed by hand, not stowed.
+`dsh.workofekajaya.com` and `magicdns.example.ts.net:8444`, and all proxy to
+`127.0.0.1:3080`. Three listeners exist, with deliberately different auth models:
+
+| Listener | Reached by | Auth |
+|----------|-----------|------|
+| `100.64.0.10:443` (tailnet) | the DNS name | none — tailnet membership is the boundary |
+| `203.0.113.10:443` (public) | IP literal only | HTTP Basic (`/etc/nginx/.htpasswd-public`, credential in `~/.dsh-web-pass`, 0600) |
+| `100.64.0.10:8444` (tailnet, MagicDNS name) | `https://magicdns.example.ts.net:8444` | none — tailnet bind, cookie injected |
+
+The DNS A record for the name is `100.64.0.10`, the tailnet address. That is
+deliberate: **every** client that has ever used this vhost is a tailnet device,
+so the name must resolve to the tailnet listener, which has no `auth_basic`.
+Pointing the name at the public address (as it was earlier on 2026-10-26) sent
+all of them through the Basic prompt — the "login page" this vhost must not
+have. Off-tailnet clients cannot route `100.x`, so nothing is exposed by this.
+
+`auth_basic` stays on the public listener because nginx injects the
+browser-session cookie unconditionally, so that block is the one an
+off-tailnet client can touch. Do **not** try to relax it with
+`satisfy any; allow 100.64.0.0/10;`. That was tried and removed: with
+`AdvertiseRoutes` null and `RouteAll` false, nothing routes the public IP into
+the tailnet, so a peer dialing `203.0.113.10` arrives on eth0 with its own
+public source address and the allow-list never matches.
+
+The MagicDNS listener is the short, passwordless URL (`https://magicdns.example.ts.net:8444`)
+and exists because `tailscale serve` **cannot** front dsh: dsh answers `401` to
+every request without its authority-bound cookie and `403` to every `/api`
+request whose Host is not in `trustedHosts`, and Tailscale's proxy injects
+neither (measured through it: html `401`, api `403`). It reuses the tailscale
+cert in `/etc/nginx/ssl/host.ts.{crt,key}`, kept current by
+`host-ts-cert-refresh.timer`. Two details are load-bearing:
+
+- the port must be `:8444`, not `:443`: MagicDNS `:443` already selects the
+  `nine-router-tailscale` vhost, and nginx matches on listen address+port first;
+- the block forwards `$http_host` (port included) and dsh is started with
+  `--trusted-host magicdns.example.ts.net:8444`, because the fence compares
+  `new URL(Origin).host` verbatim against the request Host. `$host` strips the
+  port and every `POST /api` from that origin then answers `403`.
+
+### SSH to this host
+
+`ssh personal@dsh-host` (or `@magicdns.example.ts.net`, or either IP) works
+with **password auth against sshd on port 22**. The password is in
+`~/.ssh-pass-personal` (0600, mode `personal`).
+
+**This password is root-equivalent.** `personal` is in `sudo` *and* `docker`,
+and docker-group membership alone grants root. `sshd` listens on `0.0.0.0:22`
+with password auth on, the box takes ~1300 failed root logins per hour from
+dozens of IPs, and there is no fail2ban. So the 24-character password is the
+only barrier between the open internet and root on this host. Do not commit
+that file, do not paste it into a transcript, and consider
+`PermitRootLogin prohibit-password` plus restricting `:22` to `tailscale0` —
+both were deliberately left alone here because they were outside the request.
+
+Two things matter for keeping it working:
+
+- `personal` was **locked** (`passwd -S` showed `L`) with only the box-local
+  `hermes-backup` key authorized, so no remote client could authenticate.
+- Tailscale SSH is **off** (`RunSSH: false`, stored in `tailscaled.state` by
+  `tailscale set --ssh=false`). It is not interception-capable on this host:
+  the `ts_ssh` REDIRECT chain is absent from every table while tailscaled still
+  listened on a random tailnet port, so its `SSHPolicy` was never consulted and
+  its expiring check-mode approvals were what kept breaking logins.
+
+Do **not** pin `--ssh=false` in `/etc/default/tailscaled`; it is a preference,
+not a `tailscaled` flag, and doing so makes the unit fail to start.
+
+**Known follow-up:** `sum` (`100.64.0.11`) authenticated *only* via Tailscale
+SSH — two sessions, zero `Accepted` lines in `journalctl -u ssh` — and has no
+stored password for `personal`, so it is broken until its pubkey is appended to
+`~/.ssh/authorized_keys`. It was offline (last seen 4h, ping 100% loss) and its
+netmap entry carries `sshHostKeys: []`, so the key cannot be recovered from this
+box; do it when it is next online. `iphone183` is unaffected — it never used
+either path (zero sessions in both logs).
+
+The vhost lives in `dsh/etc/nginx/sites-available/dsh.workofekajaya.com` as a
+tracked copy — `/etc/nginx` is root-owned, so it is installed by hand, not
+stowed. Re-install it after editing; a `--capture` run does not touch it.
 
 dsh still requires its own signed browser-session cookie, which would otherwise
 mean opening a fresh `?token=` URL after every restart. Two pieces remove that:
 
 | Piece | What it does |
 |-------|--------------|
-| `dsh/bin/dsh-web-cookie-refresh` | Re-mints a cookie for the public authority and writes it as `/etc/nginx/snippets/dsh-web-cookie.conf`, which the vhost `include`s as a `proxy_set_header Cookie`. |
+| `dsh/bin/dsh-web-cookie-refresh` | Re-mints one cookie per served authority and installs each as its own snippet — `/etc/nginx/snippets/dsh-web-cookie.conf` (`dsh.workofekajaya.com`) and `dsh-web-cookie-tailnet.conf` (`magicdns.example.ts.net:8444`) — which the vhosts `include` as a `proxy_set_header Cookie`. Separate files are required: the cookie *name* hashes the authority, so one shared snippet would silently break whichever authority minted last. |
 | `dsh-web-cookie.timer` | Runs the script `OnBootSec=2min` and daily, well inside the cookie's own 25-day window. |
 
 The signing secret is durable (the `client-connection/browser-session` record in
@@ -912,9 +1005,11 @@ The signing secret is durable (the `client-connection/browser-session` record in
 a re-mint is enough. The script needs root only to write the snippet and reload
 nginx (`sudo -n` for a user run), and it reads no secret from the repo.
 
-**Consequence to keep in mind:** every device on the tailnet gets full operator
-access to a shell-capable harness with no prompt. Narrow it with `allow`/`deny`
-or Tailscale ACLs if that is ever too broad.
+**Consequence to keep in mind:** on the tailnet every device still gets full
+operator access with no prompt, and the public block is protected by that single
+Basic credential. Rotate it with
+`sudo htpasswd /etc/nginx/.htpasswd-public ekajaya`, or narrow with
+`allow`/`deny` / Tailscale ACLs.
 
 ### Installing and Pinning
 
@@ -963,6 +1058,13 @@ consumer reaches it at `POST https://ai.workofekajaya.com/v1/systemone` with
 `NINEROUTER_API_KEY` — so there is no separate `OPENROUTER_API_KEY` or
 `TYPESAFE_API_KEY` to manage, and the key never has to leave the gateway.
 
+**Clients send `judge`, never `openrouter/typesafe/jev-1.14`.** The latter is a
+9router-internal alias, resolved inside the gateway; copying it into a client
+config only works if that config also points at 9router. Pointed at OpenRouter
+direct it fails with `401 User not found.` — OpenRouter's reply to a key that is
+revoked or belongs to no account, which is also what a config left over from the
+abandoned OpenRouter-direct era produces.
+
 OpenRouter direct was abandoned: the account's allowed-providers guardrail
 permits only `typesafe`, so every other OpenRouter model 404s. Routing through
 9router sidesteps that. It was briefly wired in as the **smart-router
@@ -1000,7 +1102,7 @@ to reproduce the machine-local half on a new device.
 |-----------|-----------|-------|
 | `omp-jev` | omp | Jev routing; config at `~/.config/omp-jev/config.json` (pointed at 9router SystemOne, model `judge`). |
 | `omp-jev-compaction` | omp | Jev-scored context reduction. Built from source into `~/.omp/plugins-local/`, linked with `omp plugin install <path>`. |
-| `pi-warden` | pi only | Guardrails. `typesafeBackend: openrouter` in `~/.pi/agent/pi-warden/config.json`. **Not installed for omp**: omp is kept plugin-free so its only skills are the binary's own, and warden would re-add plugin skill registrations plus per-turn guard calls. |
+| `pi-warden` | pi only | Guardrails. `typesafeBackend` in `~/.pi/agent/pi-warden/config.json` is a backend **endpoint object** — `host: https://ai.workofekajaya.com`, `path: /v1/systemone`, `keyEnv: NINEROUTER_API_KEY`, `defaultModel: judge` — not the name `openrouter`, which would send judgments to `openrouter.ai` direct. **Not installed for omp**: omp is kept plugin-free so its only skills are the binary's own, and warden would re-add plugin skill registrations plus per-turn guard calls. |
 
 ### Pen Cannot Run jev-mcp
 
@@ -1012,8 +1114,9 @@ gets Jev only if a compiled binary ships.
 
 ### Consent and Defaults
 
-- `pi-warden`: judgments are **off** until `/warden enable` (it shows a
-  disclosure naming `openrouter.ai`). Offline guards work without any key.
+- `pi-warden`: judgments are **off** until `/warden enable` (its disclosure
+  names the configured backend's host, i.e. `ai.workofekajaya.com`, not
+  `openrouter.ai`). Offline guards work without any key.
 - `omp-jev`: dispatcher ships `enabled: true`.
 - `omp-jev-compaction`: continuous context reduction is **on** by default
   (`context: true`) and sends conversation state to the decision endpoint.

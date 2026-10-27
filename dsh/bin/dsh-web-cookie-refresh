@@ -7,27 +7,40 @@
 # but the cookie's own issue/expiry window is absolute, so a cookie eventually
 # ages out even though the secret never changes.
 #
-# This re-mints a cookie for the public authority and installs it as an nginx
-# snippet that nginx sends as the request `Cookie` header. Combined with the
-# HTTP Basic password on the site, the UI then needs no per-boot `?token=` URL
-# printed by `dsh web` — opening the plain hostname and typing the password is
-# enough, and that survives every dsh restart.
+# This re-mints one cookie per served authority and installs each as an nginx
+# snippet that the matching server block sends as the request `Cookie` header,
+# so the UI needs no per-boot `?token=` URL and that survives every restart.
+#
+# One snippet PER AUTHORITY, never one shared file: the cookie name is
+# `dsh-auth-<base64url sha256(authority)>`, so a cookie signed for
+# `dsh.workofekajaya.com` is ignored on `magicdns.example.ts.net:8444`.
+# Sharing a snippet would silently break whichever authority minted last.
 #
 # Run by dsh-web-cookie.timer; safe to run by hand at any time.
 set -euo pipefail
 
-AUTHORITY="${DSH_WEB_AUTHORITY:-dsh.workofekajaya.com}"
 DAYS="${DSH_WEB_COOKIE_DAYS:-25}"
 CREDS="${DSH_HOME:-/home/user/.dsh}/.credentials.yaml"
-SNIPPET="/etc/nginx/snippets/dsh-web-cookie.conf"
+SNIPPET_DIR="${DSH_WEB_COOKIE_DIR:-/etc/nginx/snippets}"
+
+# authority [snippet basename] — the authority must be exactly what dsh reads
+# back from the Host header (`new URL("http://" + host).host`), port included
+# when nginx passes the port through.
+AUTHORITIES=(
+  "dsh.workofekajaya.com dsh-web-cookie.conf"
+  "magicdns.example.ts.net:8444 dsh-web-cookie-tailnet.conf"
+)
 
 # Root (the timer) installs directly; a normal user goes through sudo.
 if [ "$(id -u)" -eq 0 ]; then SUDO=""; else SUDO="sudo -n"; fi
 
-tmp="$(mktemp)"
-trap 'rm -f "$tmp"' EXIT
+tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' EXIT
 
-python3 - "$AUTHORITY" "$DAYS" "$CREDS" >"$tmp" <<'PY'
+for entry in "${AUTHORITIES[@]}"; do
+  read -r authority snippet <<<"$entry"
+
+  python3 - "$authority" "$DAYS" "$CREDS" >"$tmp/$snippet" <<'PY'
 import base64, hashlib, hmac, json, sys, time
 
 authority, days, creds = sys.argv[1], int(sys.argv[2]), sys.argv[3]
@@ -67,6 +80,9 @@ name = "dsh-auth-" + b64e(hashlib.sha256(authority.encode()).digest())
 print('proxy_set_header Cookie "%s=v1.%s.%s";' % (name, body, sig))
 PY
 
-$SUDO install -o root -g root -m 600 "$tmp" "$SNIPPET"
+  $SUDO install -o root -g root -m 600 "$tmp/$snippet" "$SNIPPET_DIR/$snippet"
+done
+
+# One validation and one reload for every snippet written above.
 $SUDO nginx -t
 $SUDO nginx -s reload
