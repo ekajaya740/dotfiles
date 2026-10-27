@@ -8,9 +8,11 @@
 #
 # Stowed from dotfiles/dsh/ to ~/.config/systemd/user/dsh-web-cookie.service.
 [Unit]
-Description=Refresh the dsh Web UI nginx cookie snippet
+Description=Refresh the dsh Web UI nginx cookie snippets
 After=network-online.target
 
 [Service]
 Type=oneshot
-ExecStart=/home/user/.local/bin/dsh-web-cookie-refresh
+# ~/bin/dsh-web-cookie-refresh is the stow link into dotfiles/dsh/bin, so the
+# repo stays the single source of truth; a copy under ~/.local/bin would drift.
+ExecStart=/home/user/bin/dsh-web-cookie-refresh
