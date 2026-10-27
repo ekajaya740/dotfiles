@@ -20,7 +20,7 @@
 set -euo pipefail
 
 DAYS="${DSH_WEB_COOKIE_DAYS:-25}"
-CREDS="${DSH_HOME:-/home/personal/.dsh}/.credentials.yaml"
+CREDS="${DSH_HOME:-$HOME/.dsh}/.credentials.yaml"
 SNIPPET_DIR="${DSH_WEB_COOKIE_DIR:-/etc/nginx/snippets}"
 
 # authority [snippet basename] — the authority must be exactly what dsh reads

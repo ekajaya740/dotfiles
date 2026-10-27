@@ -537,8 +537,9 @@ Stowed (symlinked, `--no-folding`):
 - `dsh/.config/systemd/user/dsh-web-cookie.{service,timer}` → `~/.config/systemd/user/`
   (daily re-mint of the nginx cookie snippet; see *Web UI Access* below)
 - `dsh/bin/dsh-web-cookie-refresh` → `~/bin/` (the script those units run)
-- `dsh/etc/nginx/sites-available/dsh.workofekajaya.com` → `~/etc/nginx/...`
-  (tracked copy; `/etc/nginx` is root-owned, so installing it is a manual `cp`)
+- `dsh/etc/nginx/sites-available/dsh.workofekajaya.com` → root-owned install
+  copy, **not stowed** (`^/etc(/|$)` in `dsh/.stow-local-ignore`); installing it
+  is a manual `sudo cp`, see *Web UI Access* below.
 
 Seeded, not stowed (copied by `dsh/install.sh --profiles`):
 
@@ -565,8 +566,9 @@ deep-merge keys.** A partial patch silently drops every key it does not restate.
 ### Profile Config Is Seeded, Never Symlinked
 
 The profile's own `cordis.patch.yml` and manifest *are* versioned — they carry
-the MCP rows (Hevy, arXiv), the auto-archive schedule and the 9router route, and
-losing them means rebuilding by hand. But three constraints shape how they land:
+the MCP rows (Hevy, arXiv), the `hmr`/`locale` rows, `patchReload: live` and the
+9router route, and losing them means rebuilding by hand. But three constraints
+shape how they land:
 
 1. **`dsh` claims a profile directory exclusively** — the launcher rejects a
    target whose directory already exists. So the seeds cannot be stowed; a
@@ -587,6 +589,26 @@ never overwrites a file that already exists with different content — it report
 the drift instead, because the live copy may hold a settings change made in the
 UI. `./install.sh --capture` copies live edits back into the repo, which is the
 step to run after changing settings in the dashboard.
+
+**`--capture` is not the fix for a stripped profile.** The seeded copies are the
+record of intent; a live profile can be older and emptier (a fresh `dsh web`
+boot writes its own stub `cordis.patch.yml`, and an untouched profile has
+`dependencies: {}`). Capturing that state deletes the rows above from the repo.
+Check `git diff` and the file mtimes first; when the repo is the newer side,
+re-seed instead:
+
+```bash
+cp -a ~/.dsh/profiles/web ~/.dsh/.backup-profiles-$(date +%Y%m%d)/
+./dsh/install.sh --profiles          # or: cp the seed over the live file
+```
+
+**Host-specific values stay out of the seeds.** Three plugins are `link:` deps
+to absolute paths on one box (`dsh-auto-archive`, `dsh-hevy-training`,
+`dsh-image-preview`) and the arXiv MCP row names an absolute
+`/home/personal/.local/bin/arxiv-mcp-server`. They are machine-local: install
+them with `dsh plugin --profile web add <spec>` on the host that has them rather
+than seeding a path no other machine can resolve — a `link:` to a missing
+directory makes `pnpm install` fail outright.
 
 ### Not Synced (machine-local state and secrets)
 
@@ -1004,6 +1026,58 @@ The signing secret is durable (the `client-connection/browser-session` record in
 `~/.dsh/.credentials.yaml`); only the issue/expiry window ages out, which is why
 a re-mint is enough. The script needs root only to write the snippet and reload
 nginx (`sudo -n` for a user run), and it reads no secret from the repo.
+
+#### Installing the vhost (order matters)
+
+The vhosts `include` `/etc/nginx/snippets/dsh-web-cookie{,-tailnet}.conf`, so
+`nginx -t` fails with `open() .../dsh-web-cookie.conf failed (2: No such file or
+directory)` until the refresh script has written them. Run the script **before**
+validating the new vhost:
+
+```bash
+cd ~/dotfiles && ./sync-dotfiles.sh --sync-only
+
+# 1. sudoers first: the script's next run needs `sudo -n` to succeed.
+#    Write the rule ON THE HOST with visudo — it is deliberately NOT tracked
+#    in this repo (see the note under "Verify" below), so there is nothing to
+#    copy out of the tree here.
+sudo visudo -f /etc/sudoers.d/dsh-web-cookie
+
+# 2. mint the snippets (also does its own nginx -t + reload).
+sudo mkdir -p /etc/nginx/snippets
+~/bin/dsh-web-cookie-refresh
+
+# 3. install the vhost, now that the includes resolve.
+sudo cp dsh/etc/nginx/sites-available/dsh.workofekajaya.com /etc/nginx/sites-available/
+sudo ln -sf /etc/nginx/sites-available/dsh.workofekajaya.com /etc/nginx/sites-enabled/
+sudo nginx -t && sudo systemctl reload nginx
+
+# 4. the units, and the cookie timer that keeps the snippets fresh.
+systemctl --user daemon-reload
+systemctl --user enable --now dsh-web-cookie.timer
+systemctl --user restart dsh-web
+```
+
+`dsh-web-cookie.service` runs `~/bin/dsh-web-cookie-refresh` — the stow link into
+this repo — so there is no copy to place under `/usr/local/bin`. A copy there
+would drift from the tracked script.
+
+**Verify the sudoers rule took**, because a missing one fails silently inside the
+user timer (`sudo -n` errors instead of prompting, `set -e` exits, systemd
+records a failed unit, and the URL falls back to `?token=` when the 25-day cookie
+expires):
+
+```bash
+sudo -n nginx -t && echo "passwordless nginx OK"
+sudo -n /usr/bin/install --version >/dev/null && echo "passwordless install OK"
+systemctl --user list-timers dsh-web-cookie.timer
+```
+
+The rule grants only `/usr/bin/install`, `/usr/sbin/nginx -t` and
+`/usr/sbin/nginx -s reload`. `personal` is already in `sudo` and `docker` (docker
+group membership alone is root-equivalent), so the alias widens nothing; confirm
+the binary paths match the host (`command -v install nginx`) before relying on
+it — Debian and Arch put them where the alias expects, others may differ.
 
 **Consequence to keep in mind:** on the tailnet every device still gets full
 operator access with no prompt, and the public block is protected by that single

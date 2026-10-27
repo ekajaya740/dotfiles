@@ -16,3 +16,7 @@ plugins.txt
 # "\.dsh/profiles/" matches nothing. Verify with:
 #   stow -t "$(mktemp -d)" --simulate -v dsh 2>&1 >/dev/null | grep profiles
 ^/\.dsh/profiles(/|$)
+
+# etc/ holds a root-owned install copy (the nginx vhost). It must not appear as
+# ~/etc/...; it is installed by hand with `sudo cp`.
+^/etc(/|$)
