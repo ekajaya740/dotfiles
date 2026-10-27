@@ -88,12 +88,14 @@
 # and semantic_search/reindex (the last two need the [pro] extra, so they
 # will report a missing-dependency error as installed here).
 #
-# Absolute path, not `uvx`: the daemon's PATH is not guaranteed to carry
-# ~/.local/bin, and uvx would re-resolve the package on every start.
-# No credentials are needed. Two optional env vars are deliberately NOT
-# set: SEMANTIC_SCHOLAR_API_KEY (unauthenticated citation_graph works until
-# its quota runs out) and the ARXIV_* timeout knobs (defaults: 30s read /
-# 10s connect / 50s per-call budget).
+# Resolved from PATH, not an absolute path and not `uvx`: a hardcoded
+# /home/user/... is meaningless on any other host, and `uvx` would
+# re-resolve the package on every start. dsh-web.service therefore puts
+# ~/.local/bin on PATH explicitly; a host that installs this server elsewhere
+# must do the same. No credentials are needed. Two optional env vars are
+# deliberately NOT set: SEMANTIC_SCHOLAR_API_KEY (unauthenticated
+# citation_graph works until its quota runs out) and the ARXIV_* timeout knobs
+# (defaults: 30s read / 10s connect / 50s per-call budget).
 # Storage defaults to ~/.arxiv-mcp-server/papers (markdown + LaTeX cache,
 # topic watches, semantic index); pass `--storage-path` in args to move it.
 # download_paper converts full PDFs, so the call timeout is above the 60s
@@ -104,31 +106,9 @@
       config:
         serverName: arxiv
         transport: stdio
-        command: /home/user/.local/bin/arxiv-mcp-server
+        command: arxiv-mcp-server
         args: [ ]
         toolCallTimeoutMs: 120000
-
-# ── Auto-archive: scheduled cleanup of idle sessions ──────────────────
-# Local plugin at /home/user/dsh-auto-archive (linked dependency). Neither
-# DSH core nor @michengai/dsh-archive-manager schedules archiving — the manager
-# documents "There is no scheduled or automatic background cleanup", and the
-# sandbox has no usable cron/systemd. This row supplies the clock: it archives
-# sessions whose last activity is older than `idleDays`, skipping archived,
-# pinned, favourite, unknown-activity and ACTIVE sessions (archiveSession is
-# called without stopActivity, so DSH refuses a running turn instead of
-# killing it). `cron` is written against `timeZone` (the host runs on Etc/UTC,
-# so naming the zone keeps "04:00" meaning 04:00 local); runs are appended to
-# $DSH_HOME/auto-archive.log.
-- insert:
-    - id: dsh-auto-archive
-      name: dsh-auto-archive
-      config:
-        cron: "0 4 * * *"
-        timeZone: Asia/Makassar
-        idleDays: 30
-        dryRun: false
-- id: dsh-hevy-training
-  disabled: false
 
 # ── 9router routing (machine-local, dsh-host) ───────────────────────
 # TWO ROWS ARE REQUIRED. The llm-deepseek row registers the provider

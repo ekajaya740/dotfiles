@@ -9,12 +9,9 @@
     "@perrylink/dsh-plugin-doctor": "^0.7.4",
     "@thewaifu/dsh-market": "1.1.2",
     "billion-context": "^0.1.202",
-    "dsh-auto-archive": "link:/home/user/dsh-auto-archive",
     "dsh-better-sidebar": "^0.26.1",
     "dsh-continual-evolve": "^0.19.0",
     "dsh-free-search": "^0.9.5",
-    "dsh-hevy-training": "link:/home/user/Documents/01-Projects/WORKOUT/dsh-hevy-training",
-    "dsh-image-preview": "link:/home/user/dsh-image-preview",
     "dsh-mcp-panel": "^0.6.27",
     "dsh-rewind-plugin": "0.15.3",
     "dsh-taskboard": "^0.9.1",
@@ -41,9 +38,7 @@
         "dsh-mcp-panel",
         "@deepseek-ai/dsh-experimental-agent-team-profile",
         "@deepseek-ai/dsh-experimental-auto-review",
-        "@deepseek-ai/dsh-experimental-schedule-bundle",
-        "dsh-image-preview",
-        "dsh-hevy-training"
+        "@deepseek-ai/dsh-experimental-schedule-bundle"
       ],
       "patchReload": "live"
     }

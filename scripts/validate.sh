@@ -130,6 +130,19 @@ print(",".join(sorted(required - off)))
             fail "dsh patch is missing enabled:false for: ${missing:-unparseable}"
         fi
     fi
+
+    # The dsh profile seeds are shared across machines, so an absolute path in
+    # one is a landmine: a `link:`/`command:` under /home/user resolves on
+    # exactly one box and makes `pnpm install` fail everywhere else. It has
+    # already happened once, so gate it rather than trust review.
+    host_paths="$(grep -rn '/home/user' dsh/.dsh/profiles/ 2>/dev/null \
+        | grep -v '^[^:]*:[0-9]*:#' || true)"
+    if [ -z "$host_paths" ]; then
+        pass "dsh profile seeds carry no host-specific paths"
+    else
+        fail "host-specific path in a dsh profile seed (must be installed per host, not seeded):"
+        printf '%s\n' "$host_paths" | sed 's/^/      /'
+    fi
 else
     fail "pyyaml not installed"
 fi

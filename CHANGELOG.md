@@ -8,6 +8,29 @@ section's notes — see [AGENTS.md](./AGENTS.md#releases).
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.1] - 2026-10-27
+
+### Fixed
+
+- **The dsh profile seeds no longer carry one host's absolute paths.**
+  `web/package.json` pinned three `link:` dependencies under `/home/user`
+  (`dsh-auto-archive`, `dsh-hevy-training`, `dsh-image-preview`) and the arXiv
+  MCP row named `/home/user/.local/bin/arxiv-mcp-server`. A `link:` to a
+  missing directory makes `pnpm install` fail outright, so seeding those files
+  on any other machine broke the profile — and the repo is shared. They are now
+  installed per host with `dsh plugin --profile web add <spec>` instead, the
+  arXiv command resolves from `PATH` (the unit already puts `~/.local/bin` on
+  it), and `scripts/validate.sh` fails on any `/home/user` path in a seed.
+- **The vhost install order and its sudoers rule are documented.**
+  `dsh.workofekajaya.com` `include`s the per-authority cookie snippets, so
+  `nginx -t` fails until `~/bin/dsh-web-cookie-refresh` has written them — the
+  documented handoff validated the vhost first. `dsh-web-cookie.service` is a
+  user unit that shells out to `sudo -n install` / `nginx -t` / `nginx -s
+  reload`, and nothing granted it those commands: a missing rule makes the timer
+  exit on the first call (`set -e`), so the URL silently fell back to `?token=`
+  once the 25-day cookie aged out. The rule itself is written per host with
+  `sudo visudo -f /etc/sudoers.d/dsh-web-cookie` — it is not tracked here.
+
 ## [1.8.0] - 2026-10-27
 
 ### Added
