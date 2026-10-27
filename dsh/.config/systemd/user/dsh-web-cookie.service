@@ -2,9 +2,9 @@
 #
 # The dsh Web UI authenticates with an authority-bound signed cookie whose
 # signing secret is durable but whose issue/expiry window is absolute. This
-# regenerates the cookie into /etc/nginx/snippets/dsh-web-cookie.conf (via the
-# script's own passwordless sudo), so the plain hostname + Basic password keeps
-# working across dsh restarts without any printed ?token= URL.
+# regenerates one snippet per served authority (dsh.workofekajaya.com, and
+# roxasium.taila9af6a.ts.net:8444) via the script's own passwordless sudo, so
+# both plain URLs keep working across dsh restarts without any ?token= URL.
 #
 # Stowed from dotfiles/dsh/ to ~/.config/systemd/user/dsh-web-cookie.service.
 [Unit]
