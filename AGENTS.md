@@ -295,7 +295,7 @@ cd ~/dotfiles && stow <package>
 All AI model traffic goes through the **9router** gateway (`https://ai.workofekajaya.com/v1`, an OpenAI-compatible proxy). Models are declared in `omp/.omp/agent/models.yml` and referenced as `9router/<model-id>`.
 
 `ai.workofekajaya.com` must resolve to the **public** address
-`203.0.113.10`; it carried a `100.64.0.10` A record until 2026-10-26, which
+the host's public address; it carried a `<tailnet-v4>` A record until 2026-10-26, which
 has no public route, so every off-tailnet consumer of that base URL hung until
 `ERR_CONNECTION_TIMED_OUT`. It and `9router.workofekajaya.com` serve the same
 upstream (`127.0.0.1:20128`); keep the two vhosts in sync. Note that the app
@@ -604,11 +604,11 @@ cp -a ~/.dsh/profiles/web ~/.dsh/.backup-profiles-$(date +%Y%m%d)/
 
 **Host-specific values stay out of the seeds.** Three plugins are `link:` deps
 to absolute paths on one box (`dsh-auto-archive`, `dsh-hevy-training`,
-`dsh-image-preview`) and the arXiv MCP row names an absolute
-`/home/user/.local/bin/arxiv-mcp-server`. They are machine-local: install
-them with `dsh plugin --profile web add <spec>` on the host that has them rather
-than seeding a path no other machine can resolve — a `link:` to a missing
-directory makes `pnpm install` fail outright.
+`dsh-image-preview`) and the arXiv MCP row names an absolute path under the
+host's `~/.local/bin`. They are machine-local: install them with `dsh plugin
+--profile web add <spec>` on the host that has them rather than seeding a path
+no other machine can resolve — a `link:` to a missing directory makes `pnpm
+install` fail outright.
 
 ### Not Synced (machine-local state and secrets)
 
@@ -932,55 +932,78 @@ port. Alternatives seen in the catalog (`dsh-pocket`, `dsh-web-remote`) expose a
 LAN or Cloudflare tunnel with token auth; prefer Tailscale where possible. A
 plain SSH port-forward to loopback is the zero-plugin option.
 
-### Web UI Access (this host: tailnet-named, optional public literal)
+### Web UI Access
 
-This machine uses neither plugin. nginx terminates TLS for
-`dsh.workofekajaya.com` and `magicdns.example.ts.net:8444`, and all proxy to
-`127.0.0.1:3080`. Three listeners exist, with deliberately different auth models:
+This machine uses neither plugin. nginx terminates TLS and proxies to
+`127.0.0.1:3080`. The tracked vhost carries only what is the same on every
+host — the public listener and its redirect — and everything host-specific
+(a tailnet address, a MagicDNS name, a second port) lives in a machine-local
+snippet the vhost globs in:
+
+```nginx
+include /etc/nginx/snippets/dsh-tailnet-*.conf;
+```
+
+`dsh/etc/nginx/snippets/dsh-tailnet.conf.example` is the tracked template for
+that file. The glob matches nothing on a host with no extra listener, so a plain
+machine needs no edit. **Never** put an address or a machine name in the tracked
+vhost: it resolves on exactly one box, and this repo is public.
 
 | Listener | Reached by | Auth |
 |----------|-----------|------|
-| `100.64.0.10:443` (tailnet) | the DNS name | none — tailnet membership is the boundary |
-| `203.0.113.10:443` (public) | IP literal only | HTTP Basic (`/etc/nginx/.htpasswd-public`, credential in `~/.dsh-web-pass`, 0600) |
-| `100.64.0.10:8444` (tailnet, MagicDNS name) | `https://magicdns.example.ts.net:8444` | none — tailnet bind, cookie injected |
+| public `:443` (tracked) | the DNS name, or the IP literal | HTTP Basic (`/etc/nginx/.htpasswd-public`, credential in `~/.dsh-web-pass`, 0600) |
+| tailnet `:443` (local snippet) | the DNS name | none — tailnet membership is the boundary |
+| tailnet `:8444` (local snippet) | `https://<magicdns-name>:8444` | none — tailnet bind, cookie injected |
 
-The DNS A record for the name is `100.64.0.10`, the tailnet address. That is
-deliberate: **every** client that has ever used this vhost is a tailnet device,
-so the name must resolve to the tailnet listener, which has no `auth_basic`.
-Pointing the name at the public address (as it was earlier on 2026-10-26) sent
-all of them through the Basic prompt — the "login page" this vhost must not
-have. Off-tailnet clients cannot route `100.x`, so nothing is exposed by this.
+On a host that points the name's A record at its tailnet address, **every**
+client that has ever used this vhost is a tailnet device, so the name must
+resolve to the tailnet listener, which has no `auth_basic`. Pointing the name at
+the public address instead (as it was once) sent all of them through the Basic
+prompt — the "login page" this vhost must not have. Off-tailnet clients cannot
+route `100.x`, so nothing is exposed by that arrangement.
 
 `auth_basic` stays on the public listener because nginx injects the
 browser-session cookie unconditionally, so that block is the one an
 off-tailnet client can touch. Do **not** try to relax it with
 `satisfy any; allow 100.64.0.0/10;`. That was tried and removed: with
 `AdvertiseRoutes` null and `RouteAll` false, nothing routes the public IP into
-the tailnet, so a peer dialing `203.0.113.10` arrives on eth0 with its own
+the tailnet, so a peer dialing the public address arrives on eth0 with its own
 public source address and the allow-list never matches.
 
-The MagicDNS listener is the short, passwordless URL (`https://magicdns.example.ts.net:8444`)
-and exists because `tailscale serve` **cannot** front dsh: dsh answers `401` to
-every request without its authority-bound cookie and `403` to every `/api`
-request whose Host is not in `trustedHosts`, and Tailscale's proxy injects
-neither (measured through it: html `401`, api `403`). It reuses the tailscale
-cert in `/etc/nginx/ssl/host.ts.{crt,key}`, kept current by
-`host-ts-cert-refresh.timer`. Two details are load-bearing:
+The MagicDNS listener is the short, passwordless URL and exists because
+`tailscale serve` **cannot** front dsh: dsh answers `401` to every request
+without its authority-bound cookie and `403` to every `/api` request whose Host
+is not in `trustedHosts`, and Tailscale's proxy injects neither (measured
+through it: html `401`, api `403`). It reuses the tailscale cert in
+`/etc/nginx/ssl/<host>.ts.{crt,key}`, kept current by a local cert-refresh
+timer. Two details are load-bearing:
 
 - the port must be `:8444`, not `:443`: MagicDNS `:443` already selects the
   `nine-router-tailscale` vhost, and nginx matches on listen address+port first;
 - the block forwards `$http_host` (port included) and dsh is started with
-  `--trusted-host magicdns.example.ts.net:8444`, because the fence compares
+  `--trusted-host <magicdns-name>:8444`, because the fence compares
   `new URL(Origin).host` verbatim against the request Host. `$host` strips the
   port and every `POST /api` from that origin then answers `403`.
 
+The authority list is machine-local in both directions, so the listener dsh
+trusts and the cookie the refresh script mints cannot drift apart:
+
+| File | Supplies |
+|------|----------|
+| `~/.config/dsh/web.env` | `DSH_WEB_EXTRA_ARGS` (extra `--trusted-host` pairs) and `DSH_WEB_AUTHORITIES` (extra cookie snippets) |
+| `dsh/.config/dsh/web.env.example` | the tracked template; the real file is gitignored |
+
+Both units load that file with `EnvironmentFile=-`, so it is optional: with no
+file the public hostname is still trusted and still gets its snippet, and only
+the extra listener 403s.
+
 ### SSH to this host
 
-`ssh personal@dsh-host` (or `@magicdns.example.ts.net`, or either IP) works
+`ssh <user>@<magicdns-name>` (or `@<short-hostname>`, or either IP) works
 with **password auth against sshd on port 22**. The password is in
-`~/.ssh-pass-personal` (0600, mode `personal`).
+`~/.ssh-pass-<user>` (0600).
 
-**This password is root-equivalent.** `personal` is in `sudo` *and* `docker`,
+**This password is root-equivalent.** That user is in `sudo` *and* `docker`,
 and docker-group membership alone grants root. `sshd` listens on `0.0.0.0:22`
 with password auth on, the box takes ~1300 failed root logins per hour from
 dozens of IPs, and there is no fail2ban. So the 24-character password is the
@@ -991,7 +1014,7 @@ both were deliberately left alone here because they were outside the request.
 
 Two things matter for keeping it working:
 
-- `personal` was **locked** (`passwd -S` showed `L`) with only the box-local
+- that user was **locked** (`passwd -S` showed `L`) with only the box-local
   `hermes-backup` key authorized, so no remote client could authenticate.
 - Tailscale SSH is **off** (`RunSSH: false`, stored in `tailscaled.state` by
   `tailscale set --ssh=false`). It is not interception-capable on this host:
@@ -1002,9 +1025,9 @@ Two things matter for keeping it working:
 Do **not** pin `--ssh=false` in `/etc/default/tailscaled`; it is a preference,
 not a `tailscaled` flag, and doing so makes the unit fail to start.
 
-**Known follow-up:** `sum` (`100.64.0.11`) authenticated *only* via Tailscale
+**Known follow-up:** `sum` (a tailnet peer) authenticated *only* via Tailscale
 SSH — two sessions, zero `Accepted` lines in `journalctl -u ssh` — and has no
-stored password for `personal`, so it is broken until its pubkey is appended to
+stored password for that user, so it is broken until its pubkey is appended to
 `~/.ssh/authorized_keys`. It was offline (last seen 4h, ping 100% loss) and its
 netmap entry carries `sshHostKeys: []`, so the key cannot be recovered from this
 box; do it when it is next online. `iphone183` is unaffected — it never used
@@ -1019,7 +1042,7 @@ mean opening a fresh `?token=` URL after every restart. Two pieces remove that:
 
 | Piece | What it does |
 |-------|--------------|
-| `dsh/bin/dsh-web-cookie-refresh` | Re-mints one cookie per served authority and installs each as its own snippet — `/etc/nginx/snippets/dsh-web-cookie.conf` (`dsh.workofekajaya.com`) and `dsh-web-cookie-tailnet.conf` (`magicdns.example.ts.net:8444`) — which the vhosts `include` as a `proxy_set_header Cookie`. Separate files are required: the cookie *name* hashes the authority, so one shared snippet would silently break whichever authority minted last. |
+| `dsh/bin/dsh-web-cookie-refresh` | Re-mints one cookie per served authority and installs each as its own snippet — `/etc/nginx/snippets/dsh-web-cookie.conf` for the public hostname, plus one per entry in `DSH_WEB_AUTHORITIES` — which the vhosts `include` as a `proxy_set_header Cookie`. Separate files are required: the cookie *name* hashes the authority, so one shared snippet would silently break whichever authority minted last. |
 | `dsh-web-cookie.timer` | Runs the script `OnBootSec=2min` and daily, well inside the cookie's own 25-day window. |
 
 The signing secret is durable (the `client-connection/browser-session` record in
@@ -1047,7 +1070,10 @@ sudo visudo -f /etc/sudoers.d/dsh-web-cookie
 sudo mkdir -p /etc/nginx/snippets
 ~/bin/dsh-web-cookie-refresh
 
-# 3. install the vhost, now that the includes resolve.
+# 3. install the vhost, now that the includes resolve. On a host with a tailnet
+#    listener, write the machine-local snippet FIRST from the tracked template
+#    (dsh/etc/nginx/snippets/dsh-tailnet.conf.example) and fill in its
+#    placeholders. The vhost globs /etc/nginx/snippets/dsh-tailnet-*.conf.
 sudo cp dsh/etc/nginx/sites-available/dsh.workofekajaya.com /etc/nginx/sites-available/
 sudo ln -sf /etc/nginx/sites-available/dsh.workofekajaya.com /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
@@ -1057,6 +1083,15 @@ systemctl --user daemon-reload
 systemctl --user enable --now dsh-web-cookie.timer
 systemctl --user restart dsh-web
 ```
+
+**Order matters on a tailnet-named host, and the failure is an outage.** The
+tracked vhost has no tailnet `listen`; that block lives only in
+`/etc/nginx/snippets/dsh-tailnet-*.conf`. On this host the name's A record points
+at the tailnet address, so copying the vhost without first writing that snippet
+leaves nothing answering `https://dsh.workofekajaya.com` — `nginx -t` still
+passes, because a glob that matches nothing is legal. Write the snippet from the
+template, then install the vhost. The same applies to the 9router vhost and
+`ai-tailnet-*.conf`.
 
 `dsh-web-cookie.service` runs `~/bin/dsh-web-cookie-refresh` — the stow link into
 this repo — so there is no copy to place under `/usr/local/bin`. A copy there
@@ -1074,7 +1109,7 @@ systemctl --user list-timers dsh-web-cookie.timer
 ```
 
 The rule grants only `/usr/bin/install`, `/usr/sbin/nginx -t` and
-`/usr/sbin/nginx -s reload`. `personal` is already in `sudo` and `docker` (docker
+`/usr/sbin/nginx -s reload`. That user is already in `sudo` and `docker` (docker
 group membership alone is root-equivalent), so the alias widens nothing; confirm
 the binary paths match the host (`command -v install nginx`) before relying on
 it — Debian and Arch put them where the alias expects, others may differ.
@@ -1082,7 +1117,7 @@ it — Debian and Arch put them where the alias expects, others may differ.
 **Consequence to keep in mind:** on the tailnet every device still gets full
 operator access with no prompt, and the public block is protected by that single
 Basic credential. Rotate it with
-`sudo htpasswd /etc/nginx/.htpasswd-public ekajaya`, or narrow with
+`sudo htpasswd /etc/nginx/.htpasswd-public <user>`, or narrow with
 `allow`/`deny` / Tailscale ACLs.
 
 ### Installing and Pinning

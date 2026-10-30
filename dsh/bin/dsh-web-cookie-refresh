@@ -12,9 +12,20 @@
 # so the UI needs no per-boot `?token=` URL and that survives every restart.
 #
 # One snippet PER AUTHORITY, never one shared file: the cookie name is
-# `dsh-auth-<base64url sha256(authority)>`, so a cookie signed for
-# `dsh.workofekajaya.com` is ignored on `magicdns.example.ts.net:8444`.
-# Sharing a snippet would silently break whichever authority minted last.
+# `dsh-auth-<base64url sha256(authority)>`, so a cookie signed for the public
+# hostname is ignored on any second authority. Sharing a snippet would silently
+# break whichever authority minted last.
+#
+# Authorities beyond the public hostname are per machine, so they come from the
+# environment:
+#
+#   DSH_WEB_AUTHORITIES="<authority> <snippet> <authority> <snippet>"
+#
+# Space-separated `<authority> <snippet-basename>` pairs, set in
+# ~/.config/dsh/web.env (template: dsh/.config/dsh/web.env.example), which the
+# timer's unit loads. The public authority below is always minted, so a host
+# with no web.env still gets its primary snippet: a missing env file degrades to
+# "extra authorities absent", never to "no snippet at all".
 #
 # Run by dsh-web-cookie.timer; safe to run by hand at any time.
 set -euo pipefail
@@ -23,13 +34,20 @@ DAYS="${DSH_WEB_COOKIE_DAYS:-25}"
 CREDS="${DSH_HOME:-$HOME/.dsh}/.credentials.yaml"
 SNIPPET_DIR="${DSH_WEB_COOKIE_DIR:-/etc/nginx/snippets}"
 
+# The authority the public vhost always serves. Renamable for a fork that moves
+# the domain, but not host-specific, so it does not live in web.env.
+PUBLIC_AUTHORITY="${DSH_WEB_PUBLIC_AUTHORITY:-dsh.workofekajaya.com}"
+
 # authority [snippet basename] — the authority must be exactly what dsh reads
 # back from the Host header (`new URL("http://" + host).host`), port included
 # when nginx passes the port through.
-AUTHORITIES=(
-  "dsh.workofekajaya.com dsh-web-cookie.conf"
-  "magicdns.example.ts.net:8444 dsh-web-cookie-tailnet.conf"
-)
+AUTHORITIES=("$PUBLIC_AUTHORITY dsh-web-cookie.conf")
+if [ -n "${DSH_WEB_AUTHORITIES:-}" ]; then
+  read -r -a _extra <<<"$DSH_WEB_AUTHORITIES"
+  for ((_i = 0; _i + 1 < ${#_extra[@]}; _i += 2)); do
+    AUTHORITIES+=("${_extra[_i]} ${_extra[_i + 1]}")
+  done
+fi
 
 # Root (the timer) installs directly; a normal user goes through sudo.
 if [ "$(id -u)" -eq 0 ]; then SUDO=""; else SUDO="sudo -n"; fi

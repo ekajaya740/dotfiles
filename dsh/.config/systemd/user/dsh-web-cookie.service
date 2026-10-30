@@ -2,9 +2,13 @@
 #
 # The dsh Web UI authenticates with an authority-bound signed cookie whose
 # signing secret is durable but whose issue/expiry window is absolute. This
-# regenerates one snippet per served authority (dsh.workofekajaya.com, and
-# magicdns.example.ts.net:8444) via the script's own passwordless sudo, so
-# both plain URLs keep working across dsh restarts without any ?token= URL.
+# regenerates one snippet per served authority via the script's own passwordless
+# sudo, so every configured URL keeps working across dsh restarts without any
+# ?token= URL.
+#
+# The authority list is machine-local ($DSH_WEB_AUTHORITIES in
+# ~/.config/dsh/web.env, template: dsh/.config/dsh/web.env.example). The script
+# always mints the public hostname; anything else is opt-in per host.
 #
 # Stowed from dotfiles/dsh/ to ~/.config/systemd/user/dsh-web-cookie.service.
 [Unit]
@@ -15,4 +19,5 @@ After=network-online.target
 Type=oneshot
 # ~/bin/dsh-web-cookie-refresh is the stow link into dotfiles/dsh/bin, so the
 # repo stays the single source of truth; a copy under ~/.local/bin would drift.
-ExecStart=/home/user/bin/dsh-web-cookie-refresh
+EnvironmentFile=-%h/.config/dsh/web.env
+ExecStart=%h/bin/dsh-web-cookie-refresh

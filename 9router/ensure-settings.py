@@ -34,12 +34,18 @@ Exit: 0 already-correct or fixed; 1 gateway unreachable or write rejected.
 import argparse
 import hashlib
 import json
+import os
 import pathlib
 import sys
 import urllib.error
 import urllib.request
 
-DATA_DIR = pathlib.Path("/home/user/9router/data")
+# The gateway's data dir is wherever 9router is installed on this machine. It is
+# machine-local, so it comes from the environment rather than a committed
+# absolute path; the default matches the usual `~/.9router`-style install.
+DATA_DIR = pathlib.Path(
+    os.environ.get("NINEROUTER_DATA_DIR", pathlib.Path.home() / "9router" / "data")
+)
 BASE = "http://127.0.0.1:20128"
 
 # The values this stack depends on.

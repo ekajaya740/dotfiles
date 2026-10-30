@@ -1,0 +1,65 @@
+# ai-tailnet.conf.example — per-machine tailnet listener for the 9router vhost.
+#
+# Copy to /etc/nginx/snippets/ai-tailnet-<host>.conf on a machine that should
+# serve OmniRoute on its tailnet address as well as the public one. The tracked
+# vhost (9router/etc/nginx/sites-available/ai.workofekajaya.com) includes
+# /etc/nginx/snippets/ai-tailnet-*.conf, so the file is picked up without
+# editing anything in this repo — which is the point: these addresses resolve on
+# exactly one box, so they must never be committed.
+#
+# Placeholders to replace:
+#   <tailnet-v4>     the host's tailnet IPv4 (`tailscale ip -4`)
+#   <tailnet-v6>     the host's tailnet IPv6 (`tailscale ip -6`)
+#   <public-ip>      the host's public IPv4, if it should also answer on :80
+#
+# This is NOT a short path for in-box clients: they resolve `ai.` to the public
+# A record (no /etc/hosts pin exists), so they arrive on the public block like
+# everyone else. The tailnet bind only helps a client explicitly configured to
+# dial the tailnet address.
+
+server {
+    listen <tailnet-v4>:443 ssl;
+    listen [<tailnet-v6>]:443 ssl;
+    server_name ai.workofekajaya.com;
+
+    ssl_certificate     /etc/letsencrypt/live/ai.workofekajaya.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/ai.workofekajaya.com/privkey.pem;
+
+    client_max_body_size 50M;
+
+    location = /healthz {
+        access_log off;
+        return 200 "ok\n";
+    }
+
+    location / {
+        if ($request_method = OPTIONS) {
+            add_header Access-Control-Allow-Origin  "*" always;
+            add_header Access-Control-Allow-Methods "GET, POST, OPTIONS" always;
+            add_header Access-Control-Allow-Headers "*" always;
+            add_header Access-Control-Max-Age       "86400" always;
+            add_header Content-Type                 "text/plain" always;
+            return 204;
+        }
+
+        proxy_pass http://127.0.0.1:20128;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Accept-Language en;
+        proxy_read_timeout 3600s;
+        proxy_send_timeout 3600s;
+        proxy_buffering off;
+    }
+}
+
+server {
+    listen <tailnet-v4>:80;
+    listen [<tailnet-v6>]:80;
+    server_name ai.workofekajaya.com;
+    return 301 https://$host$request_uri;
+}

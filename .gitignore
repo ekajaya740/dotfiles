@@ -101,9 +101,16 @@ dsh/.dsh/profiles/**/.srprobe
 hypr-lua/standalone/
 hypr-lua/APPLY.md
 hypr-lua/apply.sh
-# The real service env holds provider keys and bot tokens; only the template is
-# committed. Deployed by dsh/install.sh (copied, never symlinked).
+# The real service env holds provider keys and bot tokens, and web.env names
+# addresses that resolve on exactly one host; only the templates are committed.
+# Deployed by dsh/install.sh (copied, never symlinked).
 dsh/.config/dsh/env
+dsh/.config/dsh/web.env
+
+# Machine-local nginx listeners: the tracked vhosts `include` a per-host snippet
+# glob, so a tailnet/LAN address never lands in the repo.
+dsh/etc/nginx/snippets/dsh-tailnet-*.conf
+9router/etc/nginx/snippets/ai-tailnet-*.conf
 
 hypr-lua/fix-snapper.sh
 

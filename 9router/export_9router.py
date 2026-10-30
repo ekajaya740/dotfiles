@@ -19,6 +19,7 @@ Run:  python3 9router/export_9router.py [--dry-run]
 import argparse
 import hashlib
 import json
+import os
 import pathlib
 import re
 import sqlite3
@@ -27,7 +28,12 @@ import time
 import urllib.error
 import urllib.request
 
-DATA_DIR = pathlib.Path("/home/user/9router/data")
+# The gateway's data dir is wherever 9router is installed on this machine. It is
+# machine-local, so it comes from the environment rather than a committed
+# absolute path; the default matches the usual `~/9router/data` install.
+DATA_DIR = pathlib.Path(
+    os.environ.get("NINEROUTER_DATA_DIR", pathlib.Path.home() / "9router" / "data")
+)
 DB_PATH = DATA_DIR / "db" / "data.sqlite"
 BASE = "http://127.0.0.1:20128"
 OUT = pathlib.Path(__file__).resolve().parent / "config-export.json"

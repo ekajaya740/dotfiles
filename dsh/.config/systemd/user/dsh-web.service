@@ -1,26 +1,30 @@
-# dsh-web.service — DeepSeek Harness (dsh) Web UI, tailnet-only, loopback bind.
+# dsh-web.service — DeepSeek Harness (dsh) Web UI, loopback bind behind nginx.
 #
 # Stowed from dotfiles/dsh/ to ~/.config/systemd/user/dsh-web.service. Contains
-# no secrets: the service env (provider keys) lives in ~/.config/dsh/env, which
-# is machine-local and never committed (see dsh/.config/dsh/env.example).
+# no secrets and no host-specific values: provider keys live in
+# ~/.config/dsh/env, and the per-machine proxy authorities live in
+# ~/.config/dsh/web.env. Both are machine-local and never committed (templates:
+# dsh/.config/dsh/env.example, dsh/.config/dsh/web.env.example).
 #
 # Binds 127.0.0.1 only: dsh-host-webserver accepts just 127.0.0.1 or 0.0.0.0,
 # and 0.0.0.0 carries no TLS/auth/origin policy of its own, so the loopback
-# posture is the supported one. nginx terminates TLS and proxies from both the
-# public interface and the tailscale IP (see
-# /etc/nginx/sites-available/dsh.workofekajaya.com).
+# posture is the supported one. nginx terminates TLS and proxies from whatever
+# listeners the host configures (see dsh/etc/nginx/sites-available/).
 #
 # --trusted-host is REQUIRED behind a proxy: the /api browser-trust fence
 # rejects any Host that is not loopback or listed, answering 403 before the
 # auth check. Without it the public hostname gets 403, not the 401 that the
 # ?token= exchange can satisfy.
 #
-# Two trusted authorities, both fronted by nginx:
-#   dsh.workofekajaya.com        LE cert; tailnet :443, Basic-auth public :443
-#   magicdns.example.ts.net   tailscale cert; tailnet :8444, no prompt
-# The MagicDNS entry carries :8444 because that vhost forwards `$http_host`
-# (port included) and the fence compares the authority verbatim; drop the port
-# here and every POST /api from a :8444 browser answers 403.
+# One authority is fixed in this unit: the public hostname the vhost serves.
+# Any additional authority (a tailnet MagicDNS name, a LAN name, a second port)
+# is machine-specific, so it comes from $DSH_WEB_EXTRA_ARGS in web.env — e.g.
+#
+#   DSH_WEB_EXTRA_ARGS=--trusted-host dsh.example.ts.net:8444
+#
+# systemd splits an unquoted $VAR into words, so several `--trusted-host` pairs
+# fit in that one variable. When web.env is absent the variable is empty and
+# only the public authority is trusted; the extra listener then answers 403.
 #
 # Auth: dsh mints a fresh random token every boot and prints
 #   dsh web: http://127.0.0.1:3080/?token=...
@@ -29,18 +33,19 @@
 # password to store. Read it with:
 #   journalctl --user -u dsh-web -n 20 | grep token
 [Unit]
-Description=DeepSeek Harness (dsh) Web UI - tailnet-only
+Description=DeepSeek Harness (dsh) Web UI - loopback behind nginx
 After=network-online.target
 Wants=network-online.target
 StartLimitIntervalSec=0
 
 [Service]
 Type=simple
-WorkingDirectory=/home/user
-Environment="PATH=/home/user/.local/share/mise/shims:/home/user/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-Environment="DSH_HOME=/home/user/.dsh"
-EnvironmentFile=/home/user/.config/dsh/env
-ExecStart=/home/user/.local/share/mise/shims/dsh web --no-open --port 3080 --trusted-host dsh.workofekajaya.com --trusted-host magicdns.example.ts.net:8444
+WorkingDirectory=%h
+Environment="PATH=%h/.local/share/mise/shims:%h/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+Environment="DSH_HOME=%h/.dsh"
+EnvironmentFile=%h/.config/dsh/env
+EnvironmentFile=-%h/.config/dsh/web.env
+ExecStart=%h/.local/share/mise/shims/dsh web --no-open --port 3080 --trusted-host dsh.workofekajaya.com $DSH_WEB_EXTRA_ARGS
 Restart=always
 RestartSec=5
 KillMode=mixed

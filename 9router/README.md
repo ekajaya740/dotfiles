@@ -1,7 +1,9 @@
 # 9Router Config Backup
 
 Auto-exported snapshot of the 9Router gateway (VPS `9router.service`, port 20128, v0.5.104).
-This is the **personal instance** (data dir `/home/user/9router/data/`).
+This is the **personal instance**. The gateway's data dir is machine-local
+(`$NINEROUTER_DATA_DIR`, default `~/9router/data`); the scripts below read it
+from the environment so no one host's absolute path is committed.
 
 ## Files
 
@@ -29,8 +31,8 @@ POST /api/combos               # each combo {name, models: [...], kind: llm}
 Regenerate from the live gateway whenever provider/model/combo topology changes:
 
 ```bash
-bash /home/user/dotfiles/9router/export.sh   # or: python3 .../export_9router.py
-cd /home/user/dotfiles && git add 9router && git commit -m "backup 9router config" && git push
+./9router/export.sh   # or: python3 ./9router/export_9router.py
+git add 9router && git commit -m "backup 9router config" && git push
 ```
 
 ## nginx answers the CORS preflight for `/v1/*` (fixed 2026-10-16)
@@ -72,11 +74,12 @@ if ($request_method = OPTIONS) {
 }
 ```
 
-Applied from `/home/user/9router/scripts/ai.workofekajaya.com.conf` (full file). Pre-change
-copy: `/root/nginx-backups/20261016-162702/` (rollback = `cp` back + `nginx -s reload`). The
-standalone snippet file that used to sit beside it, `scripts/pen-cors-nginx-snippet.conf`, was
-deleted 2026-10-17 with the rest of the OpenPencil-hosting artifacts; the block itself is quoted
-above and lives in the ai vhost.
+Applied from the gateway host's `9router/scripts/ai.workofekajaya.com.conf` (full file).
+Pre-change copy: `/root/nginx-backups/20261016-162702/` (rollback = `cp` back + `nginx -s
+reload`). The standalone snippet file that used to sit beside it,
+`scripts/pen-cors-nginx-snippet.conf`, was deleted 2026-10-17 with the rest of
+the OpenPencil-hosting artifacts; the block itself is quoted above and lives in
+the ai vhost.
 
 **This is edge-only, which is why it is the right layer.** The real request still traverses the
 same guard and still needs its `Authorization` header — the keyless `POST` still 401s, so this is

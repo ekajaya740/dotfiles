@@ -131,11 +131,12 @@ print(",".join(sorted(required - off)))
         fi
     fi
 
-    # The dsh profile seeds are shared across machines, so an absolute path in
-    # one is a landmine: a `link:`/`command:` under /home/user resolves on
-    # exactly one box and makes `pnpm install` fail everywhere else. It has
-    # already happened once, so gate it rather than trust review.
-    host_paths="$(grep -rn '/home/user' dsh/.dsh/profiles/ 2>/dev/null \
+    # Seeds are shared across machines, so an absolute home path in one is a
+    # landmine: a `link:`/`command:` under one user's home resolves on exactly
+    # one box and makes `pnpm install` fail everywhere else. It has already
+    # happened once, so gate it rather than trust review. Comment lines are
+    # exempt because they often explain the rule itself.
+    host_paths="$(grep -rnE '(/home/|/Users/)[A-Za-z0-9._-]+' dsh/.dsh/profiles/ 2>/dev/null \
         | grep -v '^[^:]*:[0-9]*:#' || true)"
     if [ -z "$host_paths" ]; then
         pass "dsh profile seeds carry no host-specific paths"

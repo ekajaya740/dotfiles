@@ -13,14 +13,14 @@ and versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Fixed
 
 - **The dsh profile seeds no longer carry one host's absolute paths.**
-  `web/package.json` pinned three `link:` dependencies under `/home/user`
+  `web/package.json` pinned three `link:` dependencies under a host's home directory
   (`dsh-auto-archive`, `dsh-hevy-training`, `dsh-image-preview`) and the arXiv
-  MCP row named `/home/user/.local/bin/arxiv-mcp-server`. A `link:` to a
+  MCP row named an absolute path under a host's `~/.local/bin`. A `link:` to a
   missing directory makes `pnpm install` fail outright, so seeding those files
   on any other machine broke the profile — and the repo is shared. They are now
   installed per host with `dsh plugin --profile web add <spec>` instead, the
   arXiv command resolves from `PATH` (the unit already puts `~/.local/bin` on
-  it), and `scripts/validate.sh` fails on any `/home/user` path in a seed.
+  it), and `scripts/validate.sh` fails on any absolute home path in a seed.
 - **The vhost install order and its sudoers rule are documented.**
   `dsh.workofekajaya.com` `include`s the per-authority cookie snippets, so
   `nginx -t` fails until `~/bin/dsh-web-cookie-refresh` has written them — the
@@ -36,8 +36,8 @@ and versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - **The dsh Web UI is reachable passwordless on the MagicDNS name**:
-  `https://magicdns.example.ts.net:8444`. A third listener on the existing
-  `dsh.workofekajaya.com` vhost binds `100.64.0.10:8444` with the tailscale
+  `https://<magicdns-name>:8444`. A third listener on the existing
+  `dsh.workofekajaya.com` vhost binds the tailnet address on `:8444` with the tailscale
   cert, forwards `$http_host` and includes a per-authority cookie snippet, so
   opening the URL lands in the harness with no prompt and no `?token=` exchange.
   `tailscale serve` cannot be used instead: dsh answers `401` to any request
@@ -48,7 +48,7 @@ and versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   matches the listen address+port before `server_name`. The port is also
   load-bearing in two other places: `$http_host` (not `$host`) keeps `:8444` in
   the proxied Host because the fence compares `new URL(Origin).host` verbatim,
-  and `dsh web --trusted-host magicdns.example.ts.net:8444` now declares the
+  and `dsh web --trusted-host <magicdns-name>:8444` now declares the
   same authority on the service.
 
 ### Changed
@@ -56,7 +56,7 @@ and versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **`dsh-web-cookie-refresh` mints one snippet per authority.** The cookie name
   is `dsh-auth-<sha256(authority)>`, so a single shared snippet would break
   whichever authority was minted last — and the second authority
-  (`magicdns.example.ts.net:8444`) would have overwritten the snippet the
+  (`<magicdns-name>:8444`) would have overwritten the snippet the
   working `dsh.workofekajaya.com` listener includes. Both files
   (`dsh-web-cookie.conf`, `dsh-web-cookie-tailnet.conf`) are now written in one
   run behind a single `nginx -t` and reload.

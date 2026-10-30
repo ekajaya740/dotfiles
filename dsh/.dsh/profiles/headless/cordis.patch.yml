@@ -2,7 +2,7 @@
 # a top-level YAML array of loader patch entries (id-targeted config
 # overrides, disables, and insert lists; `!!js` expressions allowed).
 #
-# ── 9router routing (machine-local, dsh-host) ───────────────────────
+# ── 9router routing (machine-local, <host>) ───────────────────────
 # TWO ROWS ARE REQUIRED. llm-deepseek registers the provider route;
 # agent-default-model selects it. The shipped default points at
 # model: deepseek-flash, which 9router does not serve, so a turn would

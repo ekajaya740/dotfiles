@@ -126,10 +126,11 @@ check_stowed() {
         fi
     done
 
-    # The unit hardcodes /home/user. Flag a mismatch rather than letting a
-    # service silently fail to start on another machine.
-    if grep -q '/home/user' "$UNIT_SRC" && [[ "$HOME" != "/home/user" ]]; then
-        warn "unit hardcodes /home/user but HOME=$HOME — edit $UNIT_SRC"
+    # The unit must stay host-agnostic: it uses %h so it works for any user on
+    # any machine. An absolute /home/<user> or /Users/<user> path would pin it
+    # to one box and make the service fail to start elsewhere, so flag it.
+    if grep -qE '(/home/|/Users/)[A-Za-z0-9._-]+' "$UNIT_SRC"; then
+        warn "unit contains an absolute home path — use %h instead: $UNIT_SRC"
     fi
 
     if has systemctl; then

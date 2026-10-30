@@ -1,6 +1,6 @@
 # 9Router — 9router.workofekajaya.com (PUBLIC front door)
 # ======================================================
-# DNS: A record 9router.workofekajaya.com -> 203.0.113.10 (proxied OFF, DNS-only).
+# DNS: A record 9router.workofekajaya.com -> this host's public address (proxied OFF, DNS-only).
 # TLS: Let's Encrypt via certbot DNS-01 (auto-renews). No browser warnings.
 # Upstream: systemd system unit 9router.service (node, 127.0.0.1:20128).
 # Auth: the app's own JWT login (REQUIRE_API_KEY=true, AUTH_COOKIE_SECURE=true).

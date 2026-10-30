@@ -89,7 +89,7 @@
 # will report a missing-dependency error as installed here).
 #
 # Resolved from PATH, not an absolute path and not `uvx`: a hardcoded
-# /home/user/... is meaningless on any other host, and `uvx` would
+# ~/... is meaningless on any other host, and `uvx` would
 # re-resolve the package on every start. dsh-web.service therefore puts
 # ~/.local/bin on PATH explicitly; a host that installs this server elsewhere
 # must do the same. No credentials are needed. Two optional env vars are
@@ -110,7 +110,7 @@
         args: [ ]
         toolCallTimeoutMs: 120000
 
-# ── 9router routing (machine-local, dsh-host) ───────────────────────
+# ── 9router routing (machine-local, <host>) ───────────────────────
 # TWO ROWS ARE REQUIRED. The llm-deepseek row registers the provider
 # route; agent-default-model selects it. The shipped default points at
 # model: deepseek-flash, which 9router does not serve, so a turn would

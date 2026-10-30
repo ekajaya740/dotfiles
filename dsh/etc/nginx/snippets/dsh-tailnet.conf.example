@@ -1,0 +1,93 @@
+# dsh-tailnet.conf.example — per-machine extra listener for the dsh Web UI.
+#
+# Copy to /etc/nginx/snippets/dsh-tailnet-<host>.conf on a machine that should
+# serve the harness on a second authority (a tailnet MagicDNS name, a LAN name,
+# a second port). The tracked vhost
+# (dsh/etc/nginx/sites-available/dsh.workofekajaya.com) includes
+# /etc/nginx/snippets/dsh-tailnet-*.conf, so the file is picked up without
+# editing anything in this repo — which is the point: these addresses resolve on
+# exactly one box, so they must never be committed.
+#
+# Placeholders to replace:
+#   <tailnet-v4>        the host's tailnet IPv4 (e.g. from `tailscale ip -4`)
+#   <tailnet-v6>        the host's tailnet IPv6 (`tailscale ip -6`)
+#   <magicdns-name>     the host's MagicDNS name (`tailscale status --json`)
+#   <host>              a short label for the cert file names
+#
+# Port choice: :8444 rather than :443 because MagicDNS :443 is usually already
+# claimed by another vhost and nginx matches listen address+port before
+# server_name, so a second `:443` block would never match.
+#
+# Two details are load-bearing:
+#   * the block forwards `$http_host` (port included), because the browser-trust
+#     fence compares `new URL(Origin).host` verbatim against the request Host.
+#     `$host` strips the port and every POST /api from that origin answers 403;
+#   * dsh must be started with the same authority in `--trusted-host`, which on
+#     a stowed unit means DSH_WEB_EXTRA_ARGS in ~/.config/dsh/web.env.
+#
+# The cookie snippet is per-authority because the cookie NAME hashes the
+# authority, port included — see DSH_WEB_AUTHORITIES in the same web.env.
+
+# --- tailnet :443, the DNS name -------------------------------------------------
+# The name's A record points at this address on such a host, so without this
+# block nothing answers https://dsh.workofekajaya.com there. It is a FULL server
+# block (listen + server_name), not a bare `listen`, because the tracked vhost
+# includes this file at top level.
+server {
+    listen <tailnet-v4>:443 ssl;
+    listen [<tailnet-v6>]:443 ssl;
+    server_name dsh.workofekajaya.com;
+
+    ssl_certificate     /etc/letsencrypt/live/dsh.workofekajaya.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/dsh.workofekajaya.com/privkey.pem;
+
+    client_max_body_size 50M;
+
+    # No auth_basic: tailnet-only by bind address.
+    location / {
+        proxy_pass http://127.0.0.1:3080;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 3600s;
+        proxy_buffering off;
+
+        include /etc/nginx/snippets/dsh-web-cookie.conf;
+    }
+}
+
+# --- tailnet :8444, the MagicDNS name -------------------------------------------
+server {
+    listen <tailnet-v4>:8444 ssl;
+    listen [<tailnet-v6>]:8444 ssl;
+    server_name <magicdns-name>;
+
+    # The tailnet cert (SAN <magicdns-name> only), renewed by a local timer that
+    # also reloads nginx.
+    ssl_certificate     /etc/nginx/ssl/<host>.ts.crt;
+    ssl_certificate_key /etc/nginx/ssl/<host>.ts.key;
+
+    client_max_body_size 50M;
+
+    # No auth_basic and no ?token=: the bind address is tailnet-only and the
+    # injected cookie is authority-bound, so a stolen cookie is useless off this
+    # host:port. Every tailnet device is a full operator here.
+    location / {
+        proxy_pass http://127.0.0.1:3080;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $http_host;   # keep :8444 for the Origin fence
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 3600s;
+        proxy_buffering off;
+
+        include /etc/nginx/snippets/dsh-web-cookie-tailnet.conf;
+    }
+}
