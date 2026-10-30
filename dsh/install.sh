@@ -68,6 +68,8 @@ REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 DSH_DIR="$REPO_DIR/dsh"
 ENV_EXAMPLE="$DSH_DIR/.config/dsh/env.example"
 ENV_LIVE="$HOME/.config/dsh/env"
+WEB_ENV_EXAMPLE="$DSH_DIR/.config/dsh/web.env.example"
+WEB_ENV_LIVE="$HOME/.config/dsh/web.env"
 UNIT_SRC="$DSH_DIR/.config/systemd/user/dsh-web.service"
 UNIT_LIVE="$HOME/.config/systemd/user/dsh-web.service"
 PLUGINS_FILE="$DSH_DIR/plugins.txt"
@@ -84,17 +86,33 @@ install_env() {
     info "service env"
     if [[ -f "$ENV_LIVE" ]]; then
         ok "exists, left untouched: $ENV_LIVE"
-        return 0
-    fi
-    if $CHECK; then
+    elif $CHECK; then
         echo "  [dry-run] cp $ENV_EXAMPLE $ENV_LIVE && chmod 600 $ENV_LIVE"
         echo "  [dry-run] then fill in the keys by hand"
-        return 0
+    else
+        mkdir -p "$(dirname "$ENV_LIVE")"
+        cp "$ENV_EXAMPLE" "$ENV_LIVE"
+        chmod 600 "$ENV_LIVE"
+        ok "created $ENV_LIVE — FILL IN THE KEYS before starting dsh-web"
     fi
-    mkdir -p "$(dirname "$ENV_LIVE")"
-    cp "$ENV_EXAMPLE" "$ENV_LIVE"
-    chmod 600 "$ENV_LIVE"
-    ok "created $ENV_LIVE — FILL IN THE KEYS before starting dsh-web"
+
+    # The per-host proxy authorities. Only placeholders: a public-only host can
+    # leave both values commented out, and the service still works.
+    if [[ -f "$WEB_ENV_LIVE" ]]; then
+        ok "exists, left untouched: $WEB_ENV_LIVE"
+    elif [[ -f "$WEB_ENV_EXAMPLE" ]]; then
+        if $CHECK; then
+            echo "  [dry-run] cp $WEB_ENV_EXAMPLE $WEB_ENV_LIVE && chmod 600 $WEB_ENV_LIVE"
+            echo "  [dry-run] then fill in this host's extra authorities, if any"
+        else
+            mkdir -p "$(dirname "$WEB_ENV_LIVE")"
+            cp "$WEB_ENV_EXAMPLE" "$WEB_ENV_LIVE"
+            chmod 600 "$WEB_ENV_LIVE"
+            ok "created $WEB_ENV_LIVE — optional, fill in extra authorities"
+        fi
+    else
+        warn "missing $WEB_ENV_EXAMPLE"
+    fi
 }
 
 # ── 2. stowed files present ──────────────────────────────────
@@ -105,7 +123,8 @@ check_stowed() {
     local ok_all=true
     for f in "$HOME/.dsh/cordis.patch.yml" \
              "$UNIT_LIVE" \
-             "$HOME/.config/dsh/env.example"; do
+             "$HOME/.config/dsh/env.example" \
+             "$HOME/.config/dsh/web.env.example"; do
         if [[ -L "$f" ]]; then
             # An absolute link means something other than stow created it (stow
             # always writes a relative one). That is a real failure: stow then

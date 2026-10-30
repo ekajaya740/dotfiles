@@ -1084,14 +1084,13 @@ systemctl --user enable --now dsh-web-cookie.timer
 systemctl --user restart dsh-web
 ```
 
-**Order matters on a tailnet-named host, and the failure is an outage.** The
-tracked vhost has no tailnet `listen`; that block lives only in
-`/etc/nginx/snippets/dsh-tailnet-*.conf`. On this host the name's A record points
-at the tailnet address, so copying the vhost without first writing that snippet
-leaves nothing answering `https://dsh.workofekajaya.com` — `nginx -t` still
-passes, because a glob that matches nothing is legal. Write the snippet from the
-template, then install the vhost. The same applies to the 9router vhost and
-`ai-tailnet-*.conf`.
+**Order matters on a tailnet-named host.** The tracked vhost carries
+`listen 443 ssl` on `0.0.0.0`, so the name still answers when the snippet is
+missing — it is answered by the *public* block, which keeps `auth_basic`. The
+regression is a Basic-auth prompt on the passwordless URL, not a dead listener;
+`nginx -t` passes either way, because a glob matching nothing is legal. Write
+`dsh/etc/nginx/snippets/dsh-tailnet.conf.example` first, then install the vhost.
+Same for the 9router vhost and `ai-tailnet-*.conf`.
 
 `dsh-web-cookie.service` runs `~/bin/dsh-web-cookie-refresh` — the stow link into
 this repo — so there is no copy to place under `/usr/local/bin`. A copy there

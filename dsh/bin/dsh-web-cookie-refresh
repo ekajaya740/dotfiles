@@ -34,6 +34,19 @@ DAYS="${DSH_WEB_COOKIE_DAYS:-25}"
 CREDS="${DSH_HOME:-$HOME/.dsh}/.credentials.yaml"
 SNIPPET_DIR="${DSH_WEB_COOKIE_DIR:-/etc/nginx/snippets}"
 
+# Source the per-host authority list when run by hand. The systemd unit sets it
+# via EnvironmentFile, but AGENTS.md tells the operator to run this by hand
+# during install, and an interactive shell has no EnvironmentFile. Sourcing is
+# idempotent: a value already exported wins, because the file only sets what
+# this host needs and the timer's EnvironmentFile takes precedence anyway.
+DSH_WEB_ENV="${DSH_WEB_ENV:-$HOME/.config/dsh/web.env}"
+if [ -r "$DSH_WEB_ENV" ]; then
+  set -a
+  # shellcheck disable=SC1090
+  . "$DSH_WEB_ENV"
+  set +a
+fi
+
 # The authority the public vhost always serves. Renamable for a fork that moves
 # the domain, but not host-specific, so it does not live in web.env.
 PUBLIC_AUTHORITY="${DSH_WEB_PUBLIC_AUTHORITY:-dsh.workofekajaya.com}"

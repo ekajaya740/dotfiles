@@ -14,9 +14,13 @@
 #   <magicdns-name>     the host's MagicDNS name (`tailscale status --json`)
 #   <host>              a short label for the cert file names
 #
-# Port choice: :8444 rather than :443 because MagicDNS :443 is usually already
-# claimed by another vhost and nginx matches listen address+port before
-# server_name, so a second `:443` block would never match.
+# Why an explicit address:port is needed: the tracked vhost listens on
+# `0.0.0.0:443`, which also accepts connections to a tailnet address — but it
+# answers them with the public block, i.e. the Basic-auth prompt. A listener on
+# a specific address wins over the wildcard for that address, so binding
+# `<tailnet-v4>:443` here is what makes the name passwordless. A second
+# `0.0.0.0:443` block would never match (nginx matches address:port before
+# server_name); a different port would need a URL change.
 #
 # Two details are load-bearing:
 #   * the block forwards `$http_host` (port included), because the browser-trust
@@ -28,11 +32,11 @@
 # The cookie snippet is per-authority because the cookie NAME hashes the
 # authority, port included — see DSH_WEB_AUTHORITIES in the same web.env.
 
-# --- tailnet :443, the DNS name -------------------------------------------------
-# The name's A record points at this address on such a host, so without this
-# block nothing answers https://dsh.workofekajaya.com there. It is a FULL server
-# block (listen + server_name), not a bare `listen`, because the tracked vhost
-# includes this file at top level.
+# --- tailnet :443, the plain DNS name -------------------------------------------
+# Coexists with the tracked wildcard block; a specific bind address wins for
+# connections to that address, which is what removes the Basic prompt. It is a
+# FULL server block (listen + server_name), not a bare `listen`, because the
+# tracked vhost includes this file at top level.
 server {
     listen <tailnet-v4>:443 ssl;
     listen [<tailnet-v6>]:443 ssl;
