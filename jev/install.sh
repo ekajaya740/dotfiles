@@ -11,10 +11,8 @@
 #   ./install.sh            install everything applicable to this machine
 #   ./install.sh --check    show what would happen, change nothing
 #
-# Every Jev backend here reaches 9router's SystemOne endpoint
-# (NINEROUTER_API_KEY, model alias `judge`) — not OpenRouter and not TypeSafe.
-# A direct OpenRouter key fails with `401 User not found.` No key is ever
-# written to disk by this script.
+# All Jev backends here use OpenRouter (OPENROUTER_API_KEY), not a TypeSafe
+# key. No key is ever written to disk by this script.
 # ─────────────────────────────────────────────────────────────
 set -euo pipefail
 
@@ -32,10 +30,10 @@ export PATH="/opt/homebrew/bin:/usr/local/bin:$HOME/.bun/bin:$HOME/.local/bin:$P
 
 # ── backend check ────────────────────────────────────────────
 check_backend() {
-    if [[ -n "${NINEROUTER_API_KEY:-}" ]]; then
-        ok "NINEROUTER_API_KEY set — Jev will use the 9router SystemOne endpoint"
+    if [[ -n "${OPENROUTER_API_KEY:-}" ]]; then
+        ok "OPENROUTER_API_KEY set — Jev will use OpenRouter"
     else
-        warn "NINEROUTER_API_KEY not set — Jev tools fail closed until it is."
+        warn "OPENROUTER_API_KEY not set — Jev tools fail closed until it is."
         warn "  add it to ~/.zshenv.local (see dotfiles AGENTS.md)"
     fi
 }
@@ -50,10 +48,10 @@ install_omp_jev() {
         omp install omp-jev 2>&1 | sed 's/^/  /' || { warn "omp-jev install failed"; return 0; }
     fi
 
-    # Point it at 9router SystemOne instead of the TypeSafe default.
+    # Point it at OpenRouter instead of the TypeSafe default.
     local cfg="$HOME/.config/omp-jev/config.json"
     if $CHECK; then
-        echo "  [dry-run] write $cfg (endpoint=9router systemone, apiKeyEnv=NINEROUTER_API_KEY)"
+        echo "  [dry-run] write $cfg (endpoint=openrouter, apiKeyEnv=OPENROUTER_API_KEY)"
         return 0
     fi
     if [[ -f "$cfg" ]]; then
@@ -66,14 +64,14 @@ install_omp_jev() {
 import json, sys
 cfg = json.load(open(sys.argv[1]))
 cfg["client"] = {
-    "endpoint": "https://ai.workofekajaya.com/v1/systemone",
-    "model": "judge",
-    "apiKeyEnv": "NINEROUTER_API_KEY",
+    "endpoint": "https://openrouter.ai/api/alpha/decisions",
+    "model": "typesafe/jev-1.13",
+    "apiKeyEnv": "OPENROUTER_API_KEY",
     "timeoutMs": 5000,
 }
 json.dump(cfg, open(sys.argv[2], "w"), indent=2)
 PY
-            ok "  wrote $cfg (9router SystemOne)"
+            ok "  wrote $cfg (OpenRouter)"
         else
             warn "  template not found: $example"
         fi
@@ -101,11 +99,9 @@ install_omp_compaction() {
     fi
 
     run omp plugin install "$src"
-    # Jev backend: 9router SystemOne (not TypeSafe, not OpenRouter direct).
-    run omp plugin config set omp-jev-compaction provider typesafe
-    run omp plugin config set omp-jev-compaction baseUrl https://ai.workofekajaya.com/v1/systemone
-    run omp plugin config set omp-jev-compaction model judge
-    ok "  compaction installed, endpoint=9router SystemOne"
+    # Jev backend: OpenRouter (not TypeSafe).
+    run omp plugin config set omp-jev-compaction provider openrouter
+    ok "  compaction installed, provider=openrouter"
 }
 
 # ── MCP server: jev-mcp ──────────────────────────────────────
@@ -121,8 +117,7 @@ install_jev_mcp_note() {
              and Pen's PATH cannot resolve npx)
   Server entry:
     command: npx   args: ["-y", "@jkudish/jev-mcp"]
-    env:     JEV_PROVIDER=compatible, JEV_API_BASE_URL=https://ai.workofekajaya.com/v1/systemone,
-             JEV_API_KEY={env:NINEROUTER_API_KEY}, JEV_MCP_MODEL=judge
+    env:     OPENROUTER_API_KEY  (JEV_PROVIDER=openrouter)
   Skipped here: these configs are stow-managed in this repo, edit them there.
 EOF
 }

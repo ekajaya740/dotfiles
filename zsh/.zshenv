@@ -53,16 +53,6 @@ fi
 # posture should follow the machine. Any non-empty value works, including '0'.
 export DSH_TELEMETRY_DISABLED=1
 
-# Jev decision clients (omp-jev, omp-jev-compaction) pick a provider by which
-# key is present: `typesafe` wins over `openrouter`. Both endpoints are
-# overridden to 9router SystemOne (`model: judge`), so the only credential that
-# exists is NINEROUTER_API_KEY. Exposing it under the TypeSafe name is what
-# makes the `typesafe` provider selectable without a second key to rotate.
-# There is deliberately no OPENROUTER_API_KEY: a direct OpenRouter key is
-# rejected (`401 User not found.`), which is what surfaced as "Jev judgments
-# are off" in tools that read it.
-[[ -n "${NINEROUTER_API_KEY:-}" ]] && export TYPESAFE_API_KEY="$NINEROUTER_API_KEY"
-
 # Homebrew (macOS)
 if [[ -x /opt/homebrew/bin/brew ]]; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
