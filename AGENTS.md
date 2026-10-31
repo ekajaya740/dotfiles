@@ -380,7 +380,7 @@ stow omp
 
 ### MCP Servers
 
-Configured in `omp/.omp/agent/mcp.json` (oMP), `opencode/.config/opencode/opencode.json` (OpenCode), `pi/.pi/agent/mcp.json` (Pi — read by the `pi-mcp-extension`), `dsh/.dsh/cordis.patch.yml` (dsh — an `@deepseek-ai/dsh-mcp-client` row), and `claude/.claude/mcp.json.template` (Claude Code — merged into `~/.claude.json` by `claude/install.sh`). The `jev` MCP server is registered by the `jev-router` Claude plugin instead.
+Configured in `omp/.omp/agent/mcp.json` (oMP), `opencode/.config/opencode/opencode.json` (OpenCode), `pi/.pi/agent/mcp.json` (Pi — read by the `pi-mcp-extension`), `dsh/.dsh/cordis.patch.yml` (dsh — an `@deepseek-ai/dsh-mcp-client` row), and `claude/.claude/mcp.json.template` (Claude Code — merged into `~/.claude.json` by `claude/install.sh`). The `jev` MCP server used to be registered by the `jev-router` Claude plugin; that plugin went with the jev CLI, so no Claude-side plugin is wired from this repo.
 
 | Server | Type | Command | Purpose |
 |--------|------|---------|---------|
@@ -1194,8 +1194,8 @@ the MCP/decision tools.
 
 | Part | Location | Synced? |
 |------|----------|---------|
-| MCP server entry (`jev-mcp`) | `opencode/.config/opencode/opencode.json`, `claude/.claude/skills/jev-router/.claude-plugin/plugin.json` | ✅ stowed |
-| Everything else — CLI, plugins, node_modules | `~/.omp/plugins`, `~/.local/bin/jev`, `~/.pi/agent/npm` | ❌ machine-local |
+| MCP server entry (`jev-mcp`) | `opencode/.config/opencode/opencode.json` | ✅ stowed |
+| Everything else — CLI, plugins, node_modules | `~/.omp/plugins`, `~/.pi/agent/npm` | ❌ machine-local |
 
 `jev-mcp` is deliberately **not** in `omp/.omp/agent/mcp.json`: omp carries its
 own Jev integration instead, and a second MCP entry would duplicate the same
@@ -1215,9 +1215,9 @@ to reproduce the machine-local half on a new device.
 
 Pen launches with `PATH=/usr/bin:/bin:/usr/sbin:/sbin`, so it cannot resolve
 `npx` (the same reason `spawn npm ENOENT` appears in `~/Library/Logs/Pen/main.log`).
-Jev MCP is registered in **opencode and Claude Code (via the jev-router
-plugin) only** — not omp, which no longer routes through Jev at all. Pen
-gets Jev only if a compiled binary ships.
+Jev MCP is registered in **opencode only** — not omp, which no longer routes
+through Jev at all, and not Claude Code, whose `jev-router` plugin went with the
+CLI. Pen gets Jev only if a compiled binary ships.
 
 ### Consent and Defaults
 
@@ -1228,9 +1228,13 @@ gets Jev only if a compiled binary ships.
 ### Validation
 
 ```bash
-~/.local/bin/jev doctor          # key present, endpoint reachable, routing config
-bash jev/install.sh --check      # what a fresh device would install
+omp plugin list | grep jev            # omp-jev and omp-jev-compaction present
+bash jev/install.sh --check            # what a fresh device would install
 ```
+
+There is no `jev` CLI on this machine: `~/.local/bin/jev` was a dangling symlink
+and is gone. `~/.config/omp-jev/config.json` is the authority for the routing
+backend.
 
 ## Claude Code
 
@@ -1239,17 +1243,15 @@ bash jev/install.sh --check      # what a fresh device would install
 ### Config Files Managed in This Repo
 
 - `claude/.claude/settings.json` → merged into `~/.claude/settings.json` by `claude/install.sh`
-- `claude/.claude/skills/jev-router/` → symlinked to `~/.claude/skills/jev-router` by `claude/install.sh`
 - `claude/.claude/mcp.json.template` → merged into `~/.claude.json` by `claude/install.sh` (user-scope MCP servers)
 
 ### NOT Managed (machine-local state)
 
 `~/.claude` holds auth and runtime state: `.credentials.json`, `history.jsonl`,
 `sessions/`, `projects/`, `plugins/`, `cache/`, `daemon/`, …. Only
-`settings.json` and `skills/jev-router` are managed, and **neither is stowed** —
-the claude CLI rewrites `settings.json` in place (which would break a symlink),
-and a plugin must be a self-contained directory. `claude/install.sh` merges
-`settings.json` into `~/.claude/settings.json` and symlinks the plugin. `~/.claude.json`
+`settings.json` is managed, and it is **not stowed** — the claude CLI rewrites
+it in place, which would break a symlink. `claude/install.sh` merges it into
+`~/.claude/settings.json`. `~/.claude.json`
 is not tracked either — it holds the OAuth account and per-project state, so its
 `mcpServers` block is merged from the template.
 
@@ -1267,58 +1269,17 @@ subscription with gateway spend and dropped the `unrecognized_model` notice
 that `CLAUDE_CODE_MAX_CONTEXT_TOKENS` used to hide. Keep 9router out of this
 file unless the user asks for it explicitly.
 
-`settings.json` therefore carries only non-model keys: `statusLine`,
-`enabledPlugins`, `extraKnownMarketplaces`, `skipDangerousModePermissionPrompt`,
-and `$schema`. `claude/install.sh` **deletes** the retired model keys rather
+`settings.json` therefore carries only non-model keys: `enabledPlugins`,
+`extraKnownMarketplaces`, `skipDangerousModePermissionPrompt`, and `$schema`.
+(`statusLine` went with the `jev-router` statusline hook.) `claude/install.sh`
+**deletes** the retired model keys rather
 than unioning them in, so a stale `env`/`apiKeyHelper` cannot survive a
 template that no longer defines it (see the `RETIRED_ENV` list in that script).
 
-The `jev-router` plugin below still reaches 9router — it is a routing hook, not
-the model path.
-
-### jev-router (Jev subagent routing)
-
-`claude/.claude/skills/jev-router/` is a Claude Code plugin (auto-loads from the
-skills dir as `jev-router@skills-dir`). It carries:
-
-- a `PreToolUse` hook on `Task|Agent` that asks TypeSafe Jev — through 9router
-  SystemOne (`POST /v1/systemone`, model `judge`) — which
-  agent type and model a subagent needs;
-- the `jev` MCP server (`@jkudish/jev-mcp`, `JEV_PROVIDER=compatible`) at the
-  same SystemOne endpoint, so `/jev` tools work without native routing.
-
-The hook makes one change only: when Jev picks a read-only lookup **and**
-`Explore`/`haiku` at ≥ 0.8 confidence, the call is rewritten to the `Explore`
-agent on the `haiku` alias. Everything else runs as Claude set it up, and any Jev
-error or timeout leaves the call untouched (fail-open). Downward only — a call
-already on `haiku` is never touched, and the model is never raised.
-
-| Env var | Default | Effect |
-|---------|---------|--------|
-| `JEV_ROUTER_MODE` | `apply` | `advise` observes (status line) without rewriting |
-| `JEV_ROUTER_AGENT_MIN` / `JEV_ROUTER_MODEL_MIN` | `0.8` | confidence gates |
-| `JEV_ROUTER_DEBUG` | off | log the pick to stderr |
-| `JEV_API_BASE_URL` / `JEV_MCP_MODEL` | 9router | override the Jev backend |
-
-### Deploying
-
-`claude/` is not a stow package — deploy it, like `jev/`:
-
-```bash
-cd ~/dotfiles
-bash claude/install.sh   # merge settings.json + MCP servers, link the plugin
-```
-
-Run `claude` once first so `~/.claude/` exists. `/reload-plugins` (or a new
-session) loads `jev-router`.
-
-### Validation
-
-```bash
-jq empty claude/.claude/settings.json
-node --check claude/.claude/skills/jev-router/hooks/route.mjs
-claude plugin list | grep jev-router
-```
+**No Claude-side plugin is wired from this repo.** `jev-router` was one, and it
+was removed with the jev CLI: its `PreToolUse` hook and `/jev` MCP server both
+depended on a binary that had become a dangling symlink. Plugins installed by
+the `claude` CLI live in `~/.claude/plugins` (machine-local, untracked).
 
 ## Pi Coding Agent Extensions
 

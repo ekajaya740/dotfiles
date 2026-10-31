@@ -8,6 +8,28 @@ section's notes — see [AGENTS.md](./AGENTS.md#releases).
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.0] - 2026-10-31
+
+### Removed
+
+- **The `jev-router` Claude Code plugin, and the `jev` CLI it needed.**
+  `~/.local/bin/jev` and `~/.hermes/bin/jev` were dangling symlinks into a
+  deleted `/private/tmp/hjs`, so the plugin's `PreToolUse` hook and its `/jev`
+  MCP server could not work. Deleted: the six tracked files under
+  `claude/.claude/skills/jev-router/`, the `statusLine` that ran its
+  `statusline.mjs`, and the install step in `claude/install.sh` that symlinked
+  the plugin. `settings.json` now carries only `enabledPlugins`,
+  `extraKnownMarketplaces`, `skipDangerousModePermissionPrompt` and `$schema`.
+
+### Changed
+
+- `claude/install.sh` deploys two things instead of three: it merges
+  `settings.json` and the MCP template, and no longer links a plugin. A plugin
+  installed by the `claude` CLI lands in `~/.claude/plugins`, which stays
+  machine-local and untracked.
+- `jev/install.sh` keeps wiring `omp-jev` and `omp-jev-compaction`, which do not
+  need the CLI; only its closing verify hint changed.
+
 ## [1.8.1] - 2026-10-27
 
 ### Fixed

@@ -130,4 +130,4 @@ install_omp_compaction
 install_jev_mcp_note
 
 echo
-ok "done. verify with: jev doctor"
+ok "done. verify with: omp plugin list | grep jev"

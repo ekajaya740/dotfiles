@@ -10,12 +10,10 @@
 #   * plugin directories must be self-contained, so a plugin assembled from
 #     per-file symlinks is rejected ("path escapes plugin directory").
 #
-# So this package is deployed like jev/ — a script reproduces the machine
-# wiring — rather than symlinked:
+# So this package is deployed by a script rather than symlinked:
 #
 #   1. settings.json      → merged into ~/.claude/settings.json
 #   2. mcp.json.template  → merged into ~/.claude.json (user-scope mcpServers)
-#   3. skills/jev-router/ → symlinked to ~/.claude/skills/jev-router
 #
 # Merge semantics: the repo config wins for the keys it manages (env,
 # apiKeyHelper, statusLine, mcpServers); the plugin maps are unioned with the
@@ -44,8 +42,6 @@ warn() { printf '\033[1;33m[WARN]\033[0m  %s\n' "$*"; }
 REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 SETTINGS="$REPO_DIR/claude/.claude/settings.json"
 MCP_TEMPLATE="$REPO_DIR/claude/.claude/mcp.json.template"
-PLUGIN_SRC="$REPO_DIR/claude/.claude/skills/jev-router"
-PLUGIN_LINK="$HOME/.claude/skills/jev-router"
 LIVE_SETTINGS="$HOME/.claude/settings.json"
 LIVE_CLAUDE_JSON="$HOME/.claude.json"
 
@@ -55,7 +51,6 @@ command -v python3 >/dev/null || { warn "python3 required"; exit 1; }
 if $CHECK; then
     echo "  [dry-run] merge $SETTINGS -> $LIVE_SETTINGS"
     echo "  [dry-run] merge mcpServers from $MCP_TEMPLATE -> $LIVE_CLAUDE_JSON"
-    echo "  [dry-run] ln -sfn $PLUGIN_SRC -> $PLUGIN_LINK"
     exit 0
 fi
 
@@ -134,32 +129,8 @@ doc["mcpServers"] = servers
 write(live_json_path, doc)
 print(f"    mcpServers: +{added} ~{updated} ({len(servers)} total)")
 PY
+# 3: no plugin symlinks. jev-router, the only plugin wired from this repo, was
+# removed with the jev CLI; a plugin added later gets installed by the `claude`
+# CLI into ~/.claude/plugins, which is machine-local and stays untracked.
 
-# 3: the jev-router plugin, as a folder symlink (a self-contained plugin dir).
-mkdir -p "$(dirname "$PLUGIN_LINK")"
-
-# On a machine where ~/.claude is itself a symlink into this repo, PLUGIN_LINK
-# and PLUGIN_SRC are the same directory. Linking then produces a
-# self-referential symlink (`jev-router -> .../skills/jev-router`), which breaks
-# every read under skills/ — git, jq and validate.sh all report ELOOP. Compare
-# the canonical parents so that case is a no-op, and repair a loop already made.
-link_dir="$(cd "$(dirname "$PLUGIN_LINK")" && pwd -P)"
-src_dir="$(cd "$(dirname "$PLUGIN_SRC")" && pwd -P)"
-if [[ "$link_dir/$(basename "$PLUGIN_LINK")" == "$src_dir/$(basename "$PLUGIN_SRC")" ]]; then
-    if [[ -L "$PLUGIN_LINK" ]]; then
-        warn "$PLUGIN_LINK is a self-referential symlink — removing it"
-        rm "$PLUGIN_LINK"
-    fi
-    ok "jev-router plugin is the repo copy (~/.claude is symlinked into it)"
-elif [[ -L "$PLUGIN_LINK" && "$(readlink -f "$PLUGIN_LINK")" == "$(readlink -f "$PLUGIN_SRC")" ]]; then
-    ok "jev-router plugin already linked"
-elif [[ -e "$PLUGIN_LINK" && ! -L "$PLUGIN_LINK" ]]; then
-    warn "$PLUGIN_LINK exists and is not a symlink — moving it aside"
-    mv "$PLUGIN_LINK" "$PLUGIN_LINK.bak.$(date +%Y%m%d-%H%M%S)"
-    ln -sfn "$PLUGIN_SRC" "$PLUGIN_LINK"
-else
-    ln -sfn "$PLUGIN_SRC" "$PLUGIN_LINK"
-    ok "linked jev-router plugin"
-fi
-
-ok "Claude Code config deployed (settings.json + ~/.claude.json + jev-router)"
+ok "Claude Code config deployed (settings.json + ~/.claude.json)"
