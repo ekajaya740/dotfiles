@@ -1211,6 +1211,19 @@ to reproduce the machine-local half on a new device.
 | `omp-jev` | omp | Jev routing; config at `~/.config/omp-jev/config.json` (pointed at 9router SystemOne, model `judge`). |
 | `omp-jev-compaction` | omp | Jev-scored context reduction. Built from source into `~/.omp/plugins-local/`, linked with `omp plugin install <path>`. |
 
+**One key, three names.** Both clients select a provider by which env var is
+present, and `typesafe` outranks `openrouter`. Since every call goes to the same
+9router SystemOne endpoint, `zsh/.zshenv` re-exports the gateway key as
+`TYPESAFE_API_KEY` so the `typesafe` provider is selectable with no second
+credential to rotate, and there is deliberately **no** `OPENROUTER_API_KEY` — a
+direct OpenRouter key is rejected (`401 User not found.`), which surfaces as
+`Jev judgments are off (the key in OPENROUTER_API_KEY was rejected)`.
+
+`omp-jev-compaction` reads its endpoint from plugin settings, not env:
+`provider: typesafe`, `baseUrl: https://ai.workofekajaya.com/v1/systemone`,
+`model: judge` in `~/.omp/plugins/omp-plugins.lock.json` (the `settings` block;
+`omp plugin config set omp-jev-compaction <key> <value>`).
+
 ### Pen Cannot Run jev-mcp
 
 Pen launches with `PATH=/usr/bin:/bin:/usr/sbin:/sbin`, so it cannot resolve
@@ -1228,8 +1241,10 @@ CLI. Pen gets Jev only if a compiled binary ships.
 ### Validation
 
 ```bash
-omp plugin list | grep jev            # omp-jev and omp-jev-compaction present
-bash jev/install.sh --check            # what a fresh device would install
+omp plugin list | grep jev                      # both Jev plugins present
+omp plugin config list omp-jev-compaction       # provider/baseUrl/model point at 9router
+bash jev/install.sh --check                     # what a fresh device would install
+zsh -c 'test -n "$TYPESAFE_API_KEY" && echo key-ok'   # derived from NINEROUTER_API_KEY
 ```
 
 There is no `jev` CLI on this machine: `~/.local/bin/jev` was a dangling symlink
