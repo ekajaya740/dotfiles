@@ -1,5 +1,5 @@
 {
-  "_exported": "2026-10-26T10:45:35Z",
+  "_exported": "2026-11-10T17:37:48Z",
   "_note": "9Router config backup. Secrets masked. Restore via API: nodes->POST /api/provider-nodes, conns->POST /api/providers, models->POST /api/models/custom, aliases->PUT /api/models/alias, combos->POST /api/combos (with real keys).",
   "combos": [
     {
@@ -7,33 +7,39 @@
       "name": "coder",
       "kind": "llm",
       "models": [
+        "oc/inkling-2-small-free",
+        "ocg/deepseek-v4.1-flash(max)",
         "ollama-cloud/deepseek-v4.1-flash:1017-cloud",
-        "shiteru-deepseek-v4.1-flash"
+        "oc/beam-free"
       ],
       "createdAt": "2026-09-01T05:53:28.026Z",
-      "updatedAt": "2026-10-26T10:45:19.995Z"
+      "updatedAt": "2026-11-10T17:28:07.826Z"
     },
     {
       "id": "031b0d15-335c-4e29-99bc-e4d17b822bb1",
       "name": "advisor",
       "kind": "llm",
       "models": [
+        "shiteru/kimi-k3.1-pro(max)",
+        "shiteru-zs/kimi-k3.1-pro(max)",
+        "shiteru-deepseek-v4.1-flash",
+        "ocg/deepseek-v4.1-flash(max)",
         "ollama-cloud/deepseek-v4.1-flash:1017-cloud",
-        "shiteru-deepseek-v4.1-flash"
+        "oc/beam-free"
       ],
       "createdAt": "2026-09-01T05:53:28.033Z",
-      "updatedAt": "2026-10-26T10:45:20.013Z"
+      "updatedAt": "2026-11-10T17:22:03.024Z"
     },
     {
       "id": "5c83ba54-1708-4214-8787-f8b96c8dbf94",
       "name": "personal-chat",
       "kind": "llm",
       "models": [
-        "ollama-cloud/deepseek-v4.1-flash:1017-cloud",
+        "ollama-cloud/deepseek-v4.1-flash:1017-cloud(max)",
         "shiteru-deepseek-v4.1-flash"
       ],
       "createdAt": "2026-09-01T05:53:28.039Z",
-      "updatedAt": "2026-10-26T10:45:20.035Z"
+      "updatedAt": "2026-11-06T05:52:32.231747Z"
     },
     {
       "id": "38b97421-ed2c-4925-9748-410a02ea1d29",
@@ -150,33 +156,33 @@
       "name": "shiteru-deepseek-v4-flash",
       "kind": "llm",
       "models": [
-        "shiteru/deepseek-v4-flash",
-        "shiteru-zs/deepseek-v4-flash"
+        "shiteru/deepseek-v4-flash(max)",
+        "shiteru-zs/deepseek-v4-flash(max)"
       ],
       "createdAt": "2026-09-03T08:45:21.460Z",
-      "updatedAt": "2026-09-03T08:52:33.502Z"
+      "updatedAt": "2026-11-06T05:52:32.231835Z"
     },
     {
       "id": "b3decac3-4d88-408d-9ec4-cc9382f6c069",
       "name": "shiteru-deepseek-v4-flash-premium",
       "kind": "llm",
       "models": [
-        "shiteru/deepseek-v4-flash-premium",
-        "shiteru-zs/deepseek-v4-flash-premium"
+        "shiteru/deepseek-v4-flash-premium(max)",
+        "shiteru-zs/deepseek-v4-flash-premium(max)"
       ],
       "createdAt": "2026-09-03T08:45:21.490Z",
-      "updatedAt": "2026-09-03T08:52:33.508Z"
+      "updatedAt": "2026-11-06T05:52:32.231898Z"
     },
     {
       "id": "21165c0c-ac75-45e6-9696-a1a382003e45",
       "name": "shiteru-deepseek-v4-pro",
       "kind": "llm",
       "models": [
-        "shiteru/deepseek-v4-pro",
-        "shiteru-zs/deepseek-v4-pro"
+        "shiteru/deepseek-v4-pro(max)",
+        "shiteru-zs/deepseek-v4-pro(max)"
       ],
       "createdAt": "2026-09-03T08:45:21.497Z",
-      "updatedAt": "2026-09-03T08:52:33.514Z"
+      "updatedAt": "2026-11-06T05:52:32.231943Z"
     },
     {
       "id": "42bcf5b5-bc4d-4ce0-a044-7b2b93522f2a",
@@ -491,20 +497,20 @@
       "name": "sfw-coder",
       "kind": "llm",
       "models": [
-        "ollama-cloud/deepseek-v4.1-flash:1017-cloud"
+        "ollama-cloud/deepseek-v4.1-flash:1017-cloud(max)"
       ],
       "createdAt": "2026-09-07T02:29:29.468Z",
-      "updatedAt": "2026-10-26T05:44:58.017Z"
+      "updatedAt": "2026-11-06T05:52:32.232116Z"
     },
     {
       "id": "0467e95d-eea7-40f2-94e2-69298bf79a48",
       "name": "sfw-advisor",
       "kind": "llm",
       "models": [
-        "ollama-cloud/deepseek-v4.1-flash:1017-cloud"
+        "ollama-cloud/deepseek-v4.1-flash:1017-cloud(max)"
       ],
       "createdAt": "2026-09-07T02:29:49.983Z",
-      "updatedAt": "2026-10-26T05:44:58.035Z"
+      "updatedAt": "2026-11-06T05:52:32.232144Z"
     },
     {
       "id": "34a9aa3d-2c7e-41c1-8e62-bc7687567a0d",
@@ -544,22 +550,22 @@
       "name": "shiteru-deepseek-v4.1-flash",
       "kind": "llm",
       "models": [
-        "shiteru/deepseek-v4.1-flash(high)",
-        "shiteru-zs/deepseek-v4.1-flash(high)"
+        "shiteru/deepseek-v4.1-flash(max)",
+        "shiteru-zs/deepseek-v4.1-flash(max)"
       ],
       "createdAt": "2026-09-10T03:06:51.747Z",
-      "updatedAt": "2026-10-10T02:30:59.287Z"
+      "updatedAt": "2026-11-06T05:52:32.232213Z"
     },
     {
       "id": "3b38612e-b242-48b3-880d-990b8791bbc0",
       "name": "shiteru-deepseek-v4.1-flash-free",
       "kind": "llm",
       "models": [
-        "shiteru-shared/deepseek-v4.1-flash:free",
-        "shiteru-shared-zs/deepseek-v4.1-flash:free"
+        "shiteru-shared/deepseek-v4.1-flash:free(max)",
+        "shiteru-shared-zs/deepseek-v4.1-flash:free(max)"
       ],
       "createdAt": "2026-09-13T02:42:14.643Z",
-      "updatedAt": "2026-09-13T02:42:14.643Z"
+      "updatedAt": "2026-11-06T05:52:32.232245Z"
     },
     {
       "id": "6a3dd850-5600-45b7-9361-8aec82be3fb4",
@@ -600,10 +606,10 @@
       "kind": "llm",
       "models": [
         "ollama-cloud/gemma4:31b",
-        "ollama-cloud/deepseek-v4.1-flash:1017-cloud"
+        "ollama-cloud/deepseek-v4.1-flash:1017-cloud(max)"
       ],
       "createdAt": "2026-10-26T03:20:41.521Z",
-      "updatedAt": "2026-10-26T03:54:55.036Z"
+      "updatedAt": "2026-11-06T05:52:32.232286Z"
     }
   ],
   "connections": [
@@ -616,24 +622,22 @@
       "priority": 1,
       "isActive": true,
       "createdAt": "2026-08-27T05:35:34.813Z",
-      "updatedAt": "2026-10-26T05:38:43.062Z",
-      "testStatus": "active",
+      "updatedAt": "2026-10-30T10:58:53.540Z",
+      "testStatus": "unavailable",
       "providerSpecificData": {
         "connectionProxyEnabled": false,
         "connectionProxyUrl": "",
         "connectionNoProxy": ""
       },
       "modelLock_nemotron-3-embed-1b-20260716:free": null,
-      "errorCode": null,
+      "errorCode": 404,
       "backoffLevel": 0,
       "modelLock_deepseek-v4-flash:0731": null,
       "modelLock_typesafe/jev-router": null,
-      "lastError": null,
-      "lastErrorAt": null,
       "modelLock_deepseek-flash": null,
       "modelLock_deepseek-chat": null,
       "modelLock_deepseek-v4.1-flash": null,
-      "modelLock_typesafe/jev-1.13": null,
+      "modelLock_typesafe/jev-1.13": "2026-10-28T05:16:02.564Z",
       "modelLock_anthropic/claude-sonnet-4": null,
       "modelLock_deepseek-v3": null,
       "modelLock_deepseek/deepseek-chat": null,
@@ -652,7 +656,9 @@
       "modelLock_nvidia/nemotron-3-super-120b-a12b:free": null,
       "modelLock_deepseek/deepseek-v4-flash": null,
       "modelLock_meta-llama/llama-3.3-70b-instruct": null,
-      "rateLimitedUntil": null
+      "lastError": "[404]: {\"error\":{\"message\":\"0 endpoints out of 39 requested are available matching your guardrail restrictions and data policy. We removed them for the following reasons (an endpoint may have matched ",
+      "lastErrorAt": "2026-10-30T10:58:53.540Z",
+      "modelLock_deepseek-v4.1-flash:cloud": "2026-10-30T11:00:53.540Z"
     },
     {
       "id": "fc3d2d0b-c66f-449d-bd36-753070c57771",
@@ -663,7 +669,7 @@
       "priority": 1,
       "isActive": true,
       "createdAt": "2026-08-27T05:38:04.204Z",
-      "updatedAt": "2026-10-26T10:45:34.727Z",
+      "updatedAt": "2026-11-10T17:35:54.619Z",
       "testStatus": "active",
       "providerSpecificData": {
         "prefix": "ollama-cloud",
@@ -693,39 +699,10 @@
       "modelLock_DeepSeek-V4.1-Flash-1017": null,
       "modelLock_minimax-m3.1-flash:cloud": null,
       "modelLock_deepseek-v4.1-flash:1017-cloud": null,
+      "modelLock_deepseek-v4.1-flash:1017-cloud(max)": null,
       "lastError": null,
       "lastErrorAt": null,
       "rateLimitedUntil": null
-    },
-    {
-      "id": "5b23e330-9a7d-4695-8a2c-fc2fb50ab9b7",
-      "provider": "openai-compatible-chat-e4107e86-a564-4e6e-8ea4-a747579f651f",
-      "authType": "apikey",
-      "name": "DeepSeek API",
-      "email": null,
-      "priority": 1,
-      "isActive": true,
-      "createdAt": "2026-08-27T05:38:04.220Z",
-      "updatedAt": "2026-10-26T02:20:29.570Z",
-      "testStatus": "unavailable",
-      "providerSpecificData": {
-        "prefix": "deepseek-api",
-        "apiType": "chat",
-        "baseUrl": "https://api.deepseek.com/v1",
-        "nodeName": "DeepSeek",
-        "connectionProxyEnabled": false,
-        "connectionProxyUrl": "",
-        "connectionNoProxy": ""
-      },
-      "modelLock_deepseek-chat": "2026-10-17T12:29:24.856Z",
-      "errorCode": 402,
-      "backoffLevel": 0,
-      "modelLock_deepseek-v4-flash": "2026-10-26T02:22:29.570Z",
-      "lastError": "[402]: {\"error\":{\"message\":\"Insufficient Balance (request_id: ac1f8b34-dd0c-4384-a3de-58dc436995a5)\",\"type\":\"insufficient_balance_error\",\"param\":null,\"code\":\"invalid_request_error\"}}",
-      "lastErrorAt": "2026-10-26T02:20:29.570Z",
-      "modelLock_deepseek-v4-flash-vision-exp": "2026-10-05T09:14:28.433Z",
-      "modelLock_deepseek-v4.1-flash-expires-on-0910": "2026-10-17T12:33:47.345Z",
-      "modelLock_deepseek-flash": "2026-10-17T12:33:47.462Z"
     },
     {
       "id": "69ea4534-1553-4acb-b2e8-a7e28afaf699",
@@ -755,66 +732,6 @@
       "modelLock_gemini-3.7-flash": "2026-09-07T03:57:34.346Z"
     },
     {
-      "id": "7d230bc3-57f6-4c83-b2e4-db7db719e665",
-      "provider": "openai-compatible-chat-95e66841-5dce-4eb8-95ae-2198bf2fc67a",
-      "authType": "apikey",
-      "name": "Floodgate",
-      "email": null,
-      "priority": 1,
-      "isActive": true,
-      "createdAt": "2026-08-27T16:50:28.112Z",
-      "updatedAt": "2026-10-17T12:31:50.365Z",
-      "testStatus": "unavailable",
-      "providerSpecificData": {
-        "prefix": "floodgate",
-        "apiType": "chat",
-        "baseUrl": "https://api.floodgate.dev/v1",
-        "nodeName": "Floodgate",
-        "connectionProxyEnabled": false,
-        "connectionProxyUrl": "",
-        "connectionNoProxy": ""
-      },
-      "modelLock_glm-5.3": "2026-10-17T12:30:41.205Z",
-      "lastError": "[403]: {\"error\":{\"message\":\"Your balance is empty. Visit the website and top up to keep using the API. (request id: 202610171231473298065888268d9d6TgWDZJyD)\",\"type\":\"invalid_request_error\",\"param\":nul",
-      "errorCode": 403,
-      "lastErrorAt": "2026-10-17T12:31:50.365Z",
-      "backoffLevel": 0,
-      "modelLock_claude-opus-5": "2026-10-12T03:25:23.777Z",
-      "modelLock_deepseek-v4-flash": "2026-09-05T01:34:45.999Z",
-      "modelLock_claude-sonnet-5": "2026-10-17T12:33:49.911Z",
-      "modelLock_claude-fable-5-1": "2026-10-17T12:33:50.303Z",
-      "modelLock_claude-haiku-5-5": "2026-10-17T12:33:50.364Z"
-    },
-    {
-      "id": "958ef60f-33dc-4441-9134-28e1e1c2dffe",
-      "provider": "openai-compatible-chat-074f0069-1fc9-4e61-9375-73b338ba17cb",
-      "authType": "apikey",
-      "name": "TabiToken",
-      "email": null,
-      "priority": 1,
-      "isActive": true,
-      "createdAt": "2026-08-27T16:50:28.445Z",
-      "updatedAt": "2026-10-17T12:31:48.195Z",
-      "testStatus": "unavailable",
-      "providerSpecificData": {
-        "prefix": "tabitoken",
-        "apiType": "chat",
-        "baseUrl": "https://tabitoken.com/v1",
-        "nodeName": "TabiToken",
-        "connectionProxyEnabled": false,
-        "connectionProxyUrl": "",
-        "connectionNoProxy": ""
-      },
-      "modelLock_claude-opus-4-8": "2026-10-17T12:32:17.776Z",
-      "errorCode": 500,
-      "backoffLevel": 0,
-      "lastError": "[500]: <html>\r\n<head><title>500 Internal Server Error</title></head>\r\n<body>\r\n<center><h1>500 Internal Server Error</h1></center>\r\n<hr><center>nginx</center>\r\n<script>(function(){function c(){var b=a.",
-      "lastErrorAt": "2026-10-17T12:31:48.195Z",
-      "modelLock_glm-5.3": "2026-10-17T12:30:46.876Z",
-      "modelLock_claude-opus-5": "2026-10-17T12:32:17.809Z",
-      "modelLock_claude-opus-5-thinking": "2026-10-17T12:32:18.195Z"
-    },
-    {
       "id": "71fc9eb6-2e42-43ef-a7d8-9d4453729137",
       "provider": "openai-compatible-chat-ce0002fb-6c70-4ef5-99e2-1f7f4db0ad89",
       "authType": "apikey",
@@ -823,7 +740,7 @@
       "priority": 1,
       "isActive": true,
       "createdAt": "2026-09-03T02:00:51.052Z",
-      "updatedAt": "2026-10-26T10:44:39.360Z",
+      "updatedAt": "2026-11-10T17:27:26.812Z",
       "defaultModel": "deepseek-v4-flash",
       "testStatus": "active",
       "providerSpecificData": {
@@ -870,10 +787,12 @@
       "modelLock_gpt-5.6-terra": null,
       "modelLock_kr/claude-opus-4.8": null,
       "modelLock_claude-sonnet-4.6": null,
+      "modelLock_claude-sonnet-5:free": null,
       "lastError": null,
       "lastErrorAt": null,
-      "rateLimitedUntil": null,
-      "modelLock_claude-sonnet-5:free": null
+      "modelLock_deepseek-v4.1-flash(max)": null,
+      "modelLock_deepseek-v4-flash(max)": null,
+      "rateLimitedUntil": null
     },
     {
       "id": "b7675e72-6a89-428d-81d9-cc7b44b65d30",
@@ -884,8 +803,8 @@
       "priority": 1,
       "isActive": true,
       "createdAt": "2026-09-03T07:30:11.394Z",
-      "updatedAt": "2026-10-26T10:44:40.716Z",
-      "testStatus": "active",
+      "updatedAt": "2026-11-10T17:25:12.614Z",
+      "testStatus": "unavailable",
       "providerSpecificData": {
         "prefix": "shiteru-zs",
         "apiType": "chat",
@@ -896,7 +815,7 @@
         "connectionNoProxy": ""
       },
       "modelLock_claude-opus-5": null,
-      "errorCode": null,
+      "errorCode": 403,
       "backoffLevel": 0,
       "modelLock_deepseek-v4-flash": null,
       "modelLock_glm-5.3": null,
@@ -914,8 +833,6 @@
       "modelLock_gpt-6-astra": null,
       "modelLock_claude-fable-5.1": null,
       "modelLock_deepseek-v4.1-flash": null,
-      "lastError": null,
-      "lastErrorAt": null,
       "modelLock_hy4-preview": null,
       "modelLock_gpt-5.6-sol": null,
       "modelLock_cb/claude-sonnet-4.6": null,
@@ -924,9 +841,12 @@
       "modelLock_claude-opus-4.7": null,
       "modelLock_claude-sonnet-4.6": null,
       "modelLock_claude-opus-4.8": null,
-      "rateLimitedUntil": null,
       "modelLock_claude-sonnet-5:free": null,
-      "modelLock_kimi-k3:free": null
+      "modelLock_kimi-k3:free": null,
+      "lastError": "[403]: {\"error\":{\"message\":\"Your current subscription is not eligible for model deepseek-v4.1-flash\",\"type\":\"permission_error\",\"code\":\"subscription_not_eligible\"}}",
+      "lastErrorAt": "2026-11-10T17:25:12.614Z",
+      "modelLock_deepseek-v4.1-flash(max)": "2026-11-10T17:27:12.614Z",
+      "modelLock_deepseek-v4-flash(max)": null
     },
     {
       "id": "6e778832-d548-416a-a8fa-5c705c9aa8b3",
@@ -950,108 +870,6 @@
       }
     },
     {
-      "id": "e57b19cf-2d83-4dca-bdfc-ea3bd0860d41",
-      "provider": "openai-compatible-chat-f4d573e8-6b20-4bed-95ce-00e4a628a11d",
-      "authType": "apikey",
-      "name": "HCNSec Key",
-      "email": null,
-      "priority": 1,
-      "isActive": true,
-      "createdAt": "2026-09-03T08:01:10.350Z",
-      "updatedAt": "2026-10-26T02:21:00.142Z",
-      "testStatus": "active",
-      "providerSpecificData": {
-        "prefix": "hcnsec",
-        "apiType": "chat",
-        "baseUrl": "https://api.hcnsec.cn/v1",
-        "nodeName": "HCNSec",
-        "connectionProxyEnabled": false,
-        "connectionProxyUrl": "",
-        "connectionNoProxy": ""
-      },
-      "modelLock_DeepSeek-V4-Flash": null,
-      "errorCode": null,
-      "backoffLevel": 0,
-      "lastError": null,
-      "lastErrorAt": null,
-      "modelLock_step-3.5-flash-2603": null,
-      "modelLock_qwen3.8-max": null,
-      "modelLock_glm-5.3": null,
-      "rateLimitedUntil": null
-    },
-    {
-      "id": "8bdda4c6-37ba-4f2e-b5a6-265734650a89",
-      "provider": "openai-compatible-chat-0ad5d494-bfec-457e-b4e3-a37a3fb118b2",
-      "authType": "apikey",
-      "name": "KKToken Key",
-      "email": null,
-      "priority": 1,
-      "isActive": true,
-      "createdAt": "2026-09-03T08:18:46.102Z",
-      "updatedAt": "2026-10-17T12:31:58.290Z",
-      "testStatus": "unavailable",
-      "providerSpecificData": {
-        "prefix": "kktoken",
-        "apiType": "chat",
-        "baseUrl": "https://kktoken.cc/v1",
-        "nodeName": "KKToken",
-        "connectionProxyEnabled": false,
-        "connectionProxyUrl": "",
-        "connectionNoProxy": ""
-      },
-      "modelLock_glm-5.3": "2026-10-17T12:30:44.661Z",
-      "lastError": "[503]: {\"error\":{\"code\":\"model_not_found\",\"message\":\"No available channel for model claude-opus-5 under group default (distributor) (request id: 202610171231580878811878268d9d6zAll5iMh)\",\"type\":\"new_a",
-      "errorCode": 503,
-      "lastErrorAt": "2026-10-17T12:31:58.290Z",
-      "backoffLevel": 0,
-      "modelLock_claude-opus-5-thinking": "2026-10-17T12:33:56.557Z",
-      "modelLock_claude-opus-5": "2026-10-17T12:32:28.290Z"
-    },
-    {
-      "id": "7d2af753-9c19-4ce9-b560-b0a5ea6610ed",
-      "provider": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "authType": "apikey",
-      "name": "ModelRouter Key",
-      "email": null,
-      "priority": 1,
-      "isActive": true,
-      "createdAt": "2026-09-04T08:41:58.718Z",
-      "updatedAt": "2026-10-26T02:20:52.441Z",
-      "testStatus": "unavailable",
-      "providerSpecificData": {
-        "prefix": "modelrouter",
-        "apiType": "chat",
-        "baseUrl": "https://api.linstore.my.id/v1",
-        "nodeName": "ModelRouter",
-        "connectionProxyEnabled": false,
-        "connectionProxyUrl": "",
-        "connectionNoProxy": ""
-      },
-      "lastError": "[502]: fetch failed (cause: ERR_SSL_TLSV1_ALERT_INTERNAL_ERROR: 008DB0C0A07D0000:error:0A000438:SSL routines:ssl3_read_bytes:tlsv1 alert internal error:../deps/openssl/openssl/ssl/record/rec_layer_s3.",
-      "lastErrorAt": "2026-10-26T02:20:52.441Z",
-      "modelLock_deepseek-v4-flash-free": "2026-09-06T06:55:16.374Z",
-      "errorCode": 502,
-      "backoffLevel": 0,
-      "modelLock_deepseek-v4-flash-vision-exp-free": "2026-09-07T03:58:16.894Z",
-      "modelLock_deepseek-v4-flash": "2026-09-04T09:33:53.624Z",
-      "modelLock_deepseek-v4-flash-vision-exp": "2026-10-05T09:13:08.271Z",
-      "modelLock_glm-5.3-flash": "2026-09-05T00:36:07.193Z",
-      "modelLock_gemini-3.7-flash": "2026-10-17T12:32:30.731Z",
-      "modelLock_gemini-3-flash-preview": "2026-09-07T02:39:44.452Z",
-      "modelLock_gpt-4o-mini": "2026-10-17T12:25:09.283Z",
-      "modelLock_gemini-2.5-flash": "2026-10-05T09:13:43.364Z",
-      "modelLock_gpt-4o": "2026-10-05T09:13:52.938Z",
-      "modelLock_gemini-2.5-pro-preview": "2026-09-07T03:58:23.326Z",
-      "modelLock_claude-sonnet-4.6": "2026-10-12T03:26:39.313Z",
-      "modelLock_glm-5.3": "2026-10-17T12:27:49.030Z",
-      "modelLock_gemini-3.5-flash": "2026-10-17T12:32:30.735Z",
-      "modelLock_hy3-free": "2026-10-17T12:32:30.761Z",
-      "modelLock_qwen3.8-flash-free": "2026-10-26T02:19:17.004Z",
-      "modelLock_mimo-v2.5-free": "2026-10-26T02:19:26.573Z",
-      "modelLock_glm-5.3-free": "2026-10-26T02:20:20.604Z",
-      "modelLock_gemini-3.1-flash-lite": "2026-10-26T02:21:22.441Z"
-    },
-    {
       "id": "2bb654f2-2eb9-4ff4-98e0-4f8c7875396c",
       "provider": "openai-compatible-chat-1968cb2f-409e-4f42-84d8-eefc01d50493",
       "authType": "apikey",
@@ -1060,7 +878,7 @@
       "priority": 1,
       "isActive": true,
       "createdAt": "2026-09-06T07:17:28.298Z",
-      "updatedAt": "2026-10-26T02:51:11.011Z",
+      "updatedAt": "2026-11-06T06:11:17.255Z",
       "testStatus": "unavailable",
       "providerSpecificData": {
         "prefix": "shiteru-shared",
@@ -1074,12 +892,13 @@
       "modelLock_kr/claude-sonnet-5:free": "2026-09-13T02:46:57.234Z",
       "lastError": "[401]: {\"error\":{\"message\":\"Invalid API key\",\"type\":\"authentication_error\",\"code\":\"invalid_api_key\"}}",
       "errorCode": 401,
-      "lastErrorAt": "2026-10-26T02:51:11.011Z",
+      "lastErrorAt": "2026-11-06T06:11:17.255Z",
       "backoffLevel": 0,
       "modelLock_claude-opus-5": "2026-09-13T08:57:45.437Z",
       "modelLock_kimi-k3:free": "2026-10-17T12:33:55.522Z",
       "modelLock_glm-5.3:free": "2026-10-26T02:53:11.011Z",
-      "modelLock_deepseek-v4.1-flash:free": "2026-10-26T02:53:04.914Z"
+      "modelLock_deepseek-v4.1-flash:free": "2026-11-06T04:27:47.501Z",
+      "modelLock_deepseek-v4.1-flash:free(max)": "2026-11-06T06:13:17.255Z"
     },
     {
       "id": "60aca733-2474-48cd-8d37-7c98a21a48a8",
@@ -1090,7 +909,7 @@
       "priority": 1,
       "isActive": true,
       "createdAt": "2026-09-06T07:17:28.307Z",
-      "updatedAt": "2026-10-26T02:51:01.814Z",
+      "updatedAt": "2026-11-06T04:25:53.636Z",
       "testStatus": "unavailable",
       "providerSpecificData": {
         "prefix": "shiteru-shared-zs",
@@ -1104,10 +923,10 @@
       "modelLock_kr/claude-sonnet-5:free": "2026-10-17T12:33:56.010Z",
       "lastError": "[401]: {\"error\":{\"message\":\"Invalid API key\",\"type\":\"authentication_error\",\"code\":\"invalid_api_key\"}}",
       "errorCode": 401,
-      "lastErrorAt": "2026-10-26T02:51:01.814Z",
+      "lastErrorAt": "2026-11-06T04:25:53.635Z",
       "backoffLevel": 0,
       "modelLock_claude-opus-5": "2026-09-13T08:57:45.531Z",
-      "modelLock_deepseek-v4.1-flash:free": "2026-10-26T02:53:01.814Z"
+      "modelLock_deepseek-v4.1-flash:free": "2026-11-06T04:27:53.635Z"
     },
     {
       "id": "7e17aa35-2f1c-4b33-ba34-8f561ea90db1",
@@ -1118,17 +937,15 @@
       "priority": 1,
       "isActive": true,
       "createdAt": "2026-09-07T01:46:21.577Z",
-      "updatedAt": "2026-10-26T02:55:27.683Z",
-      "testStatus": "active",
+      "updatedAt": "2026-11-06T04:29:21.310Z",
+      "testStatus": "unavailable",
       "providerSpecificData": {
         "connectionProxyEnabled": false,
         "connectionProxyUrl": "",
         "connectionNoProxy": ""
       },
-      "modelLock_deepseek-v4-flash": null,
-      "lastError": null,
-      "errorCode": null,
-      "lastErrorAt": null,
+      "modelLock_deepseek-v4-flash": "2026-11-06T04:31:21.310Z",
+      "errorCode": 402,
       "backoffLevel": 0,
       "modelLock_auto:free": null,
       "modelLock_gemini-3.1-pro-preview": null,
@@ -1139,7 +956,9 @@
       "modelLock_mimo-v2.5": null,
       "modelLock_mimo-v2.5-pro": null,
       "modelLock_gpt-5.4-nano": null,
-      "rateLimitedUntil": null
+      "modelLock_deepseek-v4.1-flash": "2026-11-06T04:31:20.564Z",
+      "lastError": "[402]: {\"error\":{\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 12 tokens, but can only afford 0.\",\"type\":\"invalid_request_error\",\"code\":402}}",
+      "lastErrorAt": "2026-11-06T04:29:21.310Z"
     },
     {
       "id": "79536301-4260-4e7b-b59e-9d888bdc0789",
@@ -1177,7 +996,7 @@
       "priority": 1,
       "isActive": true,
       "createdAt": "2026-10-11T06:57:55.248Z",
-      "updatedAt": "2026-10-26T02:51:14.036Z",
+      "updatedAt": "2026-11-06T06:11:20.276Z",
       "testStatus": "unavailable",
       "providerSpecificData": {
         "prefix": "shiteru-shared",
@@ -1189,12 +1008,13 @@
         "connectionNoProxy": ""
       },
       "lastError": "[401]: {\"error\":{\"message\":\"Invalid API key\",\"type\":\"authentication_error\",\"code\":\"invalid_api_key\"}}",
-      "lastErrorAt": "2026-10-26T02:51:14.036Z",
+      "lastErrorAt": "2026-11-06T06:11:20.276Z",
       "errorCode": 401,
       "backoffLevel": 15,
       "modelLock_kimi-k3:free": "2026-10-17T12:33:58.534Z",
       "modelLock_glm-5.3:free": "2026-10-26T02:53:14.036Z",
-      "modelLock_deepseek-v4.1-flash:free": "2026-10-26T02:53:07.941Z"
+      "modelLock_deepseek-v4.1-flash:free": "2026-11-06T04:27:50.516Z",
+      "modelLock_deepseek-v4.1-flash:free(max)": "2026-11-06T06:13:20.276Z"
     },
     {
       "id": "f755012d-15dd-4e3a-af7e-77b8ff4bb009",
@@ -1278,8 +1098,99 @@
       "lastErrorAt": "2026-10-26T10:44:38.145Z",
       "backoffLevel": 0,
       "modelLock_deepseek-v4.1-flash-abliterated(max)": null,
-      "rateLimitedUntil": null,
       "modelLock_deepseek-v4.1-flash-free": null
+    },
+    {
+      "id": "552f66e7-cd08-44af-a54a-6e1d97b238e8",
+      "provider": "openai-compatible-chat-ce0002fb-6c70-4ef5-99e2-1f7f4db0ad89",
+      "authType": "apikey",
+      "name": "Profill",
+      "email": null,
+      "priority": 1,
+      "isActive": true,
+      "createdAt": "2026-11-04T03:28:25.058Z",
+      "updatedAt": "2026-11-10T17:25:05.513Z",
+      "defaultModel": "deepseek-v4.1-flash",
+      "testStatus": "unavailable",
+      "providerSpecificData": {
+        "prefix": "shiteru",
+        "apiType": "chat",
+        "baseUrl": "https://ai.shiteru.id/v1",
+        "nodeName": "Shiteru AI",
+        "connectionProxyEnabled": false,
+        "connectionProxyUrl": "",
+        "connectionNoProxy": ""
+      },
+      "modelLock_deepseek-v4.1-flash(high)": null,
+      "errorCode": 403,
+      "backoffLevel": 0,
+      "modelLock_deepseek-v4-flash": null,
+      "modelLock_deepseek-v4.1-flash(max)": "2026-11-10T17:27:05.513Z",
+      "modelLock_deepseek-v4-flash(max)": null,
+      "lastError": "[403]: {\"error\":{\"message\":\"Your current subscription is not eligible for model deepseek-v4.1-flash\",\"type\":\"permission_error\",\"code\":\"subscription_not_eligible\"}}",
+      "lastErrorAt": "2026-11-10T17:25:05.513Z",
+      "rateLimitedUntil": null
+    },
+    {
+      "id": "7e6ace96-f658-4317-ae66-c267cc6c63d6",
+      "provider": "openai-compatible-chat-cbe5b645-4962-4f68-b635-506d779d09f2",
+      "authType": "apikey",
+      "name": "Profill",
+      "email": null,
+      "priority": 1,
+      "isActive": true,
+      "createdAt": "2026-11-04T03:28:50.349Z",
+      "updatedAt": "2026-11-10T17:25:15.922Z",
+      "defaultModel": "deepseek-v4.1-flash",
+      "testStatus": "unavailable",
+      "providerSpecificData": {
+        "prefix": "shiteru-zs",
+        "apiType": "chat",
+        "baseUrl": "https://shiteru-zs.online/v1",
+        "nodeName": "Shiteru ZS",
+        "connectionProxyEnabled": false,
+        "connectionProxyUrl": "",
+        "connectionNoProxy": ""
+      },
+      "modelLock_deepseek-v4.1-flash(high)": null,
+      "errorCode": 403,
+      "backoffLevel": 0,
+      "modelLock_deepseek-v4-flash": null,
+      "modelLock_deepseek-v4.1-flash(max)": "2026-11-10T17:27:15.921Z",
+      "modelLock_deepseek-v4-flash(max)": null,
+      "lastError": "[403]: {\"error\":{\"message\":\"Your current subscription is not eligible for model deepseek-v4.1-flash\",\"type\":\"permission_error\",\"code\":\"subscription_not_eligible\"}}",
+      "lastErrorAt": "2026-11-10T17:25:15.921Z"
+    },
+    {
+      "id": "dde11ca6-626e-4663-80a1-71ad5fb2d60f",
+      "provider": "opencode-go",
+      "authType": "apikey",
+      "name": "Router",
+      "email": null,
+      "priority": 1,
+      "isActive": true,
+      "createdAt": "2026-11-04T17:03:45.479Z",
+      "updatedAt": "2026-11-10T17:37:42.914Z",
+      "testStatus": "active",
+      "providerSpecificData": {
+        "connectionProxyEnabled": false,
+        "connectionProxyUrl": "",
+        "connectionNoProxy": ""
+      },
+      "errorCode": null,
+      "backoffLevel": 0,
+      "modelLock_deepseek-v4.1-flash": null,
+      "modelLock_glm-5.3-flash": null,
+      "modelLock_kimi-k3": null,
+      "modelLock_minimax-m3.1-flash": null,
+      "modelLock_gemini-4-argon": null,
+      "modelLock_step-5-preview": null,
+      "modelLock_deepseek-v4-pro": null,
+      "modelLock_deepseek-v4.1-flash(max)": null,
+      "modelLock_beam-free": null,
+      "lastError": null,
+      "lastErrorAt": null,
+      "rateLimitedUntil": null
     }
   ],
   "nodes": [
@@ -1304,16 +1215,6 @@
       "baseUrl": "https://ollama.com/v1"
     },
     {
-      "id": "openai-compatible-chat-e4107e86-a564-4e6e-8ea4-a747579f651f",
-      "type": "openai-compatible",
-      "name": "DeepSeek",
-      "createdAt": "2026-08-27T05:38:04.214Z",
-      "updatedAt": "2026-08-27T06:20:55.791Z",
-      "prefix": "deepseek-api",
-      "apiType": "chat",
-      "baseUrl": "https://api.deepseek.com/v1"
-    },
-    {
       "id": "openai-compatible-chat-84b96810-9674-486c-a55d-177b1681eaa5",
       "type": "openai-compatible",
       "name": "Orvix",
@@ -1322,26 +1223,6 @@
       "prefix": "orvix",
       "apiType": "chat",
       "baseUrl": "https://api.orvix.id/v1"
-    },
-    {
-      "id": "openai-compatible-chat-95e66841-5dce-4eb8-95ae-2198bf2fc67a",
-      "type": "openai-compatible",
-      "name": "Floodgate",
-      "createdAt": "2026-08-27T16:50:28.100Z",
-      "updatedAt": "2026-08-27T16:50:28.100Z",
-      "prefix": "floodgate",
-      "apiType": "chat",
-      "baseUrl": "https://api.floodgate.dev/v1"
-    },
-    {
-      "id": "openai-compatible-chat-074f0069-1fc9-4e61-9375-73b338ba17cb",
-      "type": "openai-compatible",
-      "name": "TabiToken",
-      "createdAt": "2026-08-27T16:50:28.432Z",
-      "updatedAt": "2026-08-27T16:50:28.432Z",
-      "prefix": "tabitoken",
-      "apiType": "chat",
-      "baseUrl": "https://tabitoken.com/v1"
     },
     {
       "id": "openai-compatible-chat-cbe5b645-4962-4f68-b635-506d779d09f2",
@@ -1362,36 +1243,6 @@
       "prefix": "oc",
       "apiType": "chat",
       "baseUrl": "https://api.opencode.ai/v1"
-    },
-    {
-      "id": "openai-compatible-chat-f4d573e8-6b20-4bed-95ce-00e4a628a11d",
-      "type": "openai-compatible",
-      "name": "HCNSec",
-      "createdAt": "2026-09-03T08:01:06.962Z",
-      "updatedAt": "2026-09-03T08:01:06.962Z",
-      "prefix": "hcnsec",
-      "apiType": "chat",
-      "baseUrl": "https://api.hcnsec.cn/v1"
-    },
-    {
-      "id": "openai-compatible-chat-0ad5d494-bfec-457e-b4e3-a37a3fb118b2",
-      "type": "openai-compatible",
-      "name": "KKToken",
-      "createdAt": "2026-09-03T08:18:46.001Z",
-      "updatedAt": "2026-09-03T08:18:46.001Z",
-      "prefix": "kktoken",
-      "apiType": "chat",
-      "baseUrl": "https://kktoken.cc/v1"
-    },
-    {
-      "id": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "type": "openai-compatible",
-      "name": "ModelRouter",
-      "createdAt": "2026-09-04T08:41:58.704Z",
-      "updatedAt": "2026-09-04T08:41:58.704Z",
-      "prefix": "modelrouter",
-      "apiType": "chat",
-      "baseUrl": "https://api.linstore.my.id/v1"
     },
     {
       "id": "openai-compatible-chat-1968cb2f-409e-4f42-84d8-eefc01d50493",
@@ -2186,6 +2037,66 @@
       "name": "qwen3.8-max"
     },
     {
+      "providerAlias": "ocg",
+      "id": "beam-free",
+      "type": "llm",
+      "name": "beam-free"
+    },
+    {
+      "providerAlias": "ocg",
+      "id": "gemini-4-argon",
+      "type": "llm",
+      "name": "gemini-4-argon"
+    },
+    {
+      "providerAlias": "ocg",
+      "id": "hy4",
+      "type": "llm",
+      "name": "hy4"
+    },
+    {
+      "providerAlias": "ocg",
+      "id": "iceman-contributor-free",
+      "type": "llm",
+      "name": "iceman-contributor-free"
+    },
+    {
+      "providerAlias": "ocg",
+      "id": "longcat-2.5-free",
+      "type": "llm",
+      "name": "longcat-2.5-free"
+    },
+    {
+      "providerAlias": "ocg",
+      "id": "minimax-m3.1-flash",
+      "type": "llm",
+      "name": "minimax-m3.1-flash"
+    },
+    {
+      "providerAlias": "ocg",
+      "id": "step-5-preview",
+      "type": "llm",
+      "name": "step-5-preview"
+    },
+    {
+      "providerAlias": "oc",
+      "id": "beam-free",
+      "type": "llm",
+      "name": "beam-free"
+    },
+    {
+      "providerAlias": "oc",
+      "id": "crouton-alpha-free",
+      "type": "llm",
+      "name": "crouton-alpha-free"
+    },
+    {
+      "providerAlias": "oc",
+      "id": "inkling-2-small-free",
+      "type": "llm",
+      "name": "inkling-2-small-free"
+    },
+    {
       "providerAlias": "oc",
       "id": "muse-spark-1.3-contributor-free",
       "type": "llm",
@@ -2344,54 +2255,6 @@
       "name": "qwen3.5:397b"
     },
     {
-      "providerAlias": "openai-compatible-chat-074f0069-1fc9-4e61-9375-73b338ba17cb",
-      "id": "claude-opus-4-8-thinking",
-      "type": "llm",
-      "name": "claude-opus-4-8-thinking"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-074f0069-1fc9-4e61-9375-73b338ba17cb",
-      "id": "claude-opus-4-8",
-      "type": "llm",
-      "name": "claude-opus-4-8"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-074f0069-1fc9-4e61-9375-73b338ba17cb",
-      "id": "claude-opus-5-thinking",
-      "type": "llm",
-      "name": "claude-opus-5-thinking"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-074f0069-1fc9-4e61-9375-73b338ba17cb",
-      "id": "claude-opus-5",
-      "type": "llm",
-      "name": "claude-opus-5"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-95e66841-5dce-4eb8-95ae-2198bf2fc67a",
-      "id": "claude-opus-5",
-      "type": "llm",
-      "name": "claude-opus-5"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-95e66841-5dce-4eb8-95ae-2198bf2fc67a",
-      "id": "deepseek-v4-flash",
-      "type": "llm",
-      "name": "deepseek-v4-flash"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-95e66841-5dce-4eb8-95ae-2198bf2fc67a",
-      "id": "glm-5.3",
-      "type": "llm",
-      "name": "glm-5.3"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-95e66841-5dce-4eb8-95ae-2198bf2fc67a",
-      "id": "gpt-5.6-sol",
-      "type": "llm",
-      "name": "gpt-5.6-sol"
-    },
-    {
       "providerAlias": "openai-compatible-chat-aa806b9c-6cef-4466-88ed-f3eb7fea263b",
       "id": "deepseek-v4.1-flash-abliterated(max)",
       "type": "llm",
@@ -2444,564 +2307,6 @@
       "id": "minimax-m3.1-flash",
       "type": "llm",
       "name": "minimax-m3.1-flash"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "claude-fable-5.1",
-      "type": "llm",
-      "name": "claude-fable-5.1"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "claude-fable-5",
-      "type": "llm",
-      "name": "claude-fable-5"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "claude-haiku-4.5",
-      "type": "llm",
-      "name": "claude-haiku-4.5"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "claude-opus-4.5",
-      "type": "llm",
-      "name": "claude-opus-4.5"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "claude-opus-4.6",
-      "type": "llm",
-      "name": "claude-opus-4.6"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "claude-opus-4.7",
-      "type": "llm",
-      "name": "claude-opus-4.7"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "claude-opus-4.8",
-      "type": "llm",
-      "name": "claude-opus-4.8"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "claude-opus-5",
-      "type": "llm",
-      "name": "claude-opus-5"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "claude-sonnet-4.5",
-      "type": "llm",
-      "name": "claude-sonnet-4.5"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "claude-sonnet-4.6",
-      "type": "llm",
-      "name": "claude-sonnet-4.6"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "claude-sonnet-5",
-      "type": "llm",
-      "name": "claude-sonnet-5"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "deepseek-v4-flash-free",
-      "type": "llm",
-      "name": "deepseek-v4-flash-free"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "deepseek-v4-flash-vision-exp-free",
-      "type": "llm",
-      "name": "deepseek-v4-flash-vision-exp-free"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "deepseek-v4-flash",
-      "type": "llm",
-      "name": "deepseek-v4-flash"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "deepseek-v4-pro",
-      "type": "llm",
-      "name": "deepseek-v4-pro"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gemini-2.5-flash-lite",
-      "type": "llm",
-      "name": "gemini-2.5-flash-lite"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gemini-2.5-flash",
-      "type": "llm",
-      "name": "gemini-2.5-flash"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gemini-2.5-pro-preview",
-      "type": "llm",
-      "name": "gemini-2.5-pro-preview"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gemini-2.5-pro",
-      "type": "llm",
-      "name": "gemini-2.5-pro"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gemini-3-flash-preview",
-      "type": "llm",
-      "name": "gemini-3-flash-preview"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gemini-3.1-flash-lite-preview",
-      "type": "llm",
-      "name": "gemini-3.1-flash-lite-preview"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gemini-3.1-flash-lite",
-      "type": "llm",
-      "name": "gemini-3.1-flash-lite"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gemini-3.1-pro-preview",
-      "type": "llm",
-      "name": "gemini-3.1-pro-preview"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gemini-3.5-flash-lite",
-      "type": "llm",
-      "name": "gemini-3.5-flash-lite"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gemini-3.5-flash",
-      "type": "llm",
-      "name": "gemini-3.5-flash"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gemini-3.6-flash",
-      "type": "llm",
-      "name": "gemini-3.6-flash"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gemini-3.7-flash",
-      "type": "llm",
-      "name": "gemini-3.7-flash"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gemini-3.8-flash",
-      "type": "llm",
-      "name": "gemini-3.8-flash"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "glm-4.5",
-      "type": "llm",
-      "name": "glm-4.5"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "glm-4.6",
-      "type": "llm",
-      "name": "glm-4.6"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "glm-4.7",
-      "type": "llm",
-      "name": "glm-4.7"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "glm-5-turbo",
-      "type": "llm",
-      "name": "glm-5-turbo"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "glm-5.1",
-      "type": "llm",
-      "name": "glm-5.1"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "glm-5.2",
-      "type": "llm",
-      "name": "glm-5.2"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "glm-5.3-flash",
-      "type": "llm",
-      "name": "glm-5.3-flash"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "glm-5.3-free",
-      "type": "llm",
-      "name": "glm-5.3-free"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "glm-5.3",
-      "type": "llm",
-      "name": "glm-5.3"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "glm-5",
-      "type": "llm",
-      "name": "glm-5"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gpt-3.5-turbo",
-      "type": "llm",
-      "name": "gpt-3.5-turbo"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gpt-4-turbo",
-      "type": "llm",
-      "name": "gpt-4-turbo"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gpt-4.1-mini",
-      "type": "llm",
-      "name": "gpt-4.1-mini"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gpt-4.1-nano",
-      "type": "llm",
-      "name": "gpt-4.1-nano"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gpt-4.1",
-      "type": "llm",
-      "name": "gpt-4.1"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gpt-4o-mini",
-      "type": "llm",
-      "name": "gpt-4o-mini"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gpt-4o",
-      "type": "llm",
-      "name": "gpt-4o"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gpt-4",
-      "type": "llm",
-      "name": "gpt-4"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gpt-5-mini",
-      "type": "llm",
-      "name": "gpt-5-mini"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gpt-5-nano",
-      "type": "llm",
-      "name": "gpt-5-nano"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gpt-5-pro",
-      "type": "llm",
-      "name": "gpt-5-pro"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gpt-5.1",
-      "type": "llm",
-      "name": "gpt-5.1"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gpt-5.2-pro",
-      "type": "llm",
-      "name": "gpt-5.2-pro"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gpt-5.2",
-      "type": "llm",
-      "name": "gpt-5.2"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gpt-5.3-codex",
-      "type": "llm",
-      "name": "gpt-5.3-codex"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gpt-5.4-mini",
-      "type": "llm",
-      "name": "gpt-5.4-mini"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gpt-5.4-nano",
-      "type": "llm",
-      "name": "gpt-5.4-nano"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gpt-5.4-pro",
-      "type": "llm",
-      "name": "gpt-5.4-pro"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gpt-5.4",
-      "type": "llm",
-      "name": "gpt-5.4"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gpt-5.5-pro",
-      "type": "llm",
-      "name": "gpt-5.5-pro"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gpt-5.5",
-      "type": "llm",
-      "name": "gpt-5.5"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gpt-5.6-luna-pro",
-      "type": "llm",
-      "name": "gpt-5.6-luna-pro"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gpt-5.6-luna",
-      "type": "llm",
-      "name": "gpt-5.6-luna"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gpt-5.6-sol-pro",
-      "type": "llm",
-      "name": "gpt-5.6-sol-pro"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gpt-5.6-sol",
-      "type": "llm",
-      "name": "gpt-5.6-sol"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gpt-5.6-terra-pro",
-      "type": "llm",
-      "name": "gpt-5.6-terra-pro"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gpt-5.6-terra",
-      "type": "llm",
-      "name": "gpt-5.6-terra"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "gpt-5",
-      "type": "llm",
-      "name": "gpt-5"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "grok-4.3",
-      "type": "llm",
-      "name": "grok-4.3"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "grok-4.5",
-      "type": "llm",
-      "name": "grok-4.5"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "grok-4.6",
-      "type": "llm",
-      "name": "grok-4.6"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "hy3-free",
-      "type": "llm",
-      "name": "hy3-free"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "hy3",
-      "type": "llm",
-      "name": "hy3"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "hy4-preview",
-      "type": "llm",
-      "name": "hy4-preview"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "kimi-k2.6",
-      "type": "llm",
-      "name": "kimi-k2.6"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "kimi-k2.7-code",
-      "type": "llm",
-      "name": "kimi-k2.7-code"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "kimi-k3",
-      "type": "llm",
-      "name": "kimi-k3"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "meta/muse-spark-1.3-contributor",
-      "type": "llm",
-      "name": "meta/muse-spark-1.3-contributor"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "meta/muse-spark-1.3",
-      "type": "llm",
-      "name": "meta/muse-spark-1.3"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "mimo-v2.5-free",
-      "type": "llm",
-      "name": "mimo-v2.5-free"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "mimo-v2.5-pro",
-      "type": "llm",
-      "name": "mimo-v2.5-pro"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "mimo-v2.5",
-      "type": "llm",
-      "name": "mimo-v2.5"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "o3-pro",
-      "type": "llm",
-      "name": "o3-pro"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "o3",
-      "type": "llm",
-      "name": "o3"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "o4-mini",
-      "type": "llm",
-      "name": "o4-mini"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "qwen3.6-flash",
-      "type": "llm",
-      "name": "qwen3.6-flash"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "qwen3.6-max-preview",
-      "type": "llm",
-      "name": "qwen3.6-max-preview"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "qwen3.6-plus",
-      "type": "llm",
-      "name": "qwen3.6-plus"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "qwen3.7-flash",
-      "type": "llm",
-      "name": "qwen3.7-flash"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "qwen3.7-max",
-      "type": "llm",
-      "name": "qwen3.7-max"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "qwen3.7-plus",
-      "type": "llm",
-      "name": "qwen3.7-plus"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "qwen3.8-27b",
-      "type": "llm",
-      "name": "qwen3.8-27b"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "qwen3.8-flash-free",
-      "type": "llm",
-      "name": "qwen3.8-flash-free"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "qwen3.8-flash",
-      "type": "llm",
-      "name": "qwen3.8-flash"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-c30001fa-267f-4415-bc0f-e140d984aafc",
-      "id": "qwen3.8-max",
-      "type": "llm",
-      "name": "qwen3.8-max"
     },
     {
       "providerAlias": "openai-compatible-chat-cbe5b645-4962-4f68-b635-506d779d09f2",
@@ -3398,30 +2703,6 @@
       "id": "shiteru-auto",
       "type": "llm",
       "name": "shiteru-auto"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-e4107e86-a564-4e6e-8ea4-a747579f651f",
-      "id": "deepseek-v4-flash-vision-exp",
-      "type": "llm",
-      "name": "deepseek-v4-flash-vision-exp"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-e4107e86-a564-4e6e-8ea4-a747579f651f",
-      "id": "deepseek-v4-flash",
-      "type": "llm",
-      "name": "deepseek-v4-flash"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-e4107e86-a564-4e6e-8ea4-a747579f651f",
-      "id": "deepseek-v4-pro",
-      "type": "llm",
-      "name": "deepseek-v4-pro"
-    },
-    {
-      "providerAlias": "openai-compatible-chat-e4107e86-a564-4e6e-8ea4-a747579f651f",
-      "id": "deepseek-v4.1-flash-expires-on-0910",
-      "type": "llm",
-      "name": "deepseek-v4.1-flash-expires-on-0910"
     },
     {
       "providerAlias": "openai-compatible-chat-f69d9eee-df38-4add-9a67-b7028c4a994a",
@@ -3819,6 +3100,12 @@
     },
     {
       "providerAlias": "shiteru-zs",
+      "id": "kimi-k3.1-pro",
+      "type": "llm",
+      "name": "kimi-k3.1-pro"
+    },
+    {
+      "providerAlias": "shiteru-zs",
       "id": "kimi-k3:free",
       "type": "llm",
       "name": "kimi-k3:free"
@@ -4101,6 +3388,12 @@
     },
     {
       "providerAlias": "shiteru",
+      "id": "kimi-k3.1-pro",
+      "type": "llm",
+      "name": "kimi-k3.1-pro"
+    },
+    {
+      "providerAlias": "shiteru",
       "id": "kimi-k3:free",
       "type": "llm",
       "name": "kimi-k3:free"
@@ -4241,7 +3534,6 @@
         "enabled": true,
         "roundRobin": false,
         "models": [
-          "shiteru/glm-5.3-flash",
           "ollama-cloud/gemma4:31b"
         ]
       },
