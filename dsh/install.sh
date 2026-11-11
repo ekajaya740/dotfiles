@@ -6,6 +6,7 @@
 # owns every file that is safe to symlink:
 #
 #   ~/.dsh/cordis.patch.yml                    ← home-level patch layer
+#   ~/.dsh-superagent-personal/cordis.patch.yml ← its home patch (2nd instance)
 #   ~/.config/systemd/user/dsh-web.service     ← unit (no secrets)
 #   ~/.config/dsh/env.example                  ← template
 #
@@ -27,7 +28,9 @@
 #   1. ~/.config/dsh/env  ← copied from env.example if ABSENT (never
 #                            overwritten: it holds the provider keys)
 #   2. the profile's plugin set ← replayed from plugins.txt (--plugins)
-#   3. the profile config ← seeded from dsh/.dsh/profiles/ (--profiles)
+#   3. the profile config ← seeded from dsh/.dsh{,-superagent-personal}/profiles/
+#      (--profiles) into the matching DSH_HOME
+#   4. the vendored plugins ← linked into ~/.dsh-local-plugins/ (--local-plugins)
 #
 # Run `stow dsh` (or bootstrap.sh / sync-dotfiles.sh) for the symlinked files;
 # this script does not touch them.
@@ -39,6 +42,10 @@
 #   ./install.sh --capture   copy the LIVE profile config back into the repo
 #                            (do this after changing settings in the UI)
 #   ./install.sh --plugins   also replay plugins.txt into the web profile
+#   ./install.sh --local-plugins
+#                            link dsh/local-plugins/<name> into
+#                            ~/.dsh-local-plugins/<name>, which the profile
+#                            manifest's relative `link:` deps resolve to
 #   ./install.sh --check     show what would change, change nothing
 # ─────────────────────────────────────────────────────────────
 set -euo pipefail
@@ -47,12 +54,14 @@ CHECK=false
 DO_PLUGINS=false
 DO_PROFILES=false
 DO_CAPTURE=false
+DO_LOCAL_PLUGINS=false
 for arg in "$@"; do
     case "$arg" in
-        --check)    CHECK=true ;;
-        --plugins)  DO_PLUGINS=true ;;
-        --profiles) DO_PROFILES=true ;;
-        --capture)  DO_CAPTURE=true ;;
+        --check)         CHECK=true ;;
+        --plugins)       DO_PLUGINS=true ;;
+        --profiles)      DO_PROFILES=true ;;
+        --capture)       DO_CAPTURE=true ;;
+        --local-plugins) DO_LOCAL_PLUGINS=true ;;
         -h|--help)  sed -n '2,44p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
         *) echo "unknown option: $arg" >&2; exit 2 ;;
     esac
@@ -242,94 +251,157 @@ install_plugins() {
 # through it. So the repo holds a SEED that this copies in, and --capture pulls
 # live edits back. Only intent files are versioned; pnpm-lock.yaml and the
 # node_modules tree are derived and stay machine-local.
-PROFILES_SRC="$DSH_DIR/.dsh/profiles"
-PROFILES_LIVE="$DSH_HOME_LIVE/profiles"
 SEED_FILES=(cordis.patch.yml package.json pnpm-workspace.yaml compatibility.json)
 
-install_profiles() {
-    info "profile config (seed → live)"
-    [[ -d "$PROFILES_SRC" ]] || { warn "missing $PROFILES_SRC"; return 0; }
+# Two DSH_HOMEs are seeded, each with its own profiles/ tree. Only the homes
+# this repo owns are listed: ~/.dsh (web + headless + tui) and
+# ~/.dsh-superagent-personal. PROFILL (~/.dsh-profill), its superagent sibling
+# (~/.dsh-superagent-profill) and the default ~/.dsh profiles/profill are out
+# of scope — they belong to the profill agent and are never touched here.
+#   repo dsh/.dsh/                     → $HOME/.dsh
+#   repo dsh/.dsh-superagent-personal/ → $HOME/.dsh-superagent-personal
+SEED_HOMES=(.dsh .dsh-superagent-personal)
 
+# seed_home <repo-subdir> <live-dir> <direction: seed|capture>
+seed_home() {
+    local src_root="$DSH_DIR/$1/profiles"
+    local live_root="$2/profiles"
+    local direction="$3"
     local p f src dst changed=0 conflict=0
-    for p in "$PROFILES_SRC"/*/; do
-        p="$(basename "$p")"
-        for f in "${SEED_FILES[@]}"; do
-            src="$PROFILES_SRC/$p/$f"
-            dst="$PROFILES_LIVE/$p/$f"
-            [[ -f "$src" ]] || continue
-            if [[ -f "$dst" ]] && cmp -s "$src" "$dst"; then
-                continue
-            fi
-            changed=$((changed + 1))
-            if [[ -f "$dst" ]]; then
-                # The live file exists and differs. Do NOT clobber: it may hold
-                # a settings change made in the UI that was never captured. Say
-                # so and let the operator choose.
-                conflict=$((conflict + 1))
-                warn "differs, left untouched: $dst"
-                echo "        repo → $src"
-                echo "        adopt the live version: ./install.sh --capture"
-                echo "        overwrite with the repo:  cp '$src' '$dst'"
-            else
-                run mkdir -p "$(dirname "$dst")"
-                run cp "$src" "$dst"
-                ok "seeded $dst"
-            fi
-        done
-    done
 
-    if [[ $changed -eq 0 ]]; then
-        ok "profile config matches the repo"
-    elif [[ $conflict -gt 0 ]]; then
-        warn "$conflict file(s) drifted from the repo — resolve them (see above)"
+    if [[ "$direction" == seed ]]; then
+        [[ -d "$src_root" ]] || { warn "missing $src_root"; return 0; }
+        info "profile config (seed → live): $2"
     else
-        info "$changed file(s) seeded"
+        [[ -d "$live_root" ]] || { warn "missing $live_root"; return 0; }
+        info "profile config (live → repo): $1"
     fi
-}
 
-capture_profiles() {
-    info "profile config (live → repo)"
-    [[ -d "$PROFILES_LIVE" ]] || { warn "missing $PROFILES_LIVE"; return 0; }
-
-    local p f src dst
-    for p in "$PROFILES_LIVE"/*/; do
-        p="$(basename "$p")"
-        for f in "${SEED_FILES[@]}"; do
-            src="$PROFILES_LIVE/$p/$f"
-            dst="$PROFILES_SRC/$p/$f"
-            [[ -f "$src" ]] || continue
-            if [[ -f "$dst" ]] && cmp -s "$src" "$dst"; then
-                continue
-            fi
-            if $CHECK; then
-                echo "  [dry-run] cp $src $dst"
-                continue
-            fi
-            mkdir -p "$(dirname "$dst")"
-            cp "$src" "$dst"
-            ok "captured $dst"
+    if [[ "$direction" == seed ]]; then
+        for p in "$src_root"/*/; do
+            p="$(basename "$p")"
+            for f in "${SEED_FILES[@]}"; do
+                src="$src_root/$p/$f"
+                dst="$live_root/$p/$f"
+                [[ -f "$src" ]] || continue
+                if [[ -f "$dst" ]] && cmp -s "$src" "$dst"; then
+                    continue
+                fi
+                changed=$((changed + 1))
+                if [[ -f "$dst" ]]; then
+                    # The live file exists and differs. Do NOT clobber: it may
+                    # hold a settings change made in the UI that was never
+                    # captured. Say so and let the operator choose.
+                    conflict=$((conflict + 1))
+                    warn "differs, left untouched: $dst"
+                    echo "        repo → $src"
+                    echo "        adopt the live version: ./install.sh --capture"
+                    echo "        overwrite with the repo:  cp '$src' '$dst'"
+                else
+                    run mkdir -p "$(dirname "$dst")"
+                    run cp "$src" "$dst"
+                    ok "seeded $dst"
+                fi
+            done
         done
-    done
+    else
+        for p in "$live_root"/*/; do
+            p="$(basename "$p")"
+            for f in "${SEED_FILES[@]}"; do
+                src="$live_root/$p/$f"
+                dst="$src_root/$p/$f"
+                [[ -f "$src" ]] || continue
+                if [[ -f "$dst" ]] && cmp -s "$src" "$dst"; then
+                    continue
+                fi
+                if $CHECK; then
+                    echo "  [dry-run] cp $src $dst"
+                    continue
+                fi
+                mkdir -p "$(dirname "$dst")"
+                cp "$src" "$dst"
+                ok "captured $dst"
+            done
+        done
+    fi
 
-    if ! $CHECK && command -v git >/dev/null 2>&1; then
-        if ! git -C "$REPO_DIR" diff --quiet -- "$PROFILES_SRC" 2>/dev/null; then
-            info "review before committing:"
-            echo "  git -C $REPO_DIR diff -- ${PROFILES_SRC#$REPO_DIR/}"
+    if [[ "$direction" == seed ]]; then
+        if [[ $changed -eq 0 ]]; then
+            ok "profile config matches the repo"
+        elif [[ $conflict -gt 0 ]]; then
+            warn "$conflict file(s) drifted from the repo — resolve them (see above)"
+        else
+            info "$changed file(s) seeded"
         fi
     fi
 }
 
+install_profiles() {
+    local h
+    for h in "${SEED_HOMES[@]}"; do seed_home "$h" "$HOME/$h" seed; done
+}
+
+capture_profiles() {
+    local h
+    for h in "${SEED_HOMES[@]}"; do seed_home "$h" "$HOME/$h" capture; done
+
+    if ! $CHECK && command -v git >/dev/null 2>&1; then
+        if ! git -C "$REPO_DIR" diff --quiet -- "$DSH_DIR/.dsh" "$DSH_DIR/.dsh-superagent-personal" 2>/dev/null; then
+            info "review before committing:"
+            echo "  git -C $REPO_DIR diff -- ${DSH_DIR#"$REPO_DIR"/}"
+        fi
+    fi
+}
+
+# ── 5. vendored local plugins ───────────────────────────────
+# Five first-party plugins live in the repo at dsh/local-plugins/<name> rather
+# than a registry. The profile manifest depends on them as RELATIVE link: deps
+# (link:../../../.dsh-local-plugins/<name>), which resolves to
+# ~/.dsh-local-plugins/<name> from ~/.dsh/profiles/web. Symlink them there so a
+# fresh machine's `pnpm install` can resolve every dependency and no seed has to
+# carry an absolute path.
+LOCAL_PLUGINS_SRC="$DSH_DIR/local-plugins"
+LOCAL_PLUGINS_LIVE="$HOME/.dsh-local-plugins"
+
+install_local_plugins() {
+    info "local plugins (repo → $LOCAL_PLUGINS_LIVE)"
+    [[ -d "$LOCAL_PLUGINS_SRC" ]] || { warn "missing $LOCAL_PLUGINS_SRC"; return 0; }
+
+    local name src dst
+    for src in "$LOCAL_PLUGINS_SRC"/*/; do
+        name="$(basename "$src")"
+        dst="$LOCAL_PLUGINS_LIVE/$name"
+        if [[ -L "$dst" ]]; then
+            if [[ "$(readlink "$dst")" == "$LOCAL_PLUGINS_SRC/$name" ]]; then
+                ok "linked: $dst"
+                continue
+            fi
+            warn "link points elsewhere, replacing: $dst"
+        elif [[ -e "$dst" ]]; then
+            # A real directory here means someone worked on the plugin outside
+            # the repo. Do not delete their tree; report it.
+            warn "real directory, left untouched: $dst"
+            continue
+        fi
+        run mkdir -p "$LOCAL_PLUGINS_LIVE"
+        run ln -sfn "$LOCAL_PLUGINS_SRC/$name" "$dst"
+        ok "linked $dst → $src"
+    done
+}
+
 install_env
 check_stowed
-$DO_PROFILES && install_profiles
-$DO_CAPTURE  && capture_profiles
-$DO_PLUGINS  && install_plugins
+$DO_PROFILES      && install_profiles
+$DO_CAPTURE       && capture_profiles
+$DO_LOCAL_PLUGINS && install_local_plugins
+$DO_PLUGINS       && install_plugins
 
 echo
 if $CHECK; then
     info "dry run complete — nothing changed"
 else
     ok "dsh wiring complete"
-    $DO_PLUGINS  || info "plugin set not replayed (pass --plugins to apply it)"
-    $DO_PROFILES || info "profile config not seeded (pass --profiles to apply it)"
+    $DO_PLUGINS       || info "plugin set not replayed (pass --plugins to apply it)"
+    $DO_PROFILES      || info "profile config not seeded (pass --profiles to apply it)"
+    $DO_LOCAL_PLUGINS || info "local plugins not linked (pass --local-plugins to apply it)"
 fi

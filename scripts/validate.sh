@@ -136,8 +136,19 @@ print(",".join(sorted(required - off)))
     # one box and makes `pnpm install` fail everywhere else. It has already
     # happened once, so gate it rather than trust review. Comment lines are
     # exempt because they often explain the rule itself.
-    host_paths="$(grep -rnE '(/home/|/Users/)[A-Za-z0-9._-]+' dsh/.dsh/profiles/ 2>/dev/null \
-        | grep -v '^[^:]*:[0-9]*:#' || true)"
+    # Both seeded DSH_HOMEs are covered: ~/.dsh (dsh/.dsh) and the personal
+    # superagent instance (dsh/.dsh-superagent-personal). Only TRACKED seeds are
+    # scanned: an untracked seed (the PROFILL one, which belongs to a different
+    # instance and legitimately names its workspace) is not shipped by this repo,
+    # so it cannot break anyone else's install.
+    seed_files=()
+    while IFS= read -r f; do seed_files+=("$f"); done < <(git ls-files \
+        'dsh/.dsh/profiles/*' 'dsh/.dsh-superagent-personal/profiles/*' 2>/dev/null || true)
+    host_paths=""
+    if [ ${#seed_files[@]} -gt 0 ]; then
+        host_paths="$(grep -nE '(/home/|/Users/)[A-Za-z0-9._-]+' "${seed_files[@]}" 2>/dev/null \
+            | grep -v '^[^:]*:[0-9]*:#' || true)"
+    fi
     if [ -z "$host_paths" ]; then
         pass "dsh profile seeds carry no host-specific paths"
     else

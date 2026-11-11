@@ -52,6 +52,8 @@ KillMode=mixed
 KillSignal=SIGTERM
 TimeoutStopSec=30
 StandardOutput=journal
+# Explicit: keep the host /tmp shared with processes outside the unit.
+PrivateTmp=no
 StandardError=journal
 
 [Install]

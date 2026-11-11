@@ -1,0 +1,31 @@
+{
+  "name": "dsh-pwa",
+  "version": "0.1.0",
+  "description": "Progressive Web App support for the DSH Web GUI: installable manifest, PNG icon set, service worker caching, offline page and install/update chips — added as a plugin, without patching the shipped frontend.",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "assets",
+    "scripts",
+    "cordis.patch.yml",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "scripts": {
+    "build:icons": "node scripts/build-icons.mjs",
+    "check:icons": "node scripts/build-icons.mjs --check",
+    "test": "node --test 'test/*.test.mjs'"
+  }
+}

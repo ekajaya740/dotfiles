@@ -6,8 +6,13 @@
 # package.json is machine state (pnpm rewrites it atomically, so it cannot be
 # symlinked into the repo) and is not the record of intent.
 #
+# Regenerate after installing a plugin in the UI:
+#   node -e 'const p=require(process.env.HOME+"/.dsh/profiles/web/package.json");
+#            for (const [k,v] of Object.entries(p.dependencies).sort())
+#              console.log(v.startsWith("link:") ? "# LOCAL " + k : k + "@" + v)'
+#
 # Order does not matter for `dsh plugin add`; bundles are composed by the
-# profile manifest afterwards.
+# profile manifest's dsh.profile.bundles afterwards.
 #
 # Pinned deliberately where upstream tracks @latest or a moving branch.
 
@@ -16,27 +21,53 @@
 # @deepseek-ai/dsh-base
 # @deepseek-ai/dsh-web-app
 
-# ── third-party plugins ─────────────────────────────────────────────────────
-@little-traincar/dsh-imagegen
-# History search across other agents (Claude Code, Codex, Cursor, …). Ships a
-# bundled `deja` binary; DEJA_BIN overrides it. Its dsh.compatibility field
-# claims 0.1.1-rc.2 only, but peerDependencies are empty so nothing gates it —
-# verified loading on 0.2.0-rc.2. Note autoRecall defaults ON, which injects
-# past-session history into the runtime context on every step.
-dsh-deja
-dsh-elephant-memory
-dsh-jev-tools
-dsh-live-voice
-dsh-mcp
-dsh-telegram
-dsh-voice
+# ── UI / shell ────────────────────────────────────────────────────────────────
+dsh-better-sidebar@0.30.1
+@thewaifu/dsh-market@1.1.2
+@michengai/dsh-skills-manager@1.2.29
+@michengai/dsh-archive-manager@1.2.4
+@michengai/dsh-agency-agents@1.2.25
+@michengai/dsh-btw@1.3.2
+dsh-rewind-plugin@0.20.0
+dsh-update-checker@1.7.3
+@perrylink/dsh-plugin-doctor@^0.7.4
 
-# ── pinned / non-registry specs ─────────────────────────────────────────────
-# Kanban board (UI + 15 kanban_* tools).
-@alpacachen/dsh-kanban
-# Desktop pet / mascot (web client plugin).
-github:Sutera-Diffusus/dsh-whale-musume
-# LoopX goal driver. beta.5 does NOT support dsh 0.2.x — its peer range is
-# >=0.1.0-rc.7 <0.1.1 || >=0.1.1-rc.1 <0.2.0-0. beta.6 adds
-# >=0.2.0-rc.2 <0.2.1-0. Keep the explicit tarball so the pin is visible.
-https://github.com/loopx-project/loopx/releases/download/dsh-loopx-plugin-v0.1.1-beta.6/dsh-loopx-plugin-0.1.1-beta.6.tgz
+# Skins. The skin-manager writes the `disabled:` rows into the profile patch
+# itself (the "dsh-skin managed" block); only the packages are listed here.
+@smalltailqwq/dsh-client-ui-skin-deep-whale-manager@^0.1.8
+@smalltailqwq/dsh-client-ui-skin-maid-atelier@^0.1.9
+@smalltailqwq/dsh-client-ui-skin-orca-link@^0.1.9
+
+# ── context / model surface ───────────────────────────────────────────────────
+dsh-context@0.81.2
+dsh-mnemon@0.5.40
+dsh-elephant-memory@^0.1.1
+billion-context@^0.1.202
+dsh-free-search@0.9.31
+dsh-mcp-panel@0.6.30
+
+# ── content / media ───────────────────────────────────────────────────────────
+# Creator workbench (scripts, covers, storyboards) and 歸藏设计 (web PPT, cards,
+# page layout, de-AI prose). Both ship their own skills.
+dsh-media-desk@^2.6.2
+dsh-guizang-design@^0.1.4
+dsh-image-gen@^0.10.2
+dsh-image-preview@0.2.1
+
+# ── integrations ──────────────────────────────────────────────────────────────
+# 微信/飞书/企微/钉钉/QQ/Telegram/WhatsApp/Slack/Discord/Matrix bridge.
+@xmanrui/dsh-im@5.10.0
+# Agentero: paper reading, highlighting, translation, notes.
+agentero-dsh@^0.1.7
+
+# ── local plugins, vendored in this repo ──────────────────────────────────────
+# These five are FIRST-PARTY here: their source lives at dsh/local-plugins/<name>
+# and install.sh links it into ~/.dsh-local-plugins/<name>, which is what the
+# profile manifest's `link:../../../.dsh-local-plugins/<name>` resolves to.
+# Do NOT `dsh plugin add` them from a registry spec — replay them with:
+#   ./dsh/install.sh --local-plugins
+# dsh-auto-archive     scheduled archiving of idle sessions (cron row)
+# dsh-pwa              installable PWA manifest, icons, service worker
+# dsh-system-monitor   CPU/mem/disk/net sidebar panel
+# dsh-hevy-training    Hevy training dashboard (needs HEVY_API_KEY)
+# dsh-open-access      keyless browser entry + LAN/Tailscale aliases

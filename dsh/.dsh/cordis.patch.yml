@@ -154,3 +154,10 @@
         command: /Applications/GenOffice.app/Contents/Resources/cli/genoffice
         args:
           - mcp
+
+# --- dsh-skin managed (auto-generated; do not edit) ---
+- id: ui-skin-maid-atelier
+  disabled: true
+- id: ui-skin-orca-link
+  disabled: false
+# --- end dsh-skin managed ---

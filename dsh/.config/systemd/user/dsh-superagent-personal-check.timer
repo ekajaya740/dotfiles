@@ -1,0 +1,22 @@
+# dsh-superagent-personal-check.timer — hourly health check of the
+# dsh-superagent-personal instance.
+#
+# OnBootSec matters more than the hourly cadence: most failures here are a crash
+# loop after boot, and this turns "silently down until someone notices" into a
+# journal line within a few minutes.
+#
+# Persistent=true so a run missed while the host was asleep or off fires after
+# boot instead of quietly skipping the hour.
+[Unit]
+Description=Hourly health check of the dsh-superagent-personal instance
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=1h
+Persistent=true
+# Keep off the top of the hour, where certbot, logrotate and the 9router update
+# already run. Offset from the profill check so the two never fire together.
+RandomizedDelaySec=300
+
+[Install]
+WantedBy=timers.target

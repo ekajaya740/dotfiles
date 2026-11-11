@@ -1,0 +1,44 @@
+{
+  "name": "dsh-hevy-training",
+  "version": "0.2.0",
+  "description": "Hevy training dashboard for the DSH Web GUI: weekly volume, muscle-group balance, strength progression, body-weight trend and session detail, read from the Hevy public API by the host.",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./aggregate": "./lib/aggregate.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "test",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test 'test/*.test.js'"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "hevy",
+    "workout",
+    "training",
+    "fitness"
+  ],
+  "license": "MIT",
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": []
+    }
+  }
+}

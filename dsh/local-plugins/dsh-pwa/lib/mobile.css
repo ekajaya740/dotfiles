@@ -1,0 +1,149 @@
+/**
+ * dsh-pwa — mobile stylesheet, inlined into the index head.
+ *
+ * Three fixes, each scoped to where it is safe:
+ *
+ *   1. Focus zoom (iOS Safari). Safari zooms the viewport whenever an editable
+ *      receives focus while its computed font-size is under 16px, and never
+ *      zooms back out — the page is left scrolled sideways with no way to
+ *      recover except pinch. The harness composer is a `contenteditable` div at
+ *      14px, so every tap on it zoomed the UI. Raising touch-device editables to
+ *      16px removes the trigger; `maximum-scale` / `user-scalable=no` would too,
+ *      but those break pinch-zoom for low-vision users, so they are not used.
+ *
+ *   2. Sidebar as an overlay drawer. Below ~1024px the app collapses itself to
+ *      a 56px icon rail, and opening it puts 280px back into the grid as a
+ *      *track* — the conversation beside it is squeezed to ~110px on a phone.
+ *      Here the drawer is taken out of flow and given its own layer, so the
+ *      conversation keeps its full width underneath and the drawer simply
+ *      covers it, the way a phone navigation drawer is expected to behave.
+ *
+ *   3. Touch targets. The rail and drawer controls are 28-36px, well under the
+ *      44px a fingertip needs. The controls themselves are grown to 44px tall
+ *      (and 44px wide on the rail), with the few decorative wrappers that would
+ *      clip them opened up so the extra area is actually hittable.
+ *
+ * Every rule lives inside a media query, so injecting this document-wide is
+ * free on desktop. Selectors only ever use stable `data-slot` attributes or the
+ * `data-dsh-pwa-*` attributes this plugin sets itself on elements it has found
+ * — the app's own class names are content-hashed per build and would break on
+ * the next frontend release.
+ */
+
+/* 1. Never let a focused editable sit below 16px on a touch device. */
+@media (pointer: coarse) {
+  input:not([type='file']):not([type='range']):not([type='color']):not([type='checkbox']):not([type='radio']):not([type='hidden']),
+  textarea,
+  [contenteditable='true'] {
+    font-size: 16px !important;
+  }
+}
+
+/* 2. Sidebar: overlay drawer instead of a grid track. */
+@media (max-width: 1023px) {
+  /* Reclaim the drawer's track so the conversation keeps its full width. */
+  [data-dsh-pwa-frame]:not([data-sidebar-collapsed]) {
+    grid-template-columns: 56px minmax(0px, 1fr) 0px !important;
+  }
+
+  /* Taking a grid item out of flow makes the *remaining* items re-flow into
+     the tracks it vacated, which would drop the conversation into the 56px
+     rail track. Pin the survivors to their original tracks so the drawer's
+     departure moves nothing. */
+  [data-dsh-pwa-frame]:not([data-sidebar-collapsed]) > [data-dsh-pwa-center-col] {
+    grid-column: 2 !important;
+  }
+
+  [data-dsh-pwa-frame]:not([data-sidebar-collapsed]) > [data-dsh-pwa-rightbar-col] {
+    grid-column: 3 !important;
+  }
+
+  /* Lift the drawer out of the grid onto its own layer above the content.
+     The stack order here must match the app's own drawer: the layout shell
+     paints its scrim (`[data-sidebar-mask]`) at z-index 70 and puts the
+     sidebar column at 71. Overriding the column to anything below 70 makes the
+     scrim cover the drawer, so every touch — drag included — lands on the
+     scrim instead of the session list: the list cannot scroll and its rows
+     cannot be tapped, only tap-to-dismiss still works. Keep this above the
+     scrim, and leave the app's own scrim handling alone. */
+  [data-dsh-pwa-frame]:not([data-sidebar-collapsed]) > [data-dsh-pwa-sidebar-col] {
+    position: absolute !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: min(280px, 88vw) !important;
+    z-index: 71 !important;
+    box-shadow: 0 0 0 1px rgba(127, 127, 127, 0.16), 0 18px 48px -12px rgba(0, 0, 0, 0.45) !important;
+  }
+
+  /* Scrim: the tap-outside-to-close surface the drawer was missing. */
+  [data-dsh-pwa-scrim] {
+    display: none;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 55;
+    background: rgba(0, 0, 0, 0.32);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* The script sets an inline `display: none` so the scrim cannot claim a grid
+     track on a viewport wider than this breakpoint; `!important` re-enables it
+     while the drawer is open. */
+  [data-dsh-pwa-frame]:not([data-sidebar-collapsed]) > [data-dsh-pwa-scrim] {
+    display: block !important;
+  }
+}
+
+/* 3. Touch targets: grow the controls themselves to 44px. */
+@media (pointer: coarse) {
+  /* A `::after` overlay cannot do this job: Chrome does not hit-test a
+     pseudo-element that spills outside its button, so an oversized `::after`
+     still misses every tap that lands on it. Verified — a 120x120 `::after` on
+     a 36x36 button reports `elementFromPoint` misses 20px out. The real box has
+     to grow instead. */
+  [data-dsh-pwa-sidebar-col] button,
+  [data-slot='sidebar'] button {
+    min-height: 44px !important;
+  }
+
+  /* Width grows only on the collapsed rail, where a single column of icons has
+     horizontal room to spare. In the drawer the rows are already 252px wide and
+     the icon-only controls sit on a 32px pitch — widening them there would make
+     neighbours steal each other's taps. */
+  [data-dsh-pwa-frame][data-sidebar-collapsed] [data-dsh-pwa-sidebar-col] button,
+  [data-dsh-pwa-frame][data-sidebar-collapsed] [data-slot='sidebar'] button {
+    min-width: 44px !important;
+  }
+
+  /* Growing a button only helps if its ancestors do not clip the overflow.
+     Several wrappers in the rail are decorative boxes sized to the old 36px
+     control and carry `overflow: hidden`; opening just those keeps the sidebar
+     list itself scrollable (it grows its own scrollHeight instead, which is the
+     behaviour we want). */
+  [data-dsh-pwa-sidebar-col] :has(> button),
+  [data-slot='sidebar'] :has(> button),
+  [data-dsh-pwa-sidebar-col] :has(> * > button),
+  [data-slot='sidebar'] :has(> * > button) {
+    overflow: visible !important;
+  }
+
+  /* The workspaces section header is one level deeper and also carries a fixed
+     36px height, so it clips the "Add workspace" control above it until the box
+     grows too. */
+  [data-slot='sidebar.workspaces'] :has(> * > button) {
+    min-height: 44px !important;
+    overflow: visible !important;
+  }
+
+  /* The composer row is the other place a thumb lands: workspace picker, mode
+     picker, attach, access mode, experts, model and send were all 28-34px tall.
+     Height alone is enough here — the row is already full width, and growing it
+     vertically moves nothing sideways, so the pickers keep their spacing and the
+     composer does not overflow at 390px. */
+  [data-slot='conversation.composer'] button {
+    min-height: 44px !important;
+  }
+}

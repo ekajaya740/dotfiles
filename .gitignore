@@ -94,6 +94,35 @@ dsh/.dsh/profiles/**/package.json.lock
 dsh/.dsh/profiles/**/.plugin-manager/
 dsh/.dsh/profiles/**/.srprobe
 
+# The personal superagent instance (profiles `superagent-personal`, port 3091)
+# has its own DSH_HOME. Same rule as ~/.dsh: the home patch is stowed, the
+# profile config is seeded by `install.sh --profiles`, and its sessions/state/
+# storages stay machine-local.
+dsh/.dsh-superagent-personal/*
+!dsh/.dsh-superagent-personal/cordis.patch.yml
+!dsh/.dsh-superagent-personal/profiles/
+dsh/.dsh-superagent-personal/profiles/*
+!dsh/.dsh-superagent-personal/profiles/*/
+!dsh/.dsh-superagent-personal/profiles/*/cordis.patch.yml
+!dsh/.dsh-superagent-personal/profiles/*/package.json
+!dsh/.dsh-superagent-personal/profiles/*/pnpm-workspace.yaml
+!dsh/.dsh-superagent-personal/profiles/*/compatibility.json
+dsh/.dsh-superagent-personal/profiles/**/node_modules/
+dsh/.dsh-superagent-personal/profiles/**/pnpm-lock.yaml
+dsh/.dsh-superagent-personal/profiles/**/*.bak-*
+dsh/.dsh-superagent-personal/logs/
+dsh/.dsh-superagent-personal/sessions/
+dsh/.dsh-superagent-personal/state/
+dsh/.dsh-superagent-personal/storages/
+dsh/.dsh-superagent-personal/.credentials.yaml
+
+# Vendored first-party plugins (dsh/local-plugins/). The sources ARE tracked —
+# this is what makes the five `link:` deps in the web profile portable. Their
+# installs stay local.
+dsh/local-plugins/**/node_modules/
+dsh/local-plugins/**/dist/
+dsh/local-plugins/**/*.log
+
 # Hyprland Lua port: only the live overrides under hypr-lua/ are versioned
 hypr-lua/standalone/
 hypr-lua/APPLY.md

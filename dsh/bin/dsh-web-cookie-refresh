@@ -31,7 +31,7 @@
 set -euo pipefail
 
 DAYS="${DSH_WEB_COOKIE_DAYS:-25}"
-CREDS="${DSH_HOME:-$HOME/.dsh}/.credentials.yaml"
+MAIN_CREDS="${DSH_HOME:-$HOME/.dsh}/.credentials.yaml"
 SNIPPET_DIR="${DSH_WEB_COOKIE_DIR:-/etc/nginx/snippets}"
 
 # Source the per-host authority list when run by hand. The systemd unit sets it
@@ -51,15 +51,29 @@ fi
 # the domain, but not host-specific, so it does not live in web.env.
 PUBLIC_AUTHORITY="${DSH_WEB_PUBLIC_AUTHORITY:-dsh.workofekajaya.com}"
 
-# authority [snippet basename] — the authority must be exactly what dsh reads
-# back from the Host header (`new URL("http://" + host).host`), port included
-# when nginx passes the port through.
-AUTHORITIES=("$PUBLIC_AUTHORITY dsh-web-cookie.conf")
+# Each entry is "authority snippet credentials-file": the authority, the
+# snippet basename, and WHICH instance's browser-session secret signs it. The
+# credentials path is third because a second profiled instance (~/.dsh-profill)
+# has its own DSH_HOME, its own secret and therefore its own cookie — mixing
+# them would produce a cookie the other instance answers 401 to.
+#
+# The authority must be exactly what dsh reads back from the Host header
+# (`new URL("http://" + host).host`), port included when nginx passes the port
+# through.
+AUTHORITIES=("$PUBLIC_AUTHORITY dsh-web-cookie.conf $MAIN_CREDS")
 if [ -n "${DSH_WEB_AUTHORITIES:-}" ]; then
   read -r -a _extra <<<"$DSH_WEB_AUTHORITIES"
   for ((_i = 0; _i + 1 < ${#_extra[@]}; _i += 2)); do
-    AUTHORITIES+=("${_extra[_i]} ${_extra[_i + 1]}")
+    AUTHORITIES+=("${_extra[_i]} ${_extra[_i + 1]} $MAIN_CREDS")
   done
+fi
+
+# Instances that are NOT $DSH_HOME (each carries its own CREDS override).
+# dsh-profill.workofekajaya.com serves the PROFILL instance on 127.0.0.1:3082
+# (unit dsh-profill.service, DSH_HOME=~/.dsh-profill). Keep the two variables
+# paired: the authority alone is useless without the matching secret.
+if [ -n "${DSH_PROFILL_AUTHORITY:-}" ] && [ -n "${DSH_PROFILL_CREDS:-}" ]; then
+  AUTHORITIES+=("$DSH_PROFILL_AUTHORITY dsh-profill-cookie.conf $DSH_PROFILL_CREDS")
 fi
 
 # Root (the timer) installs directly; a normal user goes through sudo.
@@ -69,7 +83,7 @@ tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 
 for entry in "${AUTHORITIES[@]}"; do
-  read -r authority snippet <<<"$entry"
+  read -r authority snippet CREDS <<<"$entry"
 
   python3 - "$authority" "$DAYS" "$CREDS" >"$tmp/$snippet" <<'PY'
 import base64, hashlib, hmac, json, sys, time

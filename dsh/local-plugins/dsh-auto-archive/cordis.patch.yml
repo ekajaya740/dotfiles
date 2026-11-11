@@ -1,0 +1,10 @@
+- insert:
+    - id: dsh-auto-archive
+      name: dsh-auto-archive
+      config:
+        # Daily at 04:00 in `timeZone`. Replace with `intervalMinutes: 60`
+        # (and drop `cron`) for a rolling interval instead.
+        cron: "0 4 * * *"
+        timeZone: Asia/Makassar
+        idleDays: 30
+        dryRun: false

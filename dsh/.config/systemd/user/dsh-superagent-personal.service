@@ -1,0 +1,43 @@
+# dsh-superagent-personal.service — the dsh-superagent-personal instance
+# (GitHub Source, one repository: ekajaya740/skills).
+#
+# Separate PROFILE and separate DSH_HOME from both other instances:
+#   dsh-web.service              DSH_HOME=~/.dsh                    port 3080
+#   dsh-profill.service          DSH_HOME=~/.dsh-profill            port 3082
+#   dsh-superagent-profill.service DSH_HOME=~/.dsh-superagent-profill port 3090
+#   this unit                    DSH_HOME=~/.dsh-superagent-personal  port 3091
+#
+# The bundle sets process-wide PATH and git configuration for its own process, so
+# it gets its own home, its own unit and its own restart lifecycle. Nothing here
+# reads or writes the profill superagent home, profile, port or state database.
+#
+# WorkingDirectory is the bundle checkout: scripts/dsh-superagent and the
+# relative prepare/worktree paths resolve from there. The checkout is shared
+# read-only with the profill instance (same bundle commit); only the state
+# directories differ.
+#
+# Auth: dsh mints a fresh boot token per start and prints it to the journal.
+#   journalctl --user -u dsh-superagent-personal -n 20 | grep token
+[Unit]
+Description=DeepSeek Harness (dsh) - dsh-superagent-personal instance
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+WorkingDirectory=%h/work/dsh-superagent
+Environment="PATH=%h/.local/share/mise/shims:%h/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+Environment="DSH_HOME=%h/.dsh-superagent-personal"
+EnvironmentFile=%h/.config/dsh/env-superagent-personal
+ExecStart=%h/.local/share/mise/shims/dsh --profile superagent-personal --port 3091 --no-open
+Restart=always
+RestartSec=5
+KillMode=mixed
+KillSignal=SIGTERM
+TimeoutStopSec=30
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

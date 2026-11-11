@@ -1,0 +1,26 @@
+# dsh-backup-prune.service — delete dsh upgrade backups past their window.
+#
+# The rollback kit from an upgrade (`~/.dsh-upgrade-backup/<label>-<stamp>/`)
+# holds the previous release's mise pin, profile manifests and lockfiles. It is
+# useful for roughly the first week and then it is just a stale copy of ~/.dsh,
+# so it expires on a clock instead of on someone's memory.
+#
+# The stamp in the directory NAME is the expiry date, not the mtime: a `cp -a`
+# restore rewrites mtimes, and a backup must still expire when it was meant to.
+# A directory whose name carries no `<label>-YYYYMMDD-HHMMSS` stamp is never
+# deleted automatically — the script reports it and moves on.
+#
+# Run by hand at any time; `--dry-run` is the way to see what it would take.
+#
+#   ~/bin/dsh-backup-prune --dry-run
+#   DSH_BACKUP_RETENTION_DAYS=30 ~/bin/dsh-backup-prune
+[Unit]
+Description=Prune dsh upgrade backups older than the retention window
+
+[Service]
+Type=oneshot
+Environment=DSH_BACKUP_DIR=%h/.dsh-upgrade-backup
+Environment=DSH_BACKUP_RETENTION_DAYS=7
+ExecStart=%h/bin/dsh-backup-prune
+StandardOutput=journal
+StandardError=journal

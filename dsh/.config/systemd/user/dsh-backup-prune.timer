@@ -1,0 +1,16 @@
+# dsh-backup-prune.timer — daily prune of expired dsh upgrade backups.
+#
+# Daily rather than hourly: the window is measured in days, so a backup that
+# is one day past due is not a problem, and a daily run keeps the journal
+# readable. Persistent=true makes a run missed while the machine was off
+# happen at the next boot instead of being skipped.
+[Unit]
+Description=Daily prune of expired dsh upgrade backups
+
+[Timer]
+OnBootSec=15min
+OnUnitActiveSec=1d
+Persistent=true
+
+[Install]
+WantedBy=timers.target

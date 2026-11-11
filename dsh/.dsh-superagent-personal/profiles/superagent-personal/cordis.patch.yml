@@ -1,0 +1,38 @@
+# dsh-superagent profile layer for the PERSONAL instance.
+# The bundle inserts its plugins without config; this file supplies the state
+# directory and the panel port.
+#
+# Layer order: bundle patches, then this file, then $DSH_HOME/cordis.patch.yml.
+# A patch REPLACES the targeted row's whole `config`; restate every key.
+#
+# Isolation contract: this instance owns $DSH_HOME=~/.dsh-superagent-personal,
+# profile `superagent-personal`, port 3091 and its own state directory. The
+# other superagent instance (profile `superagent-profill`, DSH_HOME
+# ~/.dsh-superagent-profill, port 3090, repository profill-link/profill-monorepo)
+# shares none of those and is never touched from here. The plugin mutates
+# process-wide PATH and git config for its own process, which is exactly why the
+# two instances must not share a home.
+- id: webserver
+  config:
+    host: 127.0.0.1
+    port: 3091
+- id: dsh-superagent
+  config:
+    # `!!js` keeps the home-relative path portable across machines.
+    stateDir: !!js process.env.HOME + '/.dsh-superagent-personal/state/superagent'
+
+# Model route: the local 9router gateway (same as the web and profill profiles).
+# The route name deepseek-official is a fixed constant in the adapter; only the
+# model id changes. NINEROUTER_API_KEY comes from the service EnvironmentFile.
+- id: llm-deepseek
+  config:
+    apiKeyEnv: NINEROUTER_API_KEY
+    baseURL: http://127.0.0.1:20128
+    models:
+      - id: coder
+        name: coder
+- id: agent-default-model
+  config:
+    provider: deepseek-official
+    model: coder
+    reasoningEffort: off

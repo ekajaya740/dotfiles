@@ -540,14 +540,28 @@ Stowed (symlinked, `--no-folding`):
 - `dsh/etc/nginx/sites-available/dsh.workofekajaya.com` → root-owned install
   copy, **not stowed** (`^/etc(/|$)` in `dsh/.stow-local-ignore`); installing it
   is a manual `sudo cp`, see *Web UI Access* below.
+- `dsh/.dsh-superagent-personal/cordis.patch.yml` → `~/.dsh-superagent-personal/cordis.patch.yml`
+  (home-level patch of the superagent-personal instance, port 3091)
+- `dsh/.config/systemd/user/dsh-superagent-personal{,-check}.{service,timer}` →
+  `~/.config/systemd/user/` (the instance and its hourly health check)
 
-Seeded, not stowed (copied by `dsh/install.sh --profiles`):
+Seeded, not stowed (copied by `dsh/install.sh --profiles`), one tree per DSH_HOME:
 
-- `dsh/.dsh/profiles/{web,headless,tui}/{cordis.patch.yml,package.json,pnpm-workspace.yaml,compatibility.json}`
-  → `~/.dsh/profiles/<name>/`
+| repo | live |
+|------|------|
+| `dsh/.dsh/profiles/{web,headless,tui}/…` | `~/.dsh/profiles/<name>/` |
+| `dsh/.dsh-superagent-personal/profiles/superagent-personal/…` | `~/.dsh-superagent-personal/profiles/superagent-personal/` |
 
-Never tracked: `.credentials.yaml`, `logs/`, `profiles/*/node_modules/`,
-`profiles/*/pnpm-lock.yaml`.
+Each seeded profile carries `cordis.patch.yml`, `package.json`,
+`pnpm-workspace.yaml` and (where present) `compatibility.json`.
+
+Linked, not stowed (by `dsh/install.sh --local-plugins`):
+
+- `dsh/local-plugins/<name>/` → `~/.dsh-local-plugins/<name>` — the five
+  first-party plugins the web profile depends on as relative `link:` deps.
+
+Never tracked: `.credentials.yaml`, `logs/`, `sessions/`, `state/`, `storages/`,
+`profiles/*/node_modules/`, `profiles/*/pnpm-lock.yaml`.
 
 ### Layer Order
 
@@ -602,13 +616,18 @@ cp -a ~/.dsh/profiles/web ~/.dsh/.backup-profiles-$(date +%Y%m%d)/
 ./dsh/install.sh --profiles          # or: cp the seed over the live file
 ```
 
-**Host-specific values stay out of the seeds.** Three plugins are `link:` deps
-to absolute paths on one box (`dsh-auto-archive`, `dsh-hevy-training`,
-`dsh-image-preview`) and the arXiv MCP row names an absolute path under the
-host's `~/.local/bin`. They are machine-local: install them with `dsh plugin
---profile web add <spec>` on the host that has them rather than seeding a path
-no other machine can resolve — a `link:` to a missing directory makes `pnpm
-install` fail outright.
+**Host-specific values stay out of the seeds.** The five first-party plugins
+used to be `link:` deps to absolute paths on one box, and the arXiv MCP row
+named an absolute `/home/<user>/.local/bin/...` — both are now portable:
+
+- the plugins are **vendored** at `dsh/local-plugins/<name>` and reached through
+  a relative dep, `link:../../../.dsh-local-plugins/<name>`, which resolves from
+  `~/.dsh/profiles/web` to `~/.dsh-local-plugins/<name>`. `install.sh
+  --local-plugins` creates that symlink chain on any host.
+- the arXiv row uses `!!js process.env.HOME + '/.local/bin/arxiv-mcp-server'`.
+
+`scripts/validate.sh` enforces the rule on every **tracked** seed (an untracked
+seed, such as the PROFILL one, is not shipped and is skipped).
 
 ### Not Synced (machine-local state and secrets)
 
@@ -867,6 +886,49 @@ Profiles live at `$DSH_HOME/profiles/<name>/` and are pnpm projects holding
 machine-local. Reproduce the plugins themselves on a new machine with
 `dsh plugin --profile <name> add ...`.
 
+**A profile is not an instance.** The profile is chosen at boot and cannot be
+switched in the Web UI; reaching a *different* workspace means running a
+*second* instance with its own `DSH_HOME`, port and unit:
+
+| Instance | `DSH_HOME` | profile | port | unit | in this repo |
+|----------|-----------|---------|------|------|--------------|
+| main | `~/.dsh` | `web` | 3080 | `dsh-web.service` | ✅ seeded |
+| superagent (personal) | `~/.dsh-superagent-personal` | `superagent-personal` | 3091 | `dsh-superagent-personal.service` | ✅ seeded |
+| PROFILL | `~/.dsh-profill` | `profill` | 3082 | `dsh-profill.service` | ❌ other agent |
+| superagent (PROFILL) | `~/.dsh-superagent-profill` | `superagent-profill` | 3090 | `dsh-superagent-profill.service` | ❌ other agent |
+
+Only the first two are synced. The PROFILL pair belongs to the PROFILL agent's
+own profile (`~/.dsh-profill`) and must not be touched from here.
+
+**The PROFILL instance keeps full plugin parity with `web`** (2026-11-05): same
+bundles in the same order, same rows, same `patchReload: live`. Its working copy
+is `~/.dsh-profill/profiles/profill/`, and an **untracked** mirror sits at
+`dsh/.dsh/profiles/profill/` for convenience — git ignores it, so it is never
+shipped and its absolute workspace paths are harmless to anyone else. Only four rows differ on purpose, each
+marked `[PROFILL]` in that patch file: the model catalog (no `personal-chat`),
+`sandbox-policy.workspaceRoot` (the PROFILL tree), `xmanrui-dsh-im.workspace`,
+and the explicit `approval`/`permission` rows. Parity is checkable:
+
+```bash
+dsh --profile web --dump-config > /tmp/web.yml
+DSH_HOME=~/.dsh-profill dsh --profile profill --dump-config > /tmp/profill.yml
+diff <(grep -E '^- id:' /tmp/web.yml | sort -u) <(grep -E '^- id:' /tmp/profill.yml | sort -u)
+```
+
+No output means identical row sets. Keep both patch files in step: a row added
+to `web` belongs in `profill` too, and vice versa.
+
+Because the two instances use different `DSH_HOME`s, the *home-level* patch
+(`dsh/.dsh/cordis.patch.yml`) reaches only `~/.dsh`. Anything in it that must
+hold for PROFILL — the GenOffice MCP row, the two telemetry opt-outs — is
+restated in the profill profile patch, and secrets it needs (`HEVY_API_KEY`)
+live in its own `~/.config/dsh/env-profill`.
+
+The `web` seed was re-captured from live on 2026-11-11, so it now matches the
+running profile (same 29 dependencies, same bundle order, same rows). Re-seed
+with `./dsh/install.sh --capture` after changing settings in the UI, then
+regenerate `dsh/plugins.txt` — the comment block at its top has the one-liner.
+
 ### Telemetry: Three Egresses, Two Levers
 
 dsh has **three independent outbound paths**, and they are not switched the same
@@ -1124,11 +1186,38 @@ Basic credential. Rotate it with
 `dsh` is pinned in `bootstrap.sh`'s mise block via the npm backend:
 
 ```bash
-mise use -g npm:@deepseek-ai/dsh@0.2.0-rc.2   # DSH_VERSION overrides the pin
+mise use -g npm:@deepseek-ai/dsh@0.2.2-rc.1   # DSH_VERSION overrides the pin
 ```
 
 It is pinned rather than `@latest` on purpose: dsh is a developer preview that
 ships compatibility-breaking changes, so bump `DSH_VERSION` deliberately.
+
+**Upgrading in place, and the PATH trap.** `mise use -g` installs a *second*
+version beside the old one, and the shims directory is what makes the new pin
+win:
+
+```bash
+mise use -g npm:@deepseek-ai/dsh@<ver>
+mise reshim                      # required: the shim must exist for the new version
+hash -r                          # or open a new shell
+dsh --version                    # must print <ver>
+```
+
+A process that started before the flip keeps running the *old* install — the
+launcher bakes its own `lib/node_modules` path into every plugin it resolves —
+so both instance units must be restarted after the flip, not just the one whose
+UI looked wrong. Each `service` unit therefore needs `--trusted-host` (below)
+and a restart, and every profile's `node_modules` should be reinstalled so its
+plugins match the new bundle versions.
+
+**Rollback kits expire.** Each upgrade leaves `~/.dsh-upgrade-backup/<label>-
+YYYYMMDD-HHMMSS/` (mise pin, profile manifests and lockfiles). `dsh-backup-prune`
+deletes them 7 days after the stamp in the name, run daily by
+`dsh-backup-prune.timer`; the stamp — not the mtime — is the expiry date, so a
+restore cannot reset it, and an entry without a stamp is only reported. Check
+what would go with `~/bin/dsh-backup-prune --dry-run`, and set the window per run
+with `DSH_BACKUP_RETENTION_DAYS=<n> ~/bin/dsh-backup-prune` for a longer one.
+
 Plugins are machine-local (see Multi-Profile), so the package set is reproduced
 with `dsh plugin --profile <name> add`, not by this repo.
 

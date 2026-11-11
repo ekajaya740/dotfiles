@@ -46,7 +46,10 @@
   config:
     tabsEnabled:
       sidechat: true
-    agentOpenTools: false
+    # Lets the agent push a URL/folder/file into the sidebar's `browser` or
+    # `editor` tab (client listens on sidebar/ws/agent-opens and returns early
+    # unless this is exactly true). Client-side pref, so no restart is needed.
+    agentOpenTools: true
 # ── MCP console: English output ───────────────────────────────────────
 # dsh-mcp-panel's Config defaults `outputLanguage` to "en" already; stated
 # explicitly so the /mcp command's language is pinned rather than inherited.
@@ -75,7 +78,7 @@
         command: npx
         args: [ '-y', 'hevy-mcp@6.2.1' ]
         env:
-          HEVY_API_KEY: !!js process.env.HEVY_API_KEY
+          HEVY_API_KEY: !!js process.env.HEVY_API_KEY ?? ''
         toolCallTimeoutMs: 90000
 # ── MCP: arXiv (paper search / full-text / LaTeX) ─────────────────────
 # Local stdio server, blazickjp/arxiv-mcp-server (Apache-2.0,
@@ -88,14 +91,13 @@
 # and semantic_search/reindex (the last two need the [pro] extra, so they
 # will report a missing-dependency error as installed here).
 #
-# Resolved from PATH, not an absolute path and not `uvx`: a hardcoded
-# ~/... is meaningless on any other host, and `uvx` would
-# re-resolve the package on every start. dsh-web.service therefore puts
-# ~/.local/bin on PATH explicitly; a host that installs this server elsewhere
-# must do the same. No credentials are needed. Two optional env vars are
-# deliberately NOT set: SEMANTIC_SCHOLAR_API_KEY (unauthenticated
-# citation_graph works until its quota runs out) and the ARXIV_* timeout knobs
-# (defaults: 30s read / 10s connect / 50s per-call budget).
+# Absolute path via $HOME, not `uvx`: a desktop-app launch does not carry
+# ~/.local/bin on PATH, and uvx would re-resolve the package on every start.
+# `!!js` keeps the path host-agnostic so this seed is portable.
+# No credentials are needed. Two optional env vars are deliberately NOT
+# set: SEMANTIC_SCHOLAR_API_KEY (unauthenticated citation_graph works until
+# its quota runs out) and the ARXIV_* timeout knobs (defaults: 30s read /
+# 10s connect / 50s per-call budget).
 # Storage defaults to ~/.arxiv-mcp-server/papers (markdown + LaTeX cache,
 # topic watches, semantic index); pass `--storage-path` in args to move it.
 # download_paper converts full PDFs, so the call timeout is above the 60s
@@ -106,9 +108,49 @@
       config:
         serverName: arxiv
         transport: stdio
-        command: arxiv-mcp-server
-        args: [ ]
+        command: !!js process.env.HOME + '/.local/bin/arxiv-mcp-server'
+        args: []
         toolCallTimeoutMs: 120000
+
+# ── Auto-archive: scheduled cleanup of idle sessions ──────────────────
+# Local plugin, vendored at dotfiles/dsh/local-plugins/dsh-auto-archive and
+# linked into the profile as a relative `link:` dependency. Neither
+# DSH core nor @michengai/dsh-archive-manager schedules archiving — the manager
+# documents "There is no scheduled or automatic background cleanup", and the
+# sandbox has no usable cron/systemd. This row supplies the clock: it archives
+# sessions whose last activity is older than `idleDays`, skipping archived,
+# pinned, favourite, unknown-activity and ACTIVE sessions (archiveSession is
+# called without stopActivity, so DSH refuses a running turn instead of
+# killing it). `cron` is written against `timeZone` (the host runs on Etc/UTC,
+# so naming the zone keeps "04:00" meaning 04:00 local); runs are appended to
+# $DSH_HOME/auto-archive.log.
+- insert:
+    - id: dsh-auto-archive
+      name: dsh-auto-archive
+      config:
+        cron: "0 4 * * *"
+        timeZone: Asia/Makassar
+        idleDays: 30
+        dryRun: false
+
+# ── PWA: installable app window + service worker caching ──────────────
+# Local plugin (dotfiles/dsh/local-plugins/dsh-pwa), listed in dsh.profile.bundles, so its
+# own cordis.patch.yml inserts the row. Do NOT insert it here as well: the
+# second registration throws on the duplicate /manifest.webmanifest route.
+# Override config with a plain `- id: dsh-pwa` block instead.
+#
+# The shipped frontend manifest already passes Chrome's installability check,
+# but it is minimal (SVG-only icon, no theme/background colour, no iOS metas)
+# and the static server sends no cache-control on the ~1.4 MB hashed bundle, so
+# every reload re-downloads it. The plugin overrides /manifest.webmanifest,
+# serves a PNG icon set under /pwa/icons, serves /sw.js (cache-first for hashed
+# /assets, stale-while-revalidate for /plugins, network-only for navigations and
+# /api) and taps the index head to add the iOS metas plus the small script that
+# registers the worker and offers install / update chips. Nothing under the
+# frontend dist is modified, and nothing carrying session data is cached.
+# Route-level verification: `node --test test/*.test.mjs` in the plugin dir.
+- id: dsh-hevy-training
+  disabled: false
 
 # ── 9router routing (machine-local, <host>) ───────────────────────
 # TWO ROWS ARE REQUIRED. The llm-deepseek row registers the provider
@@ -122,14 +164,88 @@
   config:
     apiKeyEnv: NINEROUTER_API_KEY
     baseURL: http://127.0.0.1:20128
+    # inputModalities MUST be declared per model. The adapter defaults a
+    # catalog entry to ["text"], and two places then reject an image:
+    # dsh-api-session-controller's prompt admission ("Model ... does not
+    # support image input", reason MODEL_DOES_NOT_SUPPORT_IMAGES) and
+    # llm-deepseek's prepareImages (UNSUPPORTED_CONTENT). 9router's
+    # /v1/messages does accept Anthropic `image` blocks and forwards them —
+    # verified live against all three combos, each naming a two-colour test
+    # PNG's red/green halves correctly — so the gate is local, not upstream.
     models:
       - id: coder
         name: coder
+        inputModalities: [text, image]
       - id: advisor
         name: advisor
+        inputModalities: [text, image]
       - id: personal-chat
         name: personal-chat
+        inputModalities: [text, image]
 - id: agent-default-model
   config:
     provider: deepseek-official
     model: coder
+    # max: OpenCode Go's DeepSeek now rides the chat wire (9router patches/0004),
+    # which accepts reasoning_effort, so a non-off effort no longer 400s on the
+    # claude wire and the turn no longer falls through to the dead
+    # ollama (429 weekly limit) / shiteru (402 balance) legs.
+    reasoningEffort: max
+
+# ── Default mode ────────────────────────────────────────────────────
+# Standard (the harness default). It was `endless` (dsh-elephant-memory)
+# from 2026-10-31 until 2026-11-02, when elephant memory was removed: its
+# step-1 checkpoint replaced every surface node except its own context
+# kinds, so dsh-mnemon's own user-role messages (`kind: dsh-mnemon`) were
+# dropped every turn while mnemon's text-digest dedupe kept it from
+# re-emitting them. The two cannot both own the surface.
+#
+# A session's mode is fixed at its first message, so the three chats
+# already pinned to `endless` keep that preset id in their header and will
+# now fail to resolve (agent-preset/not-found). Start a new chat.
+
+# ── Personal role skills, not presets ───────────────────────────────
+# The four role agents (Money Advisor, Training Coach, Research Analyst,
+# repo-changing discipline) used to be agent presets: each declared its own
+# full copy of `standard`'s child-plugin rows plus a persona prefix. Removed
+# 2026-11-05 and reimplemented as skills under ~/.agents/skills/
+# (money-advisor, training-coach, research-analyst, repo-changer), so the
+# same guidance loads on demand in any mode and adds nothing to the plugin
+# graph. `standard` stays the default mode (agent-preset-registry default).
+# The old generator ~/.dsh/preset-work/keep/gen_presets.py is retired: it no
+# longer matches this profile and must not be re-applied.
+
+- id: ui-skin-maid-atelier
+  disabled: true
+- id: ui-skin-orca-link
+  disabled: false
+# --- end dsh-skin managed ---
+
+# ── dsh-mnemon: idle review under Agent Teams ────────────────────────
+# dsh-mnemon pauses idle review whenever the Agent Teams service and the
+# `spawn_teammate` tool are both installed (idleReviewBlockReason in
+# lib/index.js), because a review child that is itself team-capable is not
+# tool-isolated. `scoped` is the documented opt-in: the review child is
+# started through startGuardedChild, so its tools are wrapped by a
+# tools.guard() that denies delegation. Recall and writeback are unchanged;
+# this only re-enables the post-turn review pass.
+#
+# An id-targeted row REPLACES the bundle row's config, and every key the
+# bundle sets there equals the schema default, so only the nested idleReview
+# field needs restating (`idleReviewMs` remains the default 30000).
+- id: mnemon
+  config:
+    idleReview:
+      agentTeams: scoped
+- id: web
+  name: "@deepseek-ai/dsh-web"
+  config:
+    searchProvider: ddg
+    fetchProvider: fs-quality-fetch
+
+# --- dsh-skin managed (auto-generated; do not edit) ---
+- id: ui-skin-maid-atelier
+  disabled: true
+- id: ui-skin-orca-link
+  disabled: false
+# --- end dsh-skin managed ---

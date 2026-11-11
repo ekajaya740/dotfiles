@@ -8,6 +8,109 @@ section's notes — see [AGENTS.md](./AGENTS.md#releases).
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.11.0] - 2026-11-11
+
+### Added
+
+- **The `superagent-personal` instance is now synced.** It is the second dsh
+  instance this repo owns (`DSH_HOME=~/.dsh-superagent-personal`, profile
+  `superagent-personal`, port 3091). New: its home patch
+  (`dsh/.dsh-superagent-personal/cordis.patch.yml`, stowed with `--no-folding`),
+  its instance + hourly health-check units, and its profile seed. `install.sh
+  --profiles` now walks **two** DSH_HOMEs (`SEED_HOMES`) instead of assuming
+  `~/.dsh`; `--capture` pulls both back.
+- **Five first-party plugins are vendored** at `dsh/local-plugins/`
+  (`dsh-auto-archive`, `dsh-pwa`, `dsh-system-monitor`, `dsh-hevy-training`,
+  `dsh-open-access`). The `web` profile depends on them as relative
+  `link:../../../.dsh-local-plugins/<name>` deps, and a new
+  `install.sh --local-plugins` symlinks each into `~/.dsh-local-plugins/`. This
+  replaces five absolute `link:/home/<user>/...` deps that made the seed
+  unusable anywhere else.
+
+### Changed
+
+- **The `web` profile seed was re-captured from live** — it had drifted to 14
+  dependencies while the running profile has 29. The seed now carries the same
+  bundles in the same order, the same rows, and the arXiv row uses
+  `!!js process.env.HOME` instead of a hardcoded `/home/<user>` path.
+- **`dsh/plugins.txt` regenerated** from the live manifest: the media desk,
+  歸藏设计, Agentero, dsh-context, mnemon, skins, `@xmanrui/dsh-im` and
+  `billion-context` were all missing; `dsh-continual-evolve` and `dsh-taskboard`
+  were listed but no longer installed.
+- `scripts/validate.sh` now scans **both** seeded homes for host-specific paths,
+  and only **tracked** seeds (the untracked PROFILL mirror legitimately names its
+  workspace).
+- `dsh/.stow-local-ignore` adds `^/local-plugins(/|$)`, so the vendored sources
+  no longer also appear at `~/local-plugins/`.
+
+## [1.10.0] - 2026-11-05
+
+### Changed
+
+- **dsh 0.2.1-rc.5 → 0.2.2-rc.1**, and the same bump for both instances' plugin
+  sets: `dsh-better-sidebar` 0.28.2→0.30.1, `dsh-mnemon` →0.5.40,
+  `dsh-free-search` →0.9.31, `dsh-context` →0.81.2, `dsh-mcp-panel` →0.6.30,
+  `dsh-rewind-plugin` →0.20.0 (requires dsh `>=0.2.2-rc.1`), `dsh-update-checker`
+  →1.7.3, `@xmanrui/dsh-im` →5.10.0. `bootstrap.sh`'s `DSH_VERSION` pin moves
+  to the same version. Verified: both profiles compose to 225 rows with identical
+  row sets, and both instances boot with zero warnings on the new release.
+
+### Added
+
+- **`dsh/bin/dsh-backup-prune` plus `dsh-backup-prune.{service,timer}`** — the
+  upgrade backup `~/.dsh-upgrade-backup/<label>-<stamp>/` now expires on a
+  clock instead of on someone's memory: daily, anything whose name stamp is
+  older than `DSH_BACKUP_RETENTION_DAYS` (7) is removed. The age comes from the
+  name, not the mtime, so a `cp -a` restore does not reset the schedule; an
+  entry without a `YYYYMMDD-HHMMSS` stamp is reported and never auto-deleted;
+  the root must be named `*dsh-upgrade-backup`; `--dry-run` lists, deletes
+  nothing. Verified against a fixture (old kept, 7d and 8d removed, stray file
+  and unstamped dir untouched) before being pointed at the real backup.
+- **A tracked seed for the PROFILL profile** (`dsh/.dsh/profiles/profill/`:
+  `package.json`, `cordis.patch.yml`, `pnpm-workspace.yaml`), so a second
+  harness instance can be reproduced instead of rebuilt by hand. `link:`
+  dependencies are seeded as `<link-on-host>` placeholders and the PROFILL
+  paths as `<PROFILL-checkout>`, because both resolve on exactly one box —
+  the seed carries the shape, the host carries the absolute paths.
+- **A tailnet-only vhost template for the PROFILL instance**
+  (`dsh/etc/nginx/sites-available/dsh-profill.workofekajaya.com`), upstream
+  `127.0.0.1:3082`, own authority-bound cookie snippet, no `auth_basic`, no
+  public listener — the instance keeps its loopback bind and is reached only
+  from the tailnet, never through Tailscale Serve.
+- `dsh-profill.service` (untracked, machine-local) now starts dsh with
+  `--trusted-host dsh-profill.workofekajaya.com` and `--trusted-host
+  127.0.0.1:3082`, since the `/api` browser-trust fence answers 403 to an
+  unlisted Host before auth is checked.
+
+### Changed
+
+- **`dsh-web-cookie-refresh` mints per instance, not per authority in one
+  `DSH_HOME`.** Each entry now carries the credentials file that signs it, and
+  two new variables (`DSH_PROFILL_AUTHORITY`, `DSH_PROFILL_CREDS`) add the
+  PROFILL instance's snippet. A second instance has its own signing secret, so
+  reusing the main snippet there would only produce 401s.
+- `dsh/.config/dsh/web.env.example` documents those two variables.
+- **The PROFILL profile now matches the `web` profile's plugin setup** — same
+  bundles in the same order, same rows, same `patchReload: live` (previously
+  six bundles). Four rows stay different on purpose: the model catalog (no
+  `personal-chat`), `sandbox-policy.workspaceRoot`, `xmanrui-dsh-im.workspace`,
+  and the explicit `approval`/`permission` rows.
+- AGENTS.md's Multi-Profile section now separates *profiles* from *instances*
+  and records the parity rule plus its one-command check.
+- The Hevy MCP row defaults its key to the empty string, because an `undefined`
+  env value fails the row's schema and the row then never activates. Applied to
+  the `web` seed (`dsh/.dsh/profiles/web/cordis.patch.yml`) and to the PROFILL
+  profile; the live `~/.dsh/profiles/web` copy is untouched, since that profile
+  is owned elsewhere. A profile whose `env` EnvironmentFile lacks
+  `HEVY_API_KEY` hits the same failure — set it in `~/.config/dsh/env` (or
+  `env-profill`) to make the row live.
+
+### Fixed
+
+- Two `dsh` instances on different `DSH_HOME`s were silently divergent: the
+  home-level patch reaches only `~/.dsh`, so the GenOffice MCP row and the two
+  telemetry opt-outs are now restated in the PROFILL profile patch.
+
 ## [1.9.0] - 2026-10-31
 
 ### Removed

@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DSH · Offline</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #ffffff;
+    --fg: #0f1115;
+    --muted: #61666b;
+    --line: rgb(0 0 0 / 10%);
+    --card: #f6f6f7;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #151517;
+      --fg: #f9fafb;
+      --muted: #adb2b8;
+      --line: rgb(255 255 255 / 12%);
+      --card: #1c1c20;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: var(--bg);
+    color: var(--fg);
+    font: 400 15px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Montserrat, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  main {
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+  }
+  .glyph {
+    width: 56px;
+    height: 56px;
+    display: block;
+    margin: 0 auto 20px;
+    border-radius: 14px;
+    background: #0f1115;
+    display: grid;
+    place-items: center;
+  }
+  .glyph svg { width: 30px; height: 30px; display: block; }
+  h1 {
+    margin: 0 0 8px;
+    font-size: 19px;
+    line-height: 1.3;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  p {
+    margin: 0 0 20px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  button {
+    appearance: none;
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--fg);
+    font: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 9px 18px;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: opacity .15s ease, transform .15s ease;
+  }
+  button:hover { opacity: .82; }
+  button:active { transform: scale(.985); }
+  button[disabled] { opacity: .5; cursor: default; }
+  .status {
+    margin-top: 18px;
+    min-height: 20px;
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .status[data-tone="bad"] { color: #d93025; }
+</style>
+</head>
+<body>
+<main>
+  <div class="glyph">
+    <svg viewBox="0 0 50 50" fill="none" aria-hidden="true">
+      <path id="path" fill="#f9fafb" d="__DSH_PWA_GLYPH__" />
+    </svg>
+  </div>
+  <h1>You’re offline</h1>
+  <p>The harness runs on your machine, so it needs a connection to your DSH server to open a session. Nothing was lost — your conversation lives on the server.</p>
+  <button type="button" id="retry">Try again</button>
+  <div class="status" id="status" role="status" aria-live="polite"></div>
+</main>
+<script>
+  const status = document.getElementById('status')
+  const retry = document.getElementById('retry')
+  function report(tone, text) {
+    status.dataset.tone = tone
+    status.textContent = text
+  }
+  retry.addEventListener('click', () => {
+    retry.disabled = true
+    report('', 'Reconnecting…')
+    fetch(location.href, { method: 'GET', cache: 'reload' }).then((response) => {
+      if (response.ok) location.reload()
+      else report('bad', 'The server answered ' + response.status + '.')
+    }).catch(() => report('bad', 'Still offline.')).finally(() => { retry.disabled = false })
+  })
+  window.addEventListener('online', () => report('', 'Network is back — try again.'))
+  window.addEventListener('offline', () => report('bad', 'Still offline.'))
+  if (!navigator.onLine) report('bad', 'No network connection.')
+</script>
+</body>
+</html>

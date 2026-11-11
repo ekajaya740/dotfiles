@@ -1,0 +1,25 @@
+{
+  "name": "dsh-auto-archive",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Host-side scheduled auto-archive of idle DSH sessions",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "cordis.patch.yml",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  }
+}

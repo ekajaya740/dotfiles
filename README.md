@@ -46,7 +46,11 @@ top-level directory.
 - `pen/.pencil/models.json` -> `~/.pencil/models.json` (9router provider for Pen; stow with `--no-folding`)
 - `dsh/.dsh/cordis.patch.yml` -> `~/.dsh/cordis.patch.yml` (DeepSeek Harness home-level patch; stow with `--no-folding`)
 - `dsh/.config/systemd/user/`, `dsh/bin/dsh-web-cookie-refresh` -> `~/.config/systemd/user/`, `~/bin/` (web profile unit + daily cookie re-mint)
+- `dsh/.dsh-superagent-personal/cordis.patch.yml` -> `~/.dsh-superagent-personal/cordis.patch.yml` (second instance's home patch; stowed with `--no-folding`)
+- `dsh/.config/systemd/user/dsh-superagent-personal{, -check}.{service,timer}` -> `~/.config/systemd/user/` (superagent-personal instance, port 3091, + hourly health check)
 - `dsh/.dsh/profiles/{web,headless,tui}/` -> `~/.dsh/profiles/` (**seeded** by `dsh/install.sh --profiles`, not stowed — dsh rewrites these with `writeFileAtomic`, which would sever a symlink)
+- `dsh/.dsh-superagent-personal/profiles/superagent-personal/` -> the same path under `~/.dsh-superagent-personal/` (**seeded**, same reason)
+- `dsh/local-plugins/<name>/` -> `~/.dsh-local-plugins/<name>` (**linked** by `dsh/install.sh --local-plugins`, not stowed) — the five first-party plugins the `web` profile depends on as relative `link:` deps, so no seed needs an absolute path
 - `omarchy/.config/hypr/` -> `~/.config/hypr` (Hyprland/Omarchy; **Arch-only, stow by hand** — not in `STOW_PACKAGES`)
 
 `omp`, `pen`, `dsh` and `pi` share their target directory with app-managed state

@@ -1,0 +1,24 @@
+# dsh home-level patch for the PERSONAL superagent instance
+# ($DSH_HOME/cordis.patch.yml = ~/.dsh-superagent-personal/cordis.patch.yml).
+#
+# Mirrors the profill home patch: only the two request-extension egresses are
+# disabled, because both upload data about every request (the session log carries
+# message text) or the installed package inventory, and neither is wanted on an
+# unattended daemon.
+#
+# Deliberately NOT carried from ~/.dsh/cordis.patch.yml (the personal web home):
+#   - mcp-genoffice  (macOS-only path, /Applications/GenOffice.app)
+#   - ui-skin-* rows (skin-manager artifacts; this profile loads no skins)
+#   - llm-deepseek / agent-default-model comments (the profile layer sets them)
+#
+# `session-telemetry-otel` is env-only (DSH_TELEMETRY_DISABLED), not config.
+#
+# The document root is a list of patch rows, so it must stay a list.
+
+- id: session-log-deepseek
+  config:
+    enabled: false
+
+- id: plugin-package-inventory-deepseek
+  config:
+    enabled: false

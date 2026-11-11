@@ -16,6 +16,13 @@ plugins.txt
 # "\.dsh/profiles/" matches nothing. Verify with:
 #   stow -t "$(mktemp -d)" --simulate -v dsh 2>&1 >/dev/null | grep profiles
 ^/\.dsh/profiles(/|$)
+^/\.dsh-superagent-personal/profiles(/|$)
+
+# local-plugins/ is NOT stowed either: it is a source tree the profile manifest
+# reaches through a relative `link:` dep, and install.sh symlinks each plugin
+# into ~/.dsh-local-plugins/ (the path that dep resolves to). Without this rule
+# stow would plant a second copy at ~/local-plugins/ and the two could drift.
+^/local-plugins(/|$)
 
 # etc/ holds a root-owned install copy (the nginx vhost). It must not appear as
 # ~/etc/...; it is installed by hand with `sudo cp`.

@@ -1,0 +1,174 @@
+#!/usr/bin/env bash
+# dsh-backup-prune — delete dsh upgrade backups older than a retention window.
+#
+# Why this exists rather than a `cron`/`at` job: the upgrade backups hold the
+# previous release's profile manifests and lockfiles, so they must outlive the
+# window in which a rollback is still plausible, and then they must actually go
+# away — a rollback kit nobody deletes turns into years of stale copies of
+# ~/.dsh. One script + one timer keeps that promise visible instead of
+# depending on someone remembering.
+#
+# The unit names the directory, because this is driven by systemd:
+#
+#   Environment=DSH_BACKUP_DIR=%h/.dsh-upgrade-backup
+#   Environment=DSH_BACKUP_RETENTION_DAYS=7
+#
+# and it runs with --min-age-days 0 (the directory is already the upgrade one).
+# Run by hand, it defaults to that same directory and window.
+#
+# DRY RUN FIRST. The default is to delete; pass --dry-run to list instead.
+#
+#   ~/bin/dsh-backup-prune --dry-run
+#   ~/bin/dsh-backup-prune --older-than 30
+#
+# Safety rules, in order:
+#   * the target must be a directory literally named `.dsh-upgrade-backup`
+#     (or the explicit --dir), so a mistyped variable cannot point at $HOME;
+#   * only entries that are directories, whose names look like
+#     `<label>-YYYYMMDD-HHMMSS`, and whose name stamp is older than the window
+#     are considered — a stray directory or a file is left alone and reported;
+#   * the age comes from the NAME, not the mtime: a `cp -a` restore rewrites
+#     mtimes, and a backup must expire on the schedule it was created for;
+#   * each candidate is re-checked with `realpath` to be a direct child of the
+#     backup root before anything is removed.
+set -euo pipefail
+
+HOME_DIR="${HOME:?HOME is not set}"
+BACKUP_DIR="${DSH_BACKUP_DIR:-$HOME_DIR/.dsh-upgrade-backup}"
+RETENTION_DAYS="${DSH_BACKUP_RETENTION_DAYS:-7}"
+DRY_RUN=false
+VERBOSE=false
+NOW_EPOCH="${DSH_BACKUP_NOW_EPOCH:-$(date +%s)}"
+
+usage() {
+	cat <<'USAGE'
+dsh-backup-prune [-n] [-v] [--dir PATH] [--older-than DAYS]
+
+  -n, --dry-run        report what would be deleted, delete nothing
+  -v, --verbose        also list entries kept, and why
+      --dir PATH       backup root (default $DSH_BACKUP_DIR or ~/.dsh-upgrade-backup)
+      --older-than N   retention window in days (default $DSH_BACKUP_RETENTION_DAYS or 7)
+  -h, --help           this text
+
+Entries are matched by name (`<label>-YYYYMMDD-HHMMSS`), not mtime, so a copy
+that rewrote timestamps still expires on schedule.
+USAGE
+}
+
+while [ $# -gt 0 ]; do
+	case "$1" in
+	-n | --dry-run) DRY_RUN=true ;;
+	-v | --verbose) VERBOSE=true ;;
+	--dir)
+		[ $# -ge 2 ] || { echo "dsh-backup-prune: --dir needs a path" >&2; exit 2; }
+		BACKUP_DIR="$2"
+		shift
+		;;
+	--older-than)
+		[ $# -ge 2 ] || { echo "dsh-backup-prune: --older-than needs a number" >&2; exit 2; }
+		RETENTION_DAYS="$2"
+		shift
+		;;
+	-h | --help)
+		usage
+		exit 0
+		;;
+	*)
+		echo "dsh-backup-prune: unknown argument: $1" >&2
+		usage >&2
+		exit 2
+		;;
+	esac
+	shift
+done
+
+case "$RETENTION_DAYS" in
+'' | *[!0-9]*)
+	echo "dsh-backup-prune: retention must be a whole number of days, got: $RETENTION_DAYS" >&2
+	exit 2
+	;;
+esac
+
+# A root that is not an upgrade-backup directory only produces noise at best
+# and a surprise at worst, so refuse it before listing anything. `--dir` is for
+# testing the script itself; the unit points DSH_BACKUP_DIR at the real one.
+case "$(basename -- "${BACKUP_DIR%/}")" in
+*.dsh-upgrade-backup | dsh-upgrade-backup) ;;
+*)
+	echo "dsh-backup-prune: refusing $BACKUP_DIR: it is not named *dsh-upgrade-backup" >&2
+	echo "dsh-backup-prune: pass --dir only for a backup root you actually mean" >&2
+	exit 2
+	;;
+esac
+
+if [ ! -d "$BACKUP_DIR" ]; then
+	echo "dsh-backup-prune: no backup directory at $BACKUP_DIR; nothing to do"
+	exit 0
+fi
+
+# Resolve once, so the per-entry containment check compares like with like.
+ROOT="$(realpath -e -- "$BACKUP_DIR")"
+CUTOFF=$((NOW_EPOCH - RETENTION_DAYS * 86400))
+
+say() { printf '%s\n' "$*"; }
+note() { [ "$VERBOSE" = true ] && printf 'keep  %s\n' "$*" || true; }
+
+say "dsh-backup-prune: root=$ROOT retention=${RETENTION_DAYS}d now=$(date -u -d "@$NOW_EPOCH" +%Y-%m-%dT%H:%M:%SZ) dry_run=$DRY_RUN"
+
+removed=0
+kept=0
+skipped=0
+
+# Newest first is convenient in the log, but order does not matter for safety.
+for entry in "$ROOT"/*; do
+	[ -e "$entry" ] || continue
+	name="$(basename -- "$entry")"
+
+	if [ ! -d "$entry" ]; then
+		say "skip  $name (not a directory)"
+		skipped=$((skipped + 1))
+		continue
+	fi
+
+	# The stamp is mandatory: a name without one has no expiry date and is
+	# never deleted automatically, only reported.
+	# YYYYMMDD-HHMMSS, matched positively: 8 digits, a dash, 6 digits.
+	if [[ ! "$name" =~ ([0-9]{8}-[0-9]{6})$ ]]; then
+		say "skip  $name (no YYYYMMDD-HHMMSS stamp in the name)"
+		skipped=$((skipped + 1))
+		continue
+	fi
+	stamp="${BASH_REMATCH[1]}"
+
+	created="$(date -u -d "$(printf '%s' "$stamp" | cut -c1-8) $(printf '%s' "$stamp" | cut -c10-11):$(printf '%s' "$stamp" | cut -c12-13):$(printf '%s' "$stamp" | cut -c14-15)" +%s 2>/dev/null || true)"
+	if [ -z "$created" ]; then
+		say "skip  $name (stamp is not a valid date)"
+		skipped=$((skipped + 1))
+		continue
+	fi
+
+	age_days=$(((NOW_EPOCH - created) / 86400))
+	if [ "$created" -gt "$CUTOFF" ]; then
+		note "$name (age ${age_days}d, inside window)"
+		kept=$((kept + 1))
+		continue
+	fi
+
+	# Containment check: the resolved path must sit directly under the root.
+	resolved="$(realpath -e -- "$entry")"
+	if [ "$(dirname -- "$resolved")" != "$ROOT" ]; then
+		say "skip  $name (resolves to $resolved, outside $ROOT)"
+		skipped=$((skipped + 1))
+		continue
+	fi
+
+	if [ "$DRY_RUN" = true ]; then
+		say "would delete $name (age ${age_days}d)"
+	else
+		rm -rf -- "$resolved"
+		say "deleted $name (age ${age_days}d)"
+	fi
+	removed=$((removed + 1))
+done
+
+say "dsh-backup-prune: removed=$removed kept=$kept skipped=$skipped"

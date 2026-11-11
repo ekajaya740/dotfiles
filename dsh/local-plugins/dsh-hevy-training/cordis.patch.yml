@@ -1,0 +1,9 @@
+# dsh-hevy-training bundle patch.
+#
+# One row: the plugin itself. Its Config lives in the profile patch row so the
+# API key can stay in the host environment (`EnvironmentFile` in the systemd
+# unit) instead of this file — `apiKey` here is an override for setups that do
+# not have one.
+- insert:
+    - id: dsh-hevy-training
+      name: dsh-hevy-training
